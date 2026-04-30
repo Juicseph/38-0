@@ -635,41 +635,47 @@
       You do NOT need every column above, but these names are the easiest for this dashboard.
     */
 
-    const appsScriptCode = String.raw`function doGet() {
+    const appsScriptCode = String.raw`function doGet(e) {
   const sheetName = 'Recruits';
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
 
+  let payload;
+
   if (!sheet) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ error: 'Sheet not found: ' + sheetName }))
-      .setMimeType(ContentService.MimeType.JSON);
+    payload = { error: 'Sheet not found: ' + sheetName };
+  } else {
+    const values = sheet.getDataRange().getValues();
+
+    if (values.length < 2) {
+      payload = { recruits: [], updatedAt: new Date().toISOString() };
+    } else {
+      const headers = values[0].map(String);
+      const rows = values.slice(1);
+
+      const recruits = rows
+        .filter(row => row.some(cell => String(cell).trim() !== ''))
+        .map((row, index) => {
+          const obj = {};
+          headers.forEach((header, i) => {
+            obj[header] = row[i];
+          });
+          obj.id = obj.id || index + 1;
+          return obj;
+        });
+
+      payload = {
+        updatedAt: new Date().toISOString(),
+        recruits: recruits
+      };
+    }
   }
 
-  const values = sheet.getDataRange().getValues();
-  if (values.length < 2) {
+  if (e && e.parameter && e.parameter.callback) {
+    const callback = e.parameter.callback.replace(/[^a-zA-Z0-9_\.]/g, '');
     return ContentService
-      .createTextOutput(JSON.stringify({ recruits: [], updatedAt: new Date().toISOString() }))
-      .setMimeType(ContentService.MimeType.JSON);
+      .createTextOutput(callback + '(' + JSON.stringify(payload) + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
-
-  const headers = values[0].map(String);
-  const rows = values.slice(1);
-
-  const recruits = rows
-    .filter(row => row.some(cell => String(cell).trim() !== ''))
-    .map((row, index) => {
-      const obj = {};
-      headers.forEach((header, i) => {
-        obj[header] = row[i];
-      });
-      obj.id = obj.id || index + 1;
-      return obj;
-    });
-
-  const payload = {
-    updatedAt: new Date().toISOString(),
-    recruits: recruits
-  };
 
   return ContentService
     .createTextOutput(JSON.stringify(payload))
@@ -1025,11 +1031,10 @@
 
       try {
         updateStatus('Refreshing recruit data...', 'warn');
-        const response = await fetch(WEB_APP_URL + '?t=' + Date.now(), { cache: 'no-store' });
-        const data = await response.json();
+        const data = await fetchSheetData();
 
-        if (!response.ok || data.error) {
-          throw new Error(data.error || 'Could not load Google Sheet data.');
+        if (data.error) {
+          throw new Error(data.error);
         }
 
         state.recruits = (data.recruits || [])
@@ -1046,9 +1051,52 @@
       } catch (error) {
         console.error(error);
         updateStatus('Connection failed', 'error');
-        els.lastUpdated.textContent = error.message;
-        els.recruitList.innerHTML = '<div class="empty-state">Could not load data. Check your Apps Script deployment and sheet headers.</div>';
+        els.lastUpdated.textContent = error.message + ' Try opening the HTML from a hosted page instead of file://, or redeploy the Apps Script after adding the callback version.';
+        els.recruitList.innerHTML = '<div class="empty-state">Could not load data. Check Apps Script deployment, make sure the Recruits tab exists, and redeploy after updating the script below.</div>';
       }
+    }
+
+    async function fetchSheetData() {
+      try {
+        const response = await fetch(WEB_APP_URL + '?t=' + Date.now(), { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error('HTTP ' + response.status);
+        }
+        return await response.json();
+      } catch (fetchError) {
+        return await fetchSheetDataJsonp();
+      }
+    }
+
+    function fetchSheetDataJsonp() {
+      return new Promise((resolve, reject) => {
+        const callbackName = 'recruitSheetCallback_' + Date.now();
+        const script = document.createElement('script');
+        const cleanup = () => {
+          delete window[callbackName];
+          if (script.parentNode) script.parentNode.removeChild(script);
+        };
+
+        const timer = setTimeout(() => {
+          cleanup();
+          reject(new Error('Failed to fetch from Google Apps Script.'));
+        }, 12000);
+
+        window[callbackName] = (data) => {
+          clearTimeout(timer);
+          cleanup();
+          resolve(data);
+        };
+
+        script.onerror = () => {
+          clearTimeout(timer);
+          cleanup();
+          reject(new Error('Script load blocked.'));
+        };
+
+        script.src = WEB_APP_URL + '?callback=' + callbackName + '&t=' + Date.now();
+        document.body.appendChild(script);
+      });
     }
 
     function toggleScriptPanel() {
