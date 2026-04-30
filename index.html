@@ -889,7 +889,7 @@
       };
     }
 
-    function renderDetail(recruit) {
+    function renderDetail(recruit, recruitId) {
       const statHtml = (recruit.stats || []).map(([label, value]) => `
         <div class="mini">
           <div class="label">${label}</div>
@@ -914,6 +914,14 @@
         </div>
 
         <div class="detail-grid">${statHtml}</div>
+
+        <div class="section" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <h5>Quick Summary</h5>
+            <p style="margin:8px 0 0;">${recruit.summary || 'No summary added yet.'}</p>
+          </div>
+          <button class="btn secondary" id="editRecruitBtn" type="button">Edit Recruit</button>
+        </div>
 
         <div class="section">
           <h5>Quick Summary</h5>
@@ -969,20 +977,198 @@
     });
   
 
-    // ===== SIMPLE IMPORT + ADD RECRUIT FUNCTIONALITY =====
+    // ===== RECRUIT IMPORT + ADD + EDIT FUNCTIONALITY =====
 
     const importBtn = document.querySelector('.btn.secondary');
     const addBtn = document.querySelector('.btn:not(.secondary)');
 
-    // Create hidden file input
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = '.csv';
     fileInput.style.display = 'none';
     document.body.appendChild(fileInput);
 
-    importBtn.addEventListener('click', () => {
-      fileInput.click();
+    const modal = document.createElement('div');
+    modal.id = 'recruitModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(16,24,38,0.55);display:none;align-items:center;justify-content:center;padding:24px;z-index:9999;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+          <h3 id="modalTitle" style="margin:0;font-size:24px;">Add Recruit</h3>
+          <button id="closeRecruitModal" style="border:none;background:#eef2f7;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:700;">Close</button>
+        </div>
+        <form id="recruitForm" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
+          <input type="hidden" id="formRecruitId" />
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Full Name</label><input id="formName" required style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Class Year</label><input id="formClassYear" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Group</label><input id="formGroup" placeholder="Liberos, Middles, Setters, Pins..." style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Position</label><input id="formPosition" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">City</label><input id="formCity" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">State</label><input id="formState" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Club</label><input id="formClub" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Priority / Status</label><input id="formPriority" placeholder="Priority, Warm, Watch List..." style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Phone</label><input id="formPhone" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Email</label><input id="formEmail" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Profile Link</label><input id="formProfileLink" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Owner</label><input id="formOwner" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Rating</label><input id="formRating" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Wrote To Us</label><input id="formWroteToUs" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Height</label><input id="formHeight" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Graduation Year</label><input id="formGraduationYear" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q1</label><select id="formQ1" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2</label><select id="formQ2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3</label><select id="formQ3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4</label><select id="formQ4" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Tags</label><input id="formTags" placeholder="comma separated" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Summary</label><textarea id="formSummary" rows="3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes</label><textarea id="formNotes" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Evaluation</label><textarea id="formEvaluation" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Follow Up / Next Actions</label><textarea id="formFollowUp" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Academics</label><textarea id="formAcademics" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Visit Status</label><textarea id="formVisitStatus" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+            <button type="button" id="deleteRecruitBtn" style="display:none;border:none;background:#fee2e2;color:#991b1b;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:700;">Delete Recruit</button>
+            <button type="submit" style="border:none;background:#b5121b;color:white;padding:12px 18px;border-radius:12px;cursor:pointer;font-weight:700;">Save Recruit</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalTitle = document.getElementById('modalTitle');
+    const recruitForm = document.getElementById('recruitForm');
+    const closeRecruitModalBtn = document.getElementById('closeRecruitModal');
+    const deleteRecruitBtn = document.getElementById('deleteRecruitBtn');
+
+    const formEls = {
+      id: document.getElementById('formRecruitId'),
+      name: document.getElementById('formName'),
+      classYear: document.getElementById('formClassYear'),
+      group: document.getElementById('formGroup'),
+      position: document.getElementById('formPosition'),
+      city: document.getElementById('formCity'),
+      state: document.getElementById('formState'),
+      club: document.getElementById('formClub'),
+      priority: document.getElementById('formPriority'),
+      phone: document.getElementById('formPhone'),
+      email: document.getElementById('formEmail'),
+      profileLink: document.getElementById('formProfileLink'),
+      owner: document.getElementById('formOwner'),
+      rating: document.getElementById('formRating'),
+      wroteToUs: document.getElementById('formWroteToUs'),
+      height: document.getElementById('formHeight'),
+      graduationYear: document.getElementById('formGraduationYear'),
+      q1: document.getElementById('formQ1'),
+      q2: document.getElementById('formQ2'),
+      q3: document.getElementById('formQ3'),
+      q4: document.getElementById('formQ4'),
+      tags: document.getElementById('formTags'),
+      summary: document.getElementById('formSummary'),
+      notes: document.getElementById('formNotes'),
+      evaluation: document.getElementById('formEvaluation'),
+      followUp: document.getElementById('formFollowUp'),
+      academics: document.getElementById('formAcademics'),
+      visitStatus: document.getElementById('formVisitStatus')
+    };
+
+    function openRecruitModal(id = '') {
+      const recruit = id ? recruitDetails[id] : null;
+      modal.style.display = 'flex';
+      modalTitle.textContent = recruit ? 'Edit Recruit' : 'Add Recruit';
+      deleteRecruitBtn.style.display = recruit ? 'inline-flex' : 'none';
+
+      formEls.id.value = id || '';
+      formEls.name.value = recruit?.name || '';
+      formEls.classYear.value = recruit?.classYear || '';
+      formEls.group.value = recruit?.group || '';
+      formEls.position.value = recruit?.position || '';
+      formEls.city.value = recruit?.city || '';
+      formEls.state.value = recruit?.state || '';
+      formEls.club.value = recruit?.club || '';
+      formEls.priority.value = recruit?.priority || recruit?.status || '';
+      formEls.phone.value = recruit?.phone || '';
+      formEls.email.value = recruit?.email || '';
+      formEls.profileLink.value = recruit?.profileLink || '';
+      formEls.owner.value = recruit?.owner || '';
+      formEls.rating.value = recruit?.rating || '';
+      formEls.wroteToUs.value = recruit?.wroteToUs || '';
+      formEls.height.value = recruit?.height || '';
+      formEls.graduationYear.value = recruit?.graduationYear || recruit?.classYear || '';
+      formEls.q1.value = String(!!recruit?.q1);
+      formEls.q2.value = String(!!recruit?.q2);
+      formEls.q3.value = String(!!recruit?.q3);
+      formEls.q4.value = String(!!recruit?.q4);
+      formEls.tags.value = (recruit?.tags || []).join(', ');
+      formEls.summary.value = recruit?.summary || '';
+      formEls.notes.value = (recruit?.notes || []).join('; ');
+      formEls.evaluation.value = (recruit?.evaluation || []).join('; ');
+      formEls.followUp.value = recruit?.followUp || (recruit?.actions || []).join('; ');
+      formEls.academics.value = recruit?.academics || '';
+      formEls.visitStatus.value = recruit?.visitStatus || '';
+    }
+
+    function closeRecruitModal() {
+      modal.style.display = 'none';
+    }
+
+    closeRecruitModalBtn.addEventListener('click', closeRecruitModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeRecruitModal();
+    });
+
+    importBtn.addEventListener('click', () => fileInput.click());
+    addBtn.addEventListener('click', () => openRecruitModal());
+
+    recruitForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = formEls.id.value || String(Date.now());
+      const row = {
+        fullName: formEls.name.value,
+        classYear: formEls.classYear.value,
+        group: formEls.group.value,
+        position: formEls.position.value,
+        city: formEls.city.value,
+        state: formEls.state.value,
+        club: formEls.club.value,
+        priority: formEls.priority.value,
+        status: formEls.priority.value,
+        phone: formEls.phone.value,
+        email: formEls.email.value,
+        profileLink: formEls.profileLink.value,
+        owner: formEls.owner.value,
+        rating: formEls.rating.value,
+        wroteToUs: formEls.wroteToUs.value,
+        height: formEls.height.value,
+        graduationYear: formEls.graduationYear.value,
+        q1: formEls.q1.value,
+        q2: formEls.q2.value,
+        q3: formEls.q3.value,
+        q4: formEls.q4.value,
+        tags: formEls.tags.value,
+        summary: formEls.summary.value,
+        notes: formEls.notes.value,
+        evaluation: formEls.evaluation.value,
+        followUp: formEls.followUp.value,
+        academics: formEls.academics.value,
+        visitStatus: formEls.visitStatus.value
+      };
+
+      recruitDetails[id] = buildRecruitFromRow(row);
+      recruitDetails[id].height = formEls.height.value;
+      recruitDetails[id].graduationYear = formEls.graduationYear.value;
+      rebuildRecruitList(id);
+      closeRecruitModal();
+    });
+
+    deleteRecruitBtn.addEventListener('click', () => {
+      const id = formEls.id.value;
+      if (!id) return;
+      const confirmed = window.confirm('Delete this recruit?');
+      if (!confirmed) return;
+      delete recruitDetails[id];
+      closeRecruitModal();
+      const firstId = Object.keys(recruitDetails)[0] || '';
+      rebuildRecruitList(firstId);
     });
 
     fileInput.addEventListener('change', (e) => {
@@ -998,7 +1184,10 @@
 ');
         const lines = text.split('
 ').filter(line => line.trim() !== '');
-        if (lines.length < 2) return;
+        if (lines.length < 2) {
+          alert('This file does not have enough rows to import.');
+          return;
+        }
 
         const headers = parseCsvLine(lines[0]);
         const importedIds = [];
@@ -1010,46 +1199,26 @@
             row[header] = values[index] || '';
           });
 
-          if (!row.fullName && !row.name) continue;
+          if (!row.fullName && !row.name && !row.recruitName) continue;
 
           const id = String(Date.now() + i);
           recruitDetails[id] = buildRecruitFromRow(row);
+          recruitDetails[id].height = row.height || '';
+          recruitDetails[id].graduationYear = row.graduationYear || row.classYear || '';
           importedIds.push(id);
         }
 
+        if (!importedIds.length) {
+          alert('No recruits were imported. Make sure your CSV has a fullName column.');
+          return;
+        }
+
         rebuildRecruitList(importedIds[0]);
+        alert(`Imported ${importedIds.length} recruits.`);
       };
 
       reader.readAsText(file);
       fileInput.value = '';
-    });
-
-    addBtn.addEventListener('click', () => {
-      const name = prompt('Recruit name?');
-      if (!name) return;
-
-      const classYear = prompt('Class year?') || '';
-      const position = prompt('Position?') || '';
-      const club = prompt('Club?') || '';
-      const phone = prompt('Phone?') || '';
-      const email = prompt('Email?') || '';
-      const notes = prompt('Notes? Separate multiple with commas.') || '';
-
-      const id = String(Date.now());
-
-      recruitDetails[id] = buildRecruitFromRow({
-        fullName: name,
-        classYear,
-        position,
-        club,
-        phone,
-        email,
-        notes,
-        priority: 'New Recruit',
-        status: 'New Recruit'
-      });
-
-      rebuildRecruitList(id);
     });
 
     function getAllRecruits() {
@@ -1071,8 +1240,8 @@
           recruit.position,
           recruit.group,
           recruit.summary,
-          recruit.notes.join(' '),
-          recruit.tags.join(' '),
+          (recruit.notes || []).join(' '),
+          (recruit.tags || []).join(' '),
           recruit.email,
           recruit.phone
         ].join(' ').toLowerCase().includes(searchTerm);
@@ -1102,13 +1271,21 @@
       cards = document.querySelectorAll('.recruit-card');
       attachCardListeners();
 
-      const selectedRecruit = recruitDetails[activeId] || recruits[0];
+      const selectedRecruit = recruitDetails[activeId] || (recruits[0] ? recruitDetails[recruits[0].id] : null);
       if (selectedRecruit) {
-        renderDetail(selectedRecruit);
+        renderDetail(selectedRecruit, activeId || recruits[0]?.id);
+        setTimeout(() => {
+          const editBtn = document.getElementById('editRecruitBtn');
+          if (editBtn) {
+            editBtn.onclick = () => openRecruitModal(String(activeId || recruits[0]?.id || ''));
+          }
+        }, 0);
         if (!document.querySelector('.recruit-card.active') && recruits[0]) {
           const firstCard = document.querySelector(`.recruit-card[data-id="${recruits[0].id}"]`);
           if (firstCard) firstCard.classList.add('active');
         }
+      } else {
+        detailPanel.innerHTML = '<div class="section"><h5>No Recruit Selected</h5><p>Import a sheet or add a recruit to get started.</p></div>';
       }
     }
 
@@ -1118,7 +1295,13 @@
         card.onclick = () => {
           cards.forEach(c => c.classList.remove('active'));
           card.classList.add('active');
-          renderDetail(recruitDetails[card.dataset.id]);
+          renderDetail(recruitDetails[card.dataset.id], card.dataset.id);
+          setTimeout(() => {
+            const editBtn = document.getElementById('editRecruitBtn');
+            if (editBtn) {
+              editBtn.onclick = () => openRecruitModal(String(card.dataset.id));
+            }
+          }, 0);
         };
       });
     }
