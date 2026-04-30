@@ -767,6 +767,121 @@
         renderDetail(recruitDetails[card.dataset.id]);
       });
     });
-  </script>
+  
+
+    // ===== SIMPLE IMPORT + ADD RECRUIT FUNCTIONALITY =====
+
+    const importBtn = document.querySelector('.btn.secondary');
+    const addBtn = document.querySelector('.btn:not(.secondary)');
+
+    // Create hidden file input
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+    importBtn.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const text = event.target.result;
+        const rows = text.split('\n').map(r => r.split(','));
+        rows.shift(); // remove header
+
+        const newCards = rows.map((row, i) => {
+          const id = Date.now() + i;
+          const name = row[0] || 'Unknown';
+          const position = row[3] || '';
+          const location = row[4] || '';
+
+          recruitDetails[id] = {
+            name: name,
+            subtitle: `${row[1] || ''} • ${position} • ${location}`,
+            status: 'Imported',
+            chips: ['Imported from sheet'],
+            stats: [
+              ['Phone', row[6] || ''],
+              ['Email', row[7] || '']
+            ],
+            summary: 'Imported recruit.',
+            notes: [],
+            evaluation: [],
+            actions: []
+          };
+
+          return `
+            <div class="recruit-card" data-id="${id}">
+              <div class="recruit-top">
+                <div>
+                  <div class="recruit-name">${name}</div>
+                  <div class="recruit-meta">${row[1] || ''} • ${position} • ${location}</div>
+                </div>
+                <div class="badge">New</div>
+              </div>
+            </div>
+          `;
+        });
+
+        document.getElementById('recruitList').innerHTML += newCards.join('');
+
+        attachCardListeners();
+      };
+
+      reader.readAsText(file);
+    });
+
+    addBtn.addEventListener('click', () => {
+      const name = prompt('Recruit name?');
+      if (!name) return;
+
+      const id = Date.now();
+
+      recruitDetails[id] = {
+        name: name,
+        subtitle: 'New recruit',
+        status: 'New',
+        chips: [],
+        stats: [],
+        summary: '',
+        notes: [],
+        evaluation: [],
+        actions: []
+      };
+
+      const card = `
+        <div class="recruit-card" data-id="${id}">
+          <div class="recruit-top">
+            <div>
+              <div class="recruit-name">${name}</div>
+              <div class="recruit-meta">New Recruit</div>
+            </div>
+            <div class="badge">New</div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('recruitList').innerHTML += card;
+      attachCardListeners();
+    });
+
+    function attachCardListeners() {
+      const cards = document.querySelectorAll('.recruit-card');
+      cards.forEach(card => {
+        card.onclick = () => {
+          cards.forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          renderDetail(recruitDetails[card.dataset.id]);
+        };
+      });
+    }
+
+</script>
 </body>
 </html>
