@@ -1,26 +1,30 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Recruit Dashboard Prototype</title>
+  <title>Fresno State Recruit Dashboard</title>
   <style>
     :root {
-      --bg: #f5f7fb;
+      --bg: #f4f7fb;
       --panel: #ffffff;
-      --line: #d9e0ea;
-      --text: #18212f;
-      --muted: #5d6b82;
-      --accent: #b5121b;
-      --accent-soft: #fdecef;
-      --good: #1d7a46;
+      --line: #d7deea;
+      --text: #10213a;
+      --muted: #5f7088;
+      --navy: #002D62;
+      --red: #C41230;
+      --red-soft: #fff1f4;
+      --gold: #d4af37;
+      --good: #18794e;
       --warn: #9a6700;
-      --shadow: 0 8px 24px rgba(18, 32, 56, 0.08);
+      --shadow: 0 10px 30px rgba(16, 33, 58, 0.08);
       --radius: 18px;
+      --sidebar-width: 330px;
+      --sidebar-collapsed-width: 88px;
     }
 
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
@@ -30,17 +34,38 @@
 
     .app {
       display: grid;
-      grid-template-columns: 330px 1fr;
+      grid-template-columns: var(--sidebar-width) 1fr;
       min-height: 100vh;
+      transition: grid-template-columns .2s ease;
     }
 
+    .app.sidebar-collapsed { grid-template-columns: var(--sidebar-collapsed-width) 1fr; }
+
     .sidebar {
-      background: #101826;
+      background: var(--navy);
       color: white;
-      padding: 24px 20px;
+      padding: 20px 16px 24px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .sidebar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-toggle {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
     }
 
     .brand h1 {
@@ -51,35 +76,46 @@
 
     .brand p {
       margin: 8px 0 0;
-      color: #b7c3d6;
+      color: #c2d0e4;
       font-size: 14px;
+      line-height: 1.45;
     }
 
-    .nav-box,
-    .summary-box {
+    
+    .sidebar-box-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      margin-bottom:10px;
+    }
+    .sidebar-box-header h3 { margin:0; }
+    .sidebar-box-toggle {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: white;
+      border-radius: 10px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .sidebar-box.collapsed .sidebar-box-body { display:none; }
+    .pin-btn { opacity:.45; }
+    .pin-btn.pin-on { opacity:1; }
+
+    .sidebar-box {
       background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.10);
       border-radius: 16px;
-      padding: 16px;
+      padding: 14px;
     }
 
-    .nav-box h3,
-    .summary-box h3 {
+    .sidebar-box h3 {
       margin: 0 0 12px;
       font-size: 15px;
-      color: #eef3fb;
+      color: #f1f5fb;
     }
-
-    .nav-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      font-size: 14px;
-      color: #d9e3f2;
-    }
-
-    .nav-item:last-child { border-bottom: none; }
 
     .summary-stat {
       display: grid;
@@ -95,7 +131,7 @@
 
     .stat-card .label {
       font-size: 12px;
-      color: #bdc8d9;
+      color: #c5d1e2;
       margin-bottom: 6px;
     }
 
@@ -104,10 +140,49 @@
       font-weight: 700;
     }
 
+    .sidebar-actions,
+    .filter-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .sidebar-action-btn,
+    .filter-btn {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      border-radius: 12px;
+      padding: 11px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-btn.active,
+    .sidebar-action-btn.active {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .filter-count {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 4px 8px;
+      min-width: 28px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .main {
       padding: 24px;
       display: grid;
-      grid-template-rows: auto auto 1fr;
+      grid-template-rows: auto auto auto auto 1fr;
       gap: 20px;
     }
 
@@ -136,15 +211,11 @@
       flex-wrap: wrap;
     }
 
-    button,
-    select,
-    input {
-      font: inherit;
-    }
+    button, select, input, textarea { font: inherit; }
 
     .btn {
       border: none;
-      background: var(--accent);
+      background: var(--red);
       color: white;
       padding: 11px 16px;
       border-radius: 12px;
@@ -158,6 +229,168 @@
       border: 1px solid var(--line);
     }
 
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .hero-countdown {
+      position: relative;
+      background: linear-gradient(135deg, var(--navy), #143f7b 55%, var(--red));
+      color: white;
+      border-radius: 24px;
+      padding: 22px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(0,45,98,0.22);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .hero-countdown::after {
+      content: "";
+      position: absolute;
+      inset: -80px auto auto -80px;
+      width: 200px;
+      height: 200px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 50%;
+      filter: blur(10px);
+      animation: floatGlow 5s ease-in-out infinite;
+    }
+
+    @keyframes floatGlow {
+      0%,100% { transform: translateY(0); opacity: .55; }
+      50% { transform: translateY(18px); opacity: .9; }
+    }
+
+    .pulse-banner {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      animation: pulseBanner 1.8s infinite;
+    }
+
+    @keyframes pulseBanner {
+      0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.22); }
+      70% { box-shadow: 0 0 0 16px rgba(255,255,255,0); }
+      100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    }
+
+    .countdown-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(80px, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .countdown-box {
+      background: rgba(255,255,255,0.11);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 18px;
+      padding: 14px 12px;
+      text-align: center;
+      backdrop-filter: blur(4px);
+    }
+
+    .countdown-value {
+      font-size: 34px;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+      transition: transform .2s ease;
+    }
+
+    .countdown-box.bump .countdown-value { transform: scale(1.08); }
+
+    .countdown-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      opacity: .86;
+    }
+
+    .progress-wrap { margin-top: 18px; }
+    .progress-bar {
+      height: 12px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffffff, #ffd2da 55%, #ff8aa0);
+      border-radius: 999px;
+      transition: width .8s ease;
+    }
+
+    .countdown-meta {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.88);
+      flex-wrap: wrap;
+    }
+
+    
+    .hero-countdown.collapsed #countdownContent { display:none; }
+    .hero-countdown.collapsed { padding-bottom: 18px; }
+
+    .scheduled-call-visual {
+      margin-top: 8px;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fff2f4, #ffe2e8);
+      border: 1px solid #f3bcc8;
+      color: var(--red);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .scheduled-call-top {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      opacity: 0.9;
+    }
+
+    .scheduled-call-time {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .scheduled-call-origin {
+      font-size: 11px;
+      color: #8a3042;
+      font-weight: 600;
+    }
+
+    .scheduled-call {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:6px;
+      font-size:12px;
+      color: var(--red);
+      font-weight:700;
+      background: var(--red-soft);
+      border-radius:999px;
+      padding:4px 8px;
+    }
+
     .controls {
       background: var(--panel);
       border: 1px solid var(--line);
@@ -165,7 +398,7 @@
       box-shadow: var(--shadow);
       padding: 16px;
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr 1fr;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
       gap: 12px;
     }
 
@@ -183,17 +416,121 @@
       letter-spacing: 0.04em;
     }
 
-    .control input,
-    .control select {
+    .control input, .control select {
       border: 1px solid var(--line);
       border-radius: 12px;
       padding: 12px 14px;
       background: white;
     }
 
+
+    .call-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eef4ff;
+      border: 1px solid #c9d8f5;
+      color: #18407c;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.2;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .call-chip .call-label {
+      color: #5c7091;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      font-size: 10px;
+    }
+
+    .call-chip .call-time {
+      color: #18407c;
+      font-weight: 800;
+    }
+
+    .call-chip .call-zone {
+      color: #6b7f9f;
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    .sidebar-box.collapsible-box {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .collapse-header {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #f1f5fb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .collapse-header:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .collapse-chevron {
+      transition: transform .18s ease;
+      opacity: .9;
+      font-size: 14px;
+    }
+
+    .collapsible-box.collapsed .collapse-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .collapse-body {
+      padding: 0 14px 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .collapsible-box.collapsed .collapse-body {
+      display: none;
+    }
+
+    .bulk-bar {
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .bulk-bar.active { display: flex; }
+
+    .bulk-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
     .content {
       display: grid;
-      grid-template-columns: 1.2fr 0.9fr;
+      grid-template-columns: 1.25fr 0.95fr;
       gap: 20px;
       min-height: 0;
     }
@@ -226,31 +563,83 @@
       padding: 18px;
       display: grid;
       gap: 14px;
-      max-height: calc(100vh - 250px);
+      max-height: calc(100vh - 410px);
       overflow: auto;
     }
 
     .recruit-card {
       border: 1px solid var(--line);
+      border-left: 6px solid #d7deea;
       border-radius: 16px;
-      padding: 16px;
+      padding: 14px 14px 14px 12px;
       background: #fff;
       cursor: pointer;
-      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
     }
 
     .recruit-card:hover,
     .recruit-card.active {
       transform: translateY(-2px);
-      border-color: #c7a4a6;
-      box-shadow: 0 10px 24px rgba(181, 18, 27, 0.08);
+      border-color: #d8aab4;
+      box-shadow: 0 10px 24px rgba(196,18,48,0.08);
     }
 
-    .recruit-top {
+    .card-color-priority { border-left-color: var(--red); }
+    .card-color-warm { border-left-color: #f0ad1b; }
+    .card-color-watch { border-left-color: #1b7f57; }
+    .card-color-default { border-left-color: #9db1c8; }
+
+    .recruit-card-topline {
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
       gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .card-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .card-check {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+
+    .card-thumb,
+    .card-thumb-placeholder {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      flex: 0 0 auto;
+    }
+
+    .card-thumb {
+      object-fit: cover;
+      border: 1px solid var(--line);
+    }
+
+    .card-thumb-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef2f7;
+      border: 1px solid var(--line);
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    .recruit-name-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .recruit-name {
@@ -259,9 +648,22 @@
       margin-bottom: 4px;
     }
 
+    .star-btn, .pin-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .star-on { color: var(--gold); }
+    .pin-on { color: var(--red); }
+
     .recruit-meta {
       color: var(--muted);
       font-size: 13px;
+      line-height: 1.45;
     }
 
     .badge {
@@ -278,12 +680,13 @@
     .badge.priority { background: #fff2f2; color: #9f1c1c; }
     .badge.warm { background: #fff7e8; color: var(--warn); }
     .badge.good { background: #ebfff3; color: var(--good); }
+    .badge.neutral { background: #eef2f7; color: #475569; }
 
     .tag-row {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      margin-top: 14px;
+      margin-top: 10px;
     }
 
     .tag {
@@ -304,7 +707,7 @@
     .detail-scroll {
       padding: 18px;
       overflow: auto;
-      max-height: calc(100vh - 250px);
+      max-height: calc(100vh - 410px);
       display: grid;
       gap: 16px;
     }
@@ -319,14 +722,14 @@
     .hero-top {
       display:flex;
       align-items:center;
-      gap:16px;
+      gap:14px;
       flex-wrap:wrap;
     }
 
     .headshot {
-      width:84px;
-      height:84px;
-      border-radius:18px;
+      width:56px;
+      height:56px;
+      border-radius:14px;
       object-fit:cover;
       background:#eef2f7;
       border:1px solid #d9e0ea;
@@ -334,15 +737,15 @@
     }
 
     .headshot-placeholder {
-      width:84px;
-      height:84px;
-      border-radius:18px;
+      width:56px;
+      height:56px;
+      border-radius:14px;
       background:#eef2f7;
       border:1px solid #d9e0ea;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:28px;
+      font-size:20px;
       font-weight:800;
       color:#64748b;
     }
@@ -355,6 +758,13 @@
     .hero p {
       margin: 6px 0 0;
       color: var(--muted);
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
     }
 
     .detail-grid {
@@ -382,6 +792,7 @@
     .mini .value {
       font-size: 15px;
       font-weight: 700;
+      line-height: 1.4;
     }
 
     .section {
@@ -408,69 +819,172 @@
       padding-left: 18px;
     }
 
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-item {
+      border-left: 3px solid #d7deea;
+      padding-left: 10px;
+    }
+
+    .timeline-date {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .modal-field {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d9e0ea;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .compact-mode .recruit-list { gap: 10px; }
+    .compact-mode .recruit-card { padding: 10px 10px 10px 8px; }
+    .compact-mode .recruit-name { font-size: 16px; }
+    .compact-mode .tag { padding: 4px 8px; font-size: 11px; }
+    .compact-mode .card-thumb,
+    .compact-mode .card-thumb-placeholder { width: 34px; height: 34px; border-radius: 10px; }
+
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 16px;
+      top: -20px;
+      opacity: 0.9;
+      z-index: 9999;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 1;
+      }
+    }
+
+    .app.sidebar-collapsed .brand p,
+    .app.sidebar-collapsed .sidebar-box h3,
+    .app.sidebar-collapsed .sidebar-box .summary-stat,
+    .app.sidebar-collapsed .sidebar-box .filter-section,
+    .app.sidebar-collapsed .sidebar-actions .sidebar-action-btn span,
+    .app.sidebar-collapsed .sidebar-home-text {
+      display: none;
+    }
+
+    .app.sidebar-collapsed .sidebar {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .app.sidebar-collapsed .brand h1 { font-size: 16px; }
+    .app.sidebar-collapsed .sidebar-box { padding: 10px; }
+    .app.sidebar-collapsed .sidebar-action-btn { text-align: center; padding: 10px; }
+
     @media (max-width: 1100px) {
-      .app,
-      .content {
-        grid-template-columns: 1fr;
-      }
+      .app, .content { grid-template-columns: 1fr; }
+      .app.sidebar-collapsed { grid-template-columns: 1fr; }
+      
+    .hero-countdown.collapsed #countdownContent { display:none; }
+    .hero-countdown.collapsed { padding-bottom: 18px; }
 
-      .controls {
-        grid-template-columns: 1fr 1fr;
-      }
+    .scheduled-call-visual {
+      margin-top: 8px;
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #fff2f4, #ffe2e8);
+      border: 1px solid #f3bcc8;
+      color: var(--red);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
 
-      .sidebar {
-        min-height: auto;
-      }
+    .scheduled-call-top {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      opacity: 0.9;
+    }
+
+    .scheduled-call-time {
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .scheduled-call-origin {
+      font-size: 11px;
+      color: #8a3042;
+      font-weight: 600;
+    }
+
+    .scheduled-call {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:6px;
+      font-size:12px;
+      color: var(--red);
+      font-weight:700;
+      background: var(--red-soft);
+      border-radius:999px;
+      padding:4px 8px;
+    }
+
+    .controls { grid-template-columns: 1fr 1fr; }
+      .sidebar { min-height: auto; }
     }
 
     @media (max-width: 700px) {
       .main { padding: 16px; }
       .controls,
-      .detail-grid {
+      .detail-grid,
+      .summary-stat,
+      .countdown-grid {
         grid-template-columns: 1fr;
       }
+      .content { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
-  <div class="app">
+  <div class="app" id="appShell">
     <aside class="sidebar">
-      <div class="brand">
-        <h1>Recruit Board</h1>
-        <p>Organize, filter, and review athlete profiles in one place.</p>
-      </div>
-
-      <div class="summary-box">
-        <h3>Class Snapshot</h3>
-        <div class="summary-stat">
-          <div class="stat-card">
-            <div class="label">Total Recruits</div>
-            <div class="value">48</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Priority</div>
-            <div class="value">12</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Uncommitted</div>
-            <div class="value">31</div>
-          </div>
-          <div class="stat-card">
-            <div class="label">Need Follow-Up</div>
-            <div class="value">9</div>
-          </div>
+      <div class="sidebar-top">
+        <div class="brand">
+          <h1>Recruit Board</h1>
+          <p>Organize, filter, and review athlete profiles in one place.</p>
         </div>
+        <button class="sidebar-toggle" id="sidebarToggle" type="button">☰</button>
       </div>
 
-      <div class="nav-box">
-        <h3>Quick Views</h3>
-        <div class="nav-item"><span>2027 Class</span><strong>22</strong></div>
-        <div class="nav-item"><span>Middle Blockers</span><strong>8</strong></div>
-        <div class="nav-item"><span>Setters</span><strong>6</strong></div>
-        <div class="nav-item"><span>California Recruits</span><strong>15</strong></div>
-        <div class="nav-item"><span>Visited Campus</span><strong>11</strong></div>
-        <div class="nav-item"><span>High Academic Fit</span><strong>18</strong></div>
+      <div class="sidebar-actions">
+        <button class="sidebar-action-btn" id="showAllBtn" type="button"><span class="sidebar-home-text">Show All Recruits</span></button>
+        <button class="sidebar-action-btn" id="resetFiltersBtn" type="button"><span>Reset Filters</span></button>
       </div>
+
+      <div class="sidebar-box" data-box-key="snapshot">
+        <div class="sidebar-box-header"><h3>Class Snapshot</h3><button class="sidebar-box-toggle" type="button">−</button></div>
+        <div class="sidebar-box-body"><div class="summary-stat">
+          <div class="stat-card"><div class="label">Total Recruits</div><div class="value" id="totalRecruitsStat">0</div></div>
+          <div class="stat-card"><div class="label">Priority</div><div class="value" id="priorityStat">0</div></div>
+          <div class="stat-card"><div class="label">Q1 Complete</div><div class="value" id="q1Stat">0</div></div>
+          <div class="stat-card"><div class="label">Need Follow-Up</div><div class="value" id="followUpStat">0</div></div>
+        </div></div>
+      </div>
+
+      <div class="sidebar-box" data-box-key="quickViews"><div class="sidebar-box-header"><h3>Quick Views</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="quickViewsSection"></div></div></div>
+      <div class="sidebar-box" data-box-key="priority"><div class="sidebar-box-header"><h3>Priority</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="prioritySection"></div></div></div>
+      <div class="sidebar-box" data-box-key="june15Call"><div class="sidebar-box-header"><h3>June 15 Call</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="ownerSection"></div></div></div>
+      <div class="sidebar-box" data-box-key="classFilters"><div class="sidebar-box-header"><h3>Class Filters</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="classFilterSection"></div></div></div>
+      <div class="sidebar-box" data-box-key="statusShortcuts"><div class="sidebar-box-header"><h3>Status Shortcuts</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="statusShortcutSection"></div></div></div>
     </aside>
 
     <main class="main">
@@ -480,19 +994,39 @@
           <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
         </div>
         <div class="actions">
-          <button class="btn secondary">Import Sheet</button>
-          <button class="btn">Add Recruit</button>
+          <button class="btn secondary" id="importBtn">Import Sheet</button>
+          <button class="btn secondary" id="exportBtn">Export Filtered</button>
+          <button class="btn secondary" id="compactBtn">Compact Mode</button>
+          <button class="btn" id="addBtn">Add Recruit</button>
+        </div>
         </div>
       </div>
 
-      <section class="panel" style="padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
-        <div>
-          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Important Date</div>
-          <div style="font-size:24px;font-weight:800;margin-top:4px;">June 15 Contact Day</div>
+      <section class="hero-countdown" id="countdownSection">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div class="pulse-banner">June 15 Contact Day</div>
+            <div style="margin-top:12px;font-size:24px;font-weight:800;">Countdown to June 15, 2026</div>
+            <div style="margin-top:6px;font-size:14px;opacity:.92;">The biggest recruiting day on the board.</div>
+          </div>
+          <button class="btn secondary" id="countdownToggleBtn" type="button">Collapse Countdown</button>
         </div>
-        <div style="text-align:right;">
-          <div id="countdownDays" style="font-size:34px;font-weight:800;color:var(--accent);line-height:1;">--</div>
-          <div id="countdownLabel" style="font-size:13px;color:var(--muted);margin-top:4px;">days until June 15</div>
+
+        <div id="countdownContent">
+        <div class="countdown-grid">
+          <div class="countdown-box" id="boxDays"><div class="countdown-value" id="daysValue">--</div><div class="countdown-label">Days</div></div>
+          <div class="countdown-box" id="boxHours"><div class="countdown-value" id="hoursValue">--</div><div class="countdown-label">Hours</div></div>
+          <div class="countdown-box" id="boxMinutes"><div class="countdown-value" id="minutesValue">--</div><div class="countdown-label">Minutes</div></div>
+          <div class="countdown-box" id="boxSeconds"><div class="countdown-value" id="secondsValue">--</div><div class="countdown-label">Seconds</div></div>
+        </div>
+
+        <div class="progress-wrap">
+          <div class="progress-bar"><div class="progress-fill" id="countdownProgress"></div></div>
+          <div class="countdown-meta">
+            <span id="progressText">Loading countdown progress…</span>
+            <span id="countdownStatus">June 15, 2026</span>
+          </div>
+        </div>
         </div>
       </section>
 
@@ -503,33 +1037,51 @@
         </div>
         <div class="control">
           <label for="classYear">Class</label>
-          <select id="classYear">
-            <option>All Classes</option>
-            <option>2026</option>
-            <option selected>2027</option>
-            <option>2028</option>
-          </select>
+          <select id="classYear"><option value="">All Classes</option></select>
         </div>
         <div class="control">
           <label for="position">Position</label>
-          <select id="position">
-            <option>All Positions</option>
-            <option>Setter</option>
-            <option>Libero</option>
-            <option>Outside</option>
-            <option>Middle</option>
-            <option>Opposite</option>
-          </select>
+          <select id="position"><option value="">All Positions</option></select>
         </div>
         <div class="control">
           <label for="status">Recruit Status</label>
-          <select id="status">
-            <option>All Statuses</option>
-            <option>Priority</option>
-            <option>Warm</option>
-            <option>Watch List</option>
-            <option>Committed Elsewhere</option>
+          <select id="status"><option value="">All Statuses</option></select>
+        </div>
+        <div class="control">
+          <label for="sortBy">Sort By</label>
+          <select id="sortBy">
+            <option value="pinned">Pinned / Favorites</option>
+            <option value="rating">Rating</option>
+            <option value="classYear">Class</option>
+            <option value="position">Position</option>
+            <option value="june15Call">June 15 Call</option>
+            <option value="recentlyUpdated">Recently Updated</option>
+            <option value="nextActionDue">Next Action Due</option>
+            <option value="lastContactDate">Last Contact</option>
+            <option value="name">Name</option>
           </select>
+        </div>
+      </section>
+
+      <section class="bulk-bar" id="bulkBar">
+        <div><strong id="bulkCountText">0 selected</strong></div>
+        <div class="bulk-actions">
+          <select id="bulkPrioritySelect">
+            <option value="">Set Priority</option>
+            <option value="Priority">Priority</option>
+            <option value="Warm">Warm</option>
+            <option value="Watch List">Watch List</option>
+          </select>
+          <select id="bulkJune15CallSelect">
+            <option value="">Set June 15 Call</option>
+            <option value="Leisa">Leisa</option>
+            <option value="Jerome">Jerome</option>
+            <option value="Orlando">Orlando</option>
+            <option value="Kelsey">Kelsey</option>
+          </select>
+          <button class="btn secondary" id="bulkFavoriteBtn" type="button">Toggle Favorite</button>
+          <button class="btn secondary" id="bulkDeleteBtn" type="button">Delete Selected</button>
+          <button class="btn ghost" id="bulkClearBtn" type="button">Clear Selection</button>
         </div>
       </section>
 
@@ -537,54 +1089,9 @@
         <div class="panel">
           <div class="panel-header">
             <h3>Recruit List</h3>
-            <p>Click a card to view the full profile.</p>
+            <p id="recruitListCount">Click a card to view the full profile.</p>
           </div>
-          <div class="recruit-list" id="recruitList">
-            <div class="recruit-card active" data-id="1">
-              <div class="recruit-top">
-                <div>
-                  <div class="recruit-name">Shannon Kirchhardt</div>
-                  <div class="recruit-meta">2027 • Outside Hitter • San Diego, CA</div>
-                </div>
-                <div class="badge priority">Priority</div>
-              </div>
-              <div class="tag-row">
-                <span class="tag">High academic fit</span>
-                <span class="tag">Strong family connection</span>
-                <span class="tag">Club leader</span>
-              </div>
-            </div>
-
-            <div class="recruit-card" data-id="2">
-              <div class="recruit-top">
-                <div>
-                  <div class="recruit-name">Anna Holladay Craft</div>
-                  <div class="recruit-meta">2027 • Setter • Phoenix, AZ</div>
-                </div>
-                <div class="badge warm">Warm</div>
-              </div>
-              <div class="tag-row">
-                <span class="tag">Good communicator</span>
-                <span class="tag">Needs follow-up</span>
-                <span class="tag">Multi-sport</span>
-              </div>
-            </div>
-
-            <div class="recruit-card" data-id="3">
-              <div class="recruit-top">
-                <div>
-                  <div class="recruit-name">Brooklyn Rummler</div>
-                  <div class="recruit-meta">2027 • Libero • Boise, ID</div>
-                </div>
-                <div class="badge good">Watch List</div>
-              </div>
-              <div class="tag-row">
-                <span class="tag">Elite defender</span>
-                <span class="tag">Film requested</span>
-                <span class="tag">Fast riser</span>
-              </div>
-            </div>
-          </div>
+          <div class="recruit-list" id="recruitList"></div>
         </div>
 
         <div class="panel detail">
@@ -592,76 +1099,20 @@
             <h3>Recruit Profile</h3>
             <p>This panel can hold everything your staff needs at a glance.</p>
           </div>
-          <div class="detail-scroll" id="detailPanel">
-            <div class="hero">
-              <h4>Shannon Kirchhardt</h4>
-              <p>2027 • Outside Hitter • San Diego, California • Coast Volleyball Club</p>
-              <div class="tag-row">
-                <span class="badge priority">Top Priority</span>
-                <span class="tag">3.9 GPA</span>
-                <span class="tag">Campus interest high</span>
-                <span class="tag">Unofficial visit complete</span>
-              </div>
-            </div>
-
-            <div class="detail-grid">
-              <div class="mini"><div class="label">Height</div><div class="value">6'0"</div></div>
-              <div class="mini"><div class="label">Approach Touch</div><div class="value">9'10"</div></div>
-              <div class="mini"><div class="label">Graduation Year</div><div class="value">2027</div></div>
-              <div class="mini"><div class="label">Recruiting Stage</div><div class="value">Heavy Evaluation</div></div>
-              <div class="mini"><div class="label">Phone</div><div class="value">(555) 201-4455</div></div>
-              <div class="mini"><div class="label">Email</div><div class="value">shannon@example.com</div></div>
-            </div>
-
-            <div class="section">
-              <h5>Quick Summary</h5>
-              <p>High-upside outside hitter with strong academics, confident communication, and clear family support. She has shown real interest in Fresno State and responded well in prior calls.</p>
-            </div>
-
-            <div class="section">
-              <h5>Key Notes</h5>
-              <ul>
-                <li>Really values team culture and strong player relationships.</li>
-                <li>Wants a balance of competitive volleyball and a strong academic environment.</li>
-                <li>Parents are engaged and supportive in the recruiting process.</li>
-                <li>Staff should follow up after next tournament weekend.</li>
-              </ul>
-            </div>
-
-            <div class="section">
-              <h5>Evaluation Areas</h5>
-              <ul>
-                <li>Terminal attacking potential from the left pin</li>
-                <li>Serve receive consistency under pressure</li>
-                <li>Leadership presence and communication tone</li>
-                <li>Physical development over next 12 months</li>
-              </ul>
-            </div>
-
-            <div class="section">
-              <h5>Next Action Items</h5>
-              <ul>
-                <li>Send personal follow-up message before next contact window.</li>
-                <li>Review most recent match film with staff notes attached.</li>
-                <li>Track upcoming tournament schedule and assign evaluator.</li>
-              </ul>
-            </div>
-          </div>
+          <div class="detail-scroll" id="detailPanel"></div>
         </div>
       </section>
     </main>
   </div>
 
   <script>
-    let cards = document.querySelectorAll('.recruit-card');
-    const detailPanel = document.getElementById('detailPanel');
-    const recruitList = document.getElementById('recruitList');
-    const searchInput = document.getElementById('search');
-    const classSelect = document.getElementById('classYear');
-    const positionSelect = document.getElementById('position');
-    const statusSelect = document.getElementById('status');
+    const STORAGE_KEY = 'recruit_dashboard_data_v4';
+    const SIDEBAR_STATE_KEY = 'recruit_dashboard_sidebar_collapsed_v4';
+    const COMPACT_MODE_KEY = 'recruit_dashboard_compact_v4';
+    const TARGET_DATE = new Date('2026-06-15T00:00:00');
+    const YEAR_START = new Date('2025-06-15T00:00:00');
 
-    const recruitDetails = {
+    const defaultRecruits = {
       1: {
         name: 'Shannon Kirchhardt',
         classYear: '2027',
@@ -672,46 +1123,48 @@
         group: 'Pins',
         status: 'Top Priority',
         priority: 'Priority',
-        owner: 'OJ',
+        june15Call: 'Orlando',
         rating: '5',
         wroteToUs: '10',
-        q1: true,
-        q2: true,
-        q3: false,
-        q4: false,
+        q1: true, q2: true, q3: false, q4: false,
+        q1Question1: '', q1Answer1: '',
+        q1Question2: '', q1Answer2: '',
+        q1Question3: '', q1Answer3: '',
+        q2Question1: '', q2Answer1: '',
+        q2Question2: '', q2Answer2: '',
+        q2Question3: '', q2Answer3: '',
+        q3Question1: '', q3Answer1: '',
+        q3Question2: '', q3Answer2: '',
+        q3Question3: '', q3Answer3: '',
+        q4Question1: '', q4Answer1: '',
+        q4Question2: '', q4Answer2: '',
+        q4Question3: '', q4Answer3: '',
         tags: ['3.9 GPA', 'Campus interest high', 'Unofficial visit complete'],
-        stats: [
-          ['Height', "6'0\""],
-          ['Approach Touch', "9'10\""],
-          ['Graduation Year', '2027'],
-          ['Recruiting Stage', 'Heavy Evaluation'],
-          ['Phone', '(555) 201-4455'],
-          ['Email', 'shannon@example.com']
-        ],
-        summary: 'High-upside outside hitter with strong academics, confident communication, and clear family support. She has shown real interest in Fresno State and responded well in prior calls.',
-        notes: [
-          'Really values team culture and strong player relationships.',
-          'Wants a balance of competitive volleyball and a strong academic environment.',
-          'Parents are engaged and supportive in the recruiting process.',
-          'Staff should follow up after next tournament weekend.'
-        ],
-        evaluation: [
-          'Terminal attacking potential from the left pin',
-          'Serve receive consistency under pressure',
-          'Leadership presence and communication tone',
-          'Physical development over next 12 months'
-        ],
-        actions: [
-          'Send personal follow-up message before next contact window.',
-          'Review most recent match film with staff notes attached.',
-          'Track upcoming tournament schedule and assign evaluator.'
-        ],
-        academics: 'High academic fit',
-        visitStatus: 'Unofficial visit complete',
+        summary: 'High-upside outside hitter with strong academics, confident communication, and clear family support.',
+        notes: ['Really values team culture and strong player relationships.', 'Wants a balance of competitive volleyball and a strong academic environment.'],
+        notesHistory: [{date: '2026-04-25', text: 'Follow-up after next tournament weekend.'}],
+        evaluation: ['Terminal attacking potential from the left pin', 'Serve receive consistency under pressure'],
+        actions: ['Send personal follow-up message before next contact window.'],
+        academics: 'High Academic Fit',
+        visitStatus: 'Visited Campus',
         followUp: 'Follow up after next tournament weekend.',
+        nextActionDue: '2026-05-10',
+        lastContactDate: '2026-04-22',
         email: 'shannon@example.com',
         phone: '(555) 201-4455',
-        profileLink: ''
+        profileLink: '',
+        filmLink: '',
+        headshot: '',
+        height: '6\'0"',
+        graduationYear: '2027',
+        favorite: true,
+        pinned: true,
+        campAttended: true,
+        updatedAt: '2026-04-30T14:00:00',
+        callPlanLocal: '',
+        callPlanTimezone: '',
+        callPlanPST: '',
+        selected: false
       },
       2: {
         name: 'Anna Holladay Craft',
@@ -723,46 +1176,48 @@
         group: 'Setters',
         status: 'Warm',
         priority: 'Warm',
-        owner: 'OJ',
+        june15Call: 'Orlando',
         rating: '4',
         wroteToUs: '5',
-        q1: true,
-        q2: true,
-        q3: false,
-        q4: false,
+        q1: true, q2: true, q3: false, q4: false,
+        q1Question1: '', q1Answer1: '',
+        q1Question2: '', q1Answer2: '',
+        q1Question3: '', q1Answer3: '',
+        q2Question1: '', q2Answer1: '',
+        q2Question2: '', q2Answer2: '',
+        q2Question3: '', q2Answer3: '',
+        q3Question1: '', q3Answer1: '',
+        q3Question2: '', q3Answer2: '',
+        q3Question3: '', q3Answer3: '',
+        q4Question1: '', q4Answer1: '',
+        q4Question2: '', q4Answer2: '',
+        q4Question3: '', q4Answer3: '',
         tags: ['Good communicator', 'Needs follow-up', 'Multi-sport athlete'],
-        stats: [
-          ['Height', "5'10\""],
-          ['Block Touch', "9'2\""],
-          ['Graduation Year', '2027'],
-          ['Recruiting Stage', 'Relationship Build'],
-          ['Phone', '(555) 401-2258'],
-          ['Email', 'anna@example.com']
-        ],
-        summary: 'Smart floor leader with good pace control and strong communication habits. She could become a really clean fit if the relationship continues to build.',
-        notes: [
-          'Interested in programs that prioritize player development.',
-          'Wants clear communication from coaching staffs.',
-          'Academic interest leans toward health sciences.',
-          'Follow up after spring evaluation period.'
-        ],
-        evaluation: [
-          'Tempo variety across all attacker connections',
-          'Defensive competitiveness and second-contact quality',
-          'Leadership presence with older teammates',
-          'Consistency when pushed out of system'
-        ],
-        actions: [
-          'Schedule another call with more position-specific conversation.',
-          'Collect latest tournament film clips.',
-          'Update relationship notes after next contact.'
-        ],
+        summary: 'Smart floor leader with good pace control and strong communication habits.',
+        notes: ['Interested in programs that prioritize player development.', 'Academic interest leans toward health sciences.'],
+        notesHistory: [{date: '2026-04-27', text: 'Needs more detailed setter conversation.'}],
+        evaluation: ['Tempo variety across all attacker connections'],
+        actions: ['Collect latest tournament film clips.'],
         academics: 'Health sciences interest',
         visitStatus: '',
         followUp: 'Follow up after spring evaluation period.',
+        nextActionDue: '2026-05-18',
+        lastContactDate: '2026-04-20',
         email: 'anna@example.com',
         phone: '(555) 401-2258',
-        profileLink: ''
+        profileLink: '',
+        filmLink: '',
+        headshot: '',
+        height: '5\'10"',
+        graduationYear: '2027',
+        favorite: false,
+        pinned: false,
+        campAttended: false,
+        updatedAt: '2026-04-28T10:00:00',
+        callPlanLocal: '',
+        callPlanTimezone: '',
+        callPlanPST: '',
+        selected: false
       },
       3: {
         name: 'Brooklyn Rummler',
@@ -774,82 +1229,156 @@
         group: 'Liberos',
         status: 'Watch List',
         priority: 'Watch List',
-        owner: 'OJ',
+        june15Call: 'Jerome',
         rating: '5',
         wroteToUs: '2',
-        q1: true,
-        q2: false,
-        q3: false,
-        q4: false,
+        q1: true, q2: false, q3: false, q4: false,
+        q1Question1: '', q1Answer1: '',
+        q1Question2: '', q1Answer2: '',
+        q1Question3: '', q1Answer3: '',
+        q2Question1: '', q2Answer1: '',
+        q2Question2: '', q2Answer2: '',
+        q2Question3: '', q2Answer3: '',
+        q3Question1: '', q3Answer1: '',
+        q3Question2: '', q3Answer2: '',
+        q3Question3: '', q3Answer3: '',
+        q4Question1: '', q4Answer1: '',
+        q4Question2: '', q4Answer2: '',
+        q4Question3: '', q4Answer3: '',
         tags: ['Elite defender', 'Film requested', 'Fast riser'],
-        stats: [
-          ['Height', "5'6\""],
-          ['Passing Grade', 'High'],
-          ['Graduation Year', '2027'],
-          ['Recruiting Stage', 'Early Evaluation'],
-          ['Phone', '(555) 338-1984'],
-          ['Email', 'brooklyn@example.com']
-        ],
-        summary: 'Instinctive libero with good range and a strong motor. Still early, but the defensive ceiling looks worth tracking closely.',
-        notes: [
-          'Very competitive and loves being in serve receive pressure moments.',
-          'Family is open to out-of-state options.',
-          'Would benefit from more full-match film for evaluation.',
-          'Academic profile still being gathered.'
-        ],
-        evaluation: [
-          'Serve receive posture and angle control',
-          'Ability to defend hard-driven swings',
-          'Vocal organization in the backcourt',
-          'Ball control in transition'
-        ],
-        actions: [
-          'Request full-match film and measurable updates.',
-          'Add notes after next club event.',
-          'Keep on staff radar through summer period.'
-        ],
+        summary: 'Instinctive libero with good range and a strong motor.',
+        notes: ['Would benefit from more full-match film for evaluation.'],
+        notesHistory: [{date: '2026-04-21', text: 'Need full-match film and measurables.'}],
+        evaluation: ['Serve receive posture and angle control'],
+        actions: ['Request full-match film and measurable updates.'],
         academics: '',
         visitStatus: '',
         followUp: 'Request full-match film and measurable updates.',
+        nextActionDue: '2026-05-05',
+        lastContactDate: '2026-04-15',
         email: 'brooklyn@example.com',
         phone: '(555) 338-1984',
-        profileLink: ''
+        profileLink: '',
+        filmLink: '',
+        headshot: '',
+        height: '5\'6"',
+        graduationYear: '2027',
+        favorite: true,
+        pinned: false,
+        campAttended: false,
+        updatedAt: '2026-04-26T09:30:00',
+        callPlanLocal: '',
+        callPlanTimezone: '',
+        callPlanPST: '',
+        selected: false
       }
     };
+
+    let recruitDetails = loadData();
+    let selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+    let filteredIds = [];
+
+    const filterState = { group:'', priority:'', june15Call:'', classYear:'', shortcut:'' };
+
+    const detailPanel = document.getElementById('detailPanel');
+    const recruitList = document.getElementById('recruitList');
+    const searchInput = document.getElementById('search');
+    const classSelect = document.getElementById('classYear');
+    const positionSelect = document.getElementById('position');
+    const statusSelect = document.getElementById('status');
+    const sortBySelect = document.getElementById('sortBy');
+    const importBtn = document.getElementById('importBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const addBtn = document.getElementById('addBtn');
+    const compactBtn = document.getElementById('compactBtn');
+    const appShell = document.getElementById('appShell');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const showAllBtn = document.getElementById('showAllBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const bulkBar = document.getElementById('bulkBar');
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+    function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
+
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (error) {}
+      return deepClone(defaultRecruits);
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
+    }
+
+
+    function initializeCollapsibleSidebarSections() {
+      document.querySelectorAll('.collapsible-box').forEach((box) => {
+        const key = box.dataset.collapseKey;
+        const header = box.querySelector('.collapse-header');
+        const storageKey = `recruit_sidebar_section_${key}`;
+        if (localStorage.getItem(storageKey) === 'collapsed') {
+          box.classList.add('collapsed');
+        }
+        header.addEventListener('click', () => {
+          box.classList.toggle('collapsed');
+          localStorage.setItem(storageKey, box.classList.contains('collapsed') ? 'collapsed' : 'open');
+        });
+      });
+    }
+
+
+    function loadSidebarState() {
+      try {
+        if (localStorage.getItem(SIDEBAR_STATE_KEY) === 'true') appShell.classList.add('sidebar-collapsed');
+        if (localStorage.getItem(COMPACT_MODE_KEY) === 'true') appShell.classList.add('compact-mode');
+      } catch (error) {}
+    }
+
+    function saveSidebarState() {
+      localStorage.setItem(SIDEBAR_STATE_KEY, String(appShell.classList.contains('sidebar-collapsed')));
+      localStorage.setItem(COMPACT_MODE_KEY, String(appShell.classList.contains('compact-mode')));
+    }
 
     function badgeClassFromStatus(status) {
       const value = String(status || '').toLowerCase();
       if (value.includes('priority')) return 'priority';
       if (value.includes('warm')) return 'warm';
-      return 'good';
+      if (value.includes('watch')) return 'good';
+      return 'neutral';
     }
 
-    function formatBool(value) {
-      return value ? 'Yes' : 'No';
+    function cardColorClass(recruit) {
+      const value = String(recruit.priority || recruit.status || '').toLowerCase();
+      if (value.includes('priority')) return 'card-color-priority';
+      if (value.includes('warm')) return 'card-color-warm';
+      if (value.includes('watch')) return 'card-color-watch';
+      return 'card-color-default';
     }
 
     function parseYesNo(value) {
       const v = String(value || '').trim().toLowerCase();
-      return ['yes', 'y', 'true', '1', 'x', 'check', 'checked', '√'].includes(v);
+      return ['yes','y','true','1','x','check','checked','√'].includes(v);
     }
 
     function splitMulti(value) {
       if (!value) return [];
-      return String(value)
-        .split(/\||;|,/)
-        .map(item => item.trim())
-        .filter(Boolean);
+      return String(value).split(/\||;|,/).map(item => item.trim()).filter(Boolean);
     }
 
     function parseCsvLine(line) {
       const result = [];
       let current = '';
       let inQuotes = false;
-
       for (let i = 0; i < line.length; i++) {
         const char = line[i];
         const next = line[i + 1];
-
         if (char === '"') {
           if (inQuotes && next === '"') {
             current += '"';
@@ -864,84 +1393,89 @@
           current += char;
         }
       }
-
       result.push(current);
       return result.map(cell => cell.trim());
     }
 
     function profileSubtitle(recruit) {
-      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', '), recruit.club].filter(Boolean).join(' • ');
+      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', '), recruit.club]
+        .filter(Boolean).join(' • ');
     }
 
     function cardMeta(recruit) {
-      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', ')].filter(Boolean).join(' • ');
+      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', '), recruit.club]
+        .filter(Boolean).join(' • ');
     }
 
     function buildRecruitFromRow(row) {
-      const name = row.fullName || row.name || row.recruitName || 'Unknown Recruit';
       const priority = row.priority || row.status || row.group || 'Imported';
-      const tags = splitMulti(row.tags);
-      const notes = splitMulti(row.notes || row.summary || '');
-      const evaluation = splitMulti(row.evaluation || row.eval || '');
-      const actions = splitMulti(row.followUp || row.actions || row.nextAction || '');
-      const q1Answer = row.q1Answer || row.q1Notes || row.q1_response || '';
-      const q2Answer = row.q2Answer || row.q2Notes || row.q2_response || '';
-      const q3Answer = row.q3Answer || row.q3Notes || row.q3_response || '';
-      const q4Answer = row.q4Answer || row.q4Notes || row.q4_response || '';
-
-      const stats = [
-        ['Height', row.height || ''],
-        ['Graduation Year', row.graduationYear || row.classYear || ''],
-        ['Phone', row.phone || ''],
-        ['Email', row.email || ''],
-        ['Owner', row.owner || ''],
-        ['Rating', row.rating || ''],
-        ['Wrote To Us', row.wroteToUs || ''],
-        ['Q1', formatBool(parseYesNo(row.q1))],
-        ['Q2', formatBool(parseYesNo(row.q2))],
-        ['Q3', formatBool(parseYesNo(row.q3))],
-        ['Q4', formatBool(parseYesNo(row.q4))]
-      ].filter(([, value]) => value !== '');
-
       return {
-        name,
+        name: row.fullName || row.name || row.recruitName || 'Unknown Recruit',
         classYear: row.classYear || row.graduationYear || '',
         position: row.position || '',
         city: row.city || '',
         state: row.state || '',
         club: row.club || '',
         group: row.group || '',
-        status: priority,
+        status: row.status || priority,
         priority,
-        owner: row.owner || '',
+        june15Call: row.june15Call || row.owner || '',
         rating: row.rating || '',
         wroteToUs: row.wroteToUs || '',
-        q1: parseYesNo(row.q1),
-        q2: parseYesNo(row.q2),
-        q3: parseYesNo(row.q3),
-        q4: parseYesNo(row.q4),
-        tags,
-        stats,
+        q1: parseYesNo(row.q1), q2: parseYesNo(row.q2), q3: parseYesNo(row.q3), q4: parseYesNo(row.q4),
+        q1Question1: row.q1Question1 || '', q1Answer1: row.q1Answer1 || '',
+        q1Question2: row.q1Question2 || '', q1Answer2: row.q1Answer2 || '',
+        q1Question3: row.q1Question3 || '', q1Answer3: row.q1Answer3 || '',
+        q2Question1: row.q2Question1 || '', q2Answer1: row.q2Answer1 || '',
+        q2Question2: row.q2Question2 || '', q2Answer2: row.q2Answer2 || '',
+        q2Question3: row.q2Question3 || '', q2Answer3: row.q2Answer3 || '',
+        q3Question1: row.q3Question1 || '', q3Answer1: row.q3Answer1 || '',
+        q3Question2: row.q3Question2 || '', q3Answer2: row.q3Answer2 || '',
+        q3Question3: row.q3Question3 || '', q3Answer3: row.q3Answer3 || '',
+        q4Question1: row.q4Question1 || '', q4Answer1: row.q4Answer1 || '',
+        q4Question2: row.q4Question2 || '', q4Answer2: row.q4Answer2 || '',
+        q4Question3: row.q4Question3 || '', q4Answer3: row.q4Answer3 || '',
+        tags: splitMulti(row.tags),
         summary: row.summary || row.notes || 'Imported recruit profile.',
-        notes,
-        evaluation,
-        actions,
+        notes: splitMulti(row.notes || ''),
+        notesHistory: splitMulti(row.notesHistory || '').map(text => ({date: new Date().toISOString().slice(0,10), text})),
+        evaluation: splitMulti(row.evaluation || row.eval || ''),
+        actions: splitMulti(row.followUp || row.actions || row.nextAction || ''),
         academics: row.academics || '',
         visitStatus: row.visitStatus || '',
         followUp: row.followUp || '',
+        nextActionDue: row.nextActionDue || '',
+        lastContactDate: row.lastContactDate || '',
         email: row.email || '',
         phone: row.phone || '',
         profileLink: row.profileLink || '',
-        q1Answer,
-        q2Answer,
-        q3Answer,
-        q4Answer,
-        headshot: row.headshot || row.headshotUrl || ''
+        filmLink: row.filmLink || '',
+        headshot: row.headshot || row.headshotUrl || '',
+        height: row.height || '',
+        graduationYear: row.graduationYear || row.classYear || '',
+        callPlanLocal: row.callPlanLocal || '',
+        callPlanTimezone: row.callPlanTimezone || '',
+        callPlanPST: row.callPlanPST || ((row.callPlanLocal && row.callPlanTimezone) ? formatInPSTFromLocal(row.callPlanLocal, row.callPlanTimezone) : ''),
+        favorite: parseYesNo(row.favorite),
+        pinned: parseYesNo(row.pinned),
+        campAttended: parseYesNo(row.campAttended),
+        updatedAt: row.updatedAt || new Date().toISOString(),
+        selected: false
       };
     }
 
     function renderDetail(recruit, recruitId) {
-      const statHtml = (recruit.stats || []).map(([label, value]) => `
+      const statHtml = [
+        ['Height', recruit.height || '—'],
+        ['Graduation Year', recruit.graduationYear || recruit.classYear || '—'],
+        ['Phone', recruit.phone || '—'],
+        ['Email', recruit.email || '—'],
+        ['June 15 Call', recruit.june15Call || '—'],
+        ['Rating', recruit.rating || '—'],
+        ['Last Contact', recruit.lastContactDate || '—'],
+        ['Next Action Due', recruit.nextActionDue || '—'],
+        ['Planned Call (PST)', recruit.callPlanPST ? recruit.callPlanPST + ' PST' : '—']
+      ].map(([label, value]) => `
         <div class="mini">
           <div class="label">${label}</div>
           <div class="value">${value}</div>
@@ -952,7 +1486,9 @@
       const notesHtml = ((recruit.notes && recruit.notes.length ? recruit.notes : ['No notes added yet.'])).map(item => `<li>${item}</li>`).join('');
       const evalHtml = ((recruit.evaluation && recruit.evaluation.length ? recruit.evaluation : ['No evaluation notes added yet.'])).map(item => `<li>${item}</li>`).join('');
       const actionsHtml = ((recruit.actions && recruit.actions.length ? recruit.actions : ['No next actions added yet.'])).map(item => `<li>${item}</li>`).join('');
-      const profileLinkHtml = recruit.profileLink ? `<a href="${recruit.profileLink}" target="_blank" rel="noopener noreferrer">Open profile link</a>` : 'No profile link added.';
+      const historyHtml = ((recruit.notesHistory && recruit.notesHistory.length ? recruit.notesHistory : [{date:'—', text:'No notes history yet.'}]))
+        .slice().reverse()
+        .map(item => `<div class="timeline-item"><div class="timeline-date">${item.date || '—'}</div><div>${item.text || '—'}</div></div>`).join('');
 
       detailPanel.innerHTML = `
         <div class="hero">
@@ -965,19 +1501,24 @@
           </div>
           <div class="tag-row">
             <span class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.status || 'Active'}</span>
+            <span class="tag">${recruit.club || 'No Club'}</span>
             ${chipHtml}
+          </div>
+          ${recruit.callPlanPST ? `<div class="call-chip"><span class="call-label">Call</span><span class="call-time">${recruit.callPlanPST}</span><span class="call-zone">PST</span></div>` : ''}</span>
+            </div>
+          ` : ''}
+          <div class="detail-actions">
+            <button class="btn secondary" id="editRecruitBtn" type="button">Edit Recruit</button>
+            <button class="btn secondary" id="favoriteRecruitBtn" type="button">${recruit.favorite ? 'Unfavorite' : 'Favorite'}</button>
+            <button class="btn secondary" id="pinRecruitBtn" type="button">${recruit.pinned ? 'Unpin' : 'Pin'}</button>
+            ${recruit.phone ? `<a class="btn secondary" href="tel:${recruit.phone}">Call</a>` : ''}
+            ${recruit.email ? `<a class="btn secondary" href="mailto:${recruit.email}">Email</a>` : ''}
+            ${recruit.filmLink ? `<a class="btn secondary" href="${recruit.filmLink}" target="_blank" rel="noopener noreferrer">Film</a>` : ''}
+            ${recruit.profileLink ? `<a class="btn secondary" href="${recruit.profileLink}" target="_blank" rel="noopener noreferrer">Profile</a>` : ''}
           </div>
         </div>
 
         <div class="detail-grid">${statHtml}</div>
-
-        <div class="section" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div>
-            <h5>Quick Summary</h5>
-            <p style="margin:8px 0 0;">${recruit.summary || 'No summary added yet.'}</p>
-          </div>
-          <button class="btn secondary" id="editRecruitBtn" type="button">Edit Recruit</button>
-        </div>
 
         <div class="section">
           <h5>Quick Summary</h5>
@@ -988,38 +1529,62 @@
           <h5>Recruiting Info</h5>
           <ul>
             <li><strong>Group:</strong> ${recruit.group || '—'}</li>
-            <li><strong>Owner:</strong> ${recruit.owner || '—'}</li>
+            <li><strong>June 15 Call:</strong> ${recruit.june15Call || '—'}</li>
+            <li><strong>Club:</strong> ${recruit.club || '—'}</li>
             <li><strong>Rating:</strong> ${recruit.rating || '—'}</li>
             <li><strong>Wrote To Us:</strong> ${recruit.wroteToUs || '—'}</li>
             <li><strong>Academics:</strong> ${recruit.academics || '—'}</li>
             <li><strong>Visit Status:</strong> ${recruit.visitStatus || '—'}</li>
-            <li><strong>Profile Link:</strong> ${profileLinkHtml}</li>
+            <li><strong>Camp Attended:</strong> ${recruit.campAttended ? 'Yes' : 'No'}</li>
           </ul>
         </div>
 
         <div class="section">
           <h5>Contact Timeline</h5>
           <ul>
-            <li><strong>Q1:</strong> ${formatBool(recruit.q1)}</li>
-            <li><strong>Q2:</strong> ${formatBool(recruit.q2)}</li>
-            <li><strong>Q3:</strong> ${formatBool(recruit.q3)}</li>
-            <li><strong>Q4:</strong> ${formatBool(recruit.q4)}</li>
+            <li><strong>Q1:</strong> ${recruit.q1 ? 'Complete' : 'Not Complete'}</li>
+            <li><strong>Q2:</strong> ${recruit.q2 ? 'Complete' : 'Not Complete'}</li>
+            <li><strong>Q3:</strong> ${recruit.q3 ? 'Complete' : 'Not Complete'}</li>
+            <li><strong>Q4:</strong> ${recruit.q4 ? 'Complete' : 'Not Complete'}</li>
           </ul>
         </div>
 
         <div class="section">
-          <h5>Q1–Q4 Answers</h5>
+          <h5>Recruit Status Timeline</h5>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-date">${recruit.updatedAt ? recruit.updatedAt.slice(0,10) : '—'}</div><div>Last updated</div></div>
+            <div class="timeline-item"><div class="timeline-date">${recruit.lastContactDate || '—'}</div><div>Last contact</div></div>
+            <div class="timeline-item"><div class="timeline-date">${recruit.nextActionDue || '—'}</div><div>Next action due</div></div>
+            <div class="timeline-item"><div class="timeline-date">${recruit.visitStatus || '—'}</div><div>Visit tracker</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h5>Q1–Q4 Questions + Answers</h5>
           <ul>
-            <li><strong>Q1 Answer:</strong> ${recruit.q1Answer || '—'}</li>
-            <li><strong>Q2 Answer:</strong> ${recruit.q2Answer || '—'}</li>
-            <li><strong>Q3 Answer:</strong> ${recruit.q3Answer || '—'}</li>
-            <li><strong>Q4 Answer:</strong> ${recruit.q4Answer || '—'}</li>
+            <li><strong>Q1 Question 1:</strong> ${recruit.q1Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q1Answer1 || '—'}</li>
+            <li><strong>Q1 Question 2:</strong> ${recruit.q1Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q1Answer2 || '—'}</li>
+            <li><strong>Q1 Question 3:</strong> ${recruit.q1Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q1Answer3 || '—'}</li>
+            <li><strong>Q2 Question 1:</strong> ${recruit.q2Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q2Answer1 || '—'}</li>
+            <li><strong>Q2 Question 2:</strong> ${recruit.q2Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q2Answer2 || '—'}</li>
+            <li><strong>Q2 Question 3:</strong> ${recruit.q2Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q2Answer3 || '—'}</li>
+            <li><strong>Q3 Question 1:</strong> ${recruit.q3Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q3Answer1 || '—'}</li>
+            <li><strong>Q3 Question 2:</strong> ${recruit.q3Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q3Answer2 || '—'}</li>
+            <li><strong>Q3 Question 3:</strong> ${recruit.q3Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q3Answer3 || '—'}</li>
+            <li><strong>Q4 Question 1:</strong> ${recruit.q4Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q4Answer1 || '—'}</li>
+            <li><strong>Q4 Question 2:</strong> ${recruit.q4Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q4Answer2 || '—'}</li>
+            <li><strong>Q4 Question 3:</strong> ${recruit.q4Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q4Answer3 || '—'}</li>
           </ul>
         </div>
 
         <div class="section">
           <h5>Key Notes</h5>
           <ul>${notesHtml}</ul>
+        </div>
+
+        <div class="section">
+          <h5>Notes History</h5>
+          <div class="timeline">${historyHtml}</div>
         </div>
 
         <div class="section">
@@ -1032,74 +1597,496 @@
           <ul>${actionsHtml}</ul>
         </div>
       `;
+
+      document.getElementById('editRecruitBtn').onclick = () => openRecruitModal(recruitId);
+      document.getElementById('favoriteRecruitBtn').onclick = () => {
+        recruitDetails[recruitId].favorite = !recruitDetails[recruitId].favorite;
+        recruitDetails[recruitId].updatedAt = new Date().toISOString();
+        saveData();
+        rebuildRecruitList(recruitId);
+      };
+      document.getElementById('pinRecruitBtn').onclick = () => {
+        recruitDetails[recruitId].pinned = !recruitDetails[recruitId].pinned;
+        recruitDetails[recruitId].updatedAt = new Date().toISOString();
+        saveData();
+        rebuildRecruitList(recruitId);
+      };
     }
 
-    cards.forEach(card => {
-      card.addEventListener('click', () => {
-        cards.forEach(c => c.classList.remove('active'));
-        card.classList.add('active');
-        renderDetail(recruitDetails[card.dataset.id]);
+    function updateSummary(recruits) {
+      document.getElementById('totalRecruitsStat').textContent = recruits.length;
+      document.getElementById('priorityStat').textContent = recruits.filter(r => String(r.priority || '').toLowerCase().includes('priority')).length;
+      document.getElementById('q1Stat').textContent = recruits.filter(r => r.q1).length;
+      document.getElementById('followUpStat').textContent = recruits.filter(r => (r.followUp || '').trim() || (r.actions || []).length).length;
+    }
+
+    function populateFilterOptions(recruits) {
+      const selectedClass = classSelect.value;
+      const selectedPosition = positionSelect.value;
+      const selectedStatus = statusSelect.value;
+
+      const classYears = [...new Set(recruits.map(r => r.classYear).filter(Boolean))].sort();
+      const positions = [...new Set(recruits.map(r => r.position).filter(Boolean))].sort();
+      const statuses = [...new Set(recruits.map(r => r.status || r.priority).filter(Boolean))].sort();
+
+      classSelect.innerHTML = '<option value="">All Classes</option>' + classYears.map(v => `<option value="${v}">${v}</option>`).join('');
+      positionSelect.innerHTML = '<option value="">All Positions</option>' + positions.map(v => `<option value="${v}">${v}</option>`).join('');
+      statusSelect.innerHTML = '<option value="">All Statuses</option>' + statuses.map(v => `<option value="${v}">${v}</option>`).join('');
+
+      classSelect.value = classYears.includes(selectedClass) ? selectedClass : '';
+      positionSelect.value = positions.includes(selectedPosition) ? selectedPosition : '';
+      statusSelect.value = statuses.includes(selectedStatus) ? selectedStatus : '';
+    }
+
+    function getAllRecruits() {
+      return Object.entries(recruitDetails).map(([id, recruit]) => ({ id, ...recruit }));
+    }
+
+    function countBy(recruits, fn) {
+      const counts = {};
+      recruits.forEach(r => {
+        const key = fn(r);
+        if (!key) return;
+        counts[key] = (counts[key] || 0) + 1;
       });
+      return counts;
+    }
+
+    function renderFilterButtons(containerId, items, type, activeValue) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = items.map(item => `
+        <button class="filter-btn ${activeValue === item.value ? 'active' : ''}" data-filter-type="${type}" data-filter-value="${item.value}" type="button">
+          <span>${item.label}</span>
+          <span class="filter-count">${item.count}</span>
+        </button>
+      `).join('');
+
+      container.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filterType = btn.dataset.filterType;
+          const value = btn.dataset.filterValue;
+          filterState[filterType] = filterState[filterType] === value ? '' : value;
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+    }
+
+    function renderSidebarFilters(recruits) {
+      const groupOrder = ['Liberos', 'Middles', 'Setters', 'Pins', 'Camp', 'To Text'];
+      const groupCounts = countBy(recruits, r => r.group);
+      renderFilterButtons('quickViewsSection', groupOrder.map(label => ({label, value: label, count: groupCounts[label] || 0})), 'group', filterState.group);
+
+      const priorityOrder = ['Priority', 'Warm', 'Watch List'];
+      const priorityCounts = countBy(recruits, r => r.priority || r.status);
+      renderFilterButtons('prioritySection', priorityOrder.map(label => ({label, value: label, count: priorityCounts[label] || 0})), 'priority', filterState.priority);
+
+      const ownerOrder = ['Leisa', 'Jerome', 'Orlando', 'Kelsey'];
+      const ownerCounts = countBy(recruits, r => r.june15Call);
+      renderFilterButtons('ownerSection', ownerOrder.map(label => ({label, value: label, count: ownerCounts[label] || 0})), 'june15Call', filterState.june15Call);
+
+      const classOrder = ['2026', '2027', '2028'];
+      const classCounts = countBy(recruits, r => r.classYear);
+      renderFilterButtons('classFilterSection', classOrder.map(label => ({label, value: label, count: classCounts[label] || 0})), 'classYear', filterState.classYear);
+
+      const shortcutItems = [
+        { label: 'Need Follow-Up', value: 'Need Follow-Up', count: recruits.filter(r => (r.followUp || '').trim() || (r.actions || []).length).length },
+        { label: 'Visited Campus', value: 'Visited Campus', count: recruits.filter(r => String(r.visitStatus || '').toLowerCase().includes('visit')).length },
+        { label: 'High Academic Fit', value: 'High Academic Fit', count: recruits.filter(r => String(r.academics || '').toLowerCase().includes('high academic')).length }
+      ];
+      renderFilterButtons('statusShortcutSection', shortcutItems, 'shortcut', filterState.shortcut);
+    }
+
+    function passesShortcutFilter(recruit) {
+      if (!filterState.shortcut) return true;
+      if (filterState.shortcut === 'Need Follow-Up') return Boolean((recruit.followUp || '').trim() || (recruit.actions || []).length);
+      if (filterState.shortcut === 'Visited Campus') return String(recruit.visitStatus || '').toLowerCase().includes('visit');
+      if (filterState.shortcut === 'High Academic Fit') return String(recruit.academics || '').toLowerCase().includes('high academic');
+      return true;
+    }
+
+    function applySort(recruits) {
+      const sortBy = sortBySelect.value;
+      const list = [...recruits];
+
+      list.sort((a, b) => {
+        if (sortBy === 'pinned') {
+          return Number(Boolean(b.pinned)) - Number(Boolean(a.pinned))
+            || Number(Boolean(b.favorite)) - Number(Boolean(a.favorite))
+            || String(a.name).localeCompare(String(b.name));
+        }
+        if (sortBy === 'rating') return Number(b.rating || 0) - Number(a.rating || 0);
+        if (sortBy === 'classYear') return String(a.classYear).localeCompare(String(b.classYear)) || String(a.name).localeCompare(String(b.name));
+        if (sortBy === 'position') return String(a.position).localeCompare(String(b.position)) || String(a.name).localeCompare(String(b.name));
+        if (sortBy === 'june15Call') return String(a.june15Call).localeCompare(String(b.june15Call)) || String(a.name).localeCompare(String(b.name));
+        if (sortBy === 'recentlyUpdated') return String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''));
+        if (sortBy === 'nextActionDue') return String(a.nextActionDue || '9999-99-99').localeCompare(String(b.nextActionDue || '9999-99-99'));
+        if (sortBy === 'lastContactDate') return String(b.lastContactDate || '').localeCompare(String(a.lastContactDate || ''));
+        return String(a.name).localeCompare(String(b.name));
+      });
+
+      // Always surface pinned recruits first a little
+      list.sort((a,b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+      return list;
+    }
+
+    function rebuildRecruitList(activeId) {
+      const recruits = getAllRecruits();
+      populateFilterOptions(recruits);
+      updateSummary(recruits);
+      renderSidebarFilters(recruits);
+      detectDuplicates(recruits);
+
+      const searchTerm = (searchInput.value || '').toLowerCase().trim();
+      const classValue = classSelect.value;
+      const positionValue = positionSelect.value;
+      const statusValue = statusSelect.value;
+
+      let filtered = recruits.filter(recruit => {
+        const haystack = [
+          recruit.name, recruit.club, recruit.city, recruit.state, recruit.position, recruit.group,
+          recruit.summary, recruit.june15Call, (recruit.notes || []).join(' '), (recruit.tags || []).join(' '),
+          recruit.email, recruit.phone
+        ].join(' ').toLowerCase();
+
+        return (!searchTerm || haystack.includes(searchTerm))
+          && (!classValue || recruit.classYear === classValue)
+          && (!positionValue || recruit.position === positionValue)
+          && (!statusValue || recruit.status === statusValue || recruit.priority === statusValue)
+          && (!filterState.group || recruit.group === filterState.group)
+          && (!filterState.priority || recruit.priority === filterState.priority || recruit.status === filterState.priority)
+          && (!filterState.june15Call || recruit.june15Call === filterState.june15Call)
+          && (!filterState.classYear || recruit.classYear === filterState.classYear)
+          && passesShortcutFilter(recruit);
+      });
+
+      filtered = applySort(filtered);
+      filteredIds = filtered.map(r => r.id);
+
+      if (!filteredIds.includes(String(activeId))) activeId = filteredIds[0] || '';
+      selectedRecruitId = activeId;
+
+      document.getElementById('recruitListCount').textContent = filteredIds.length
+        ? `${filteredIds.length} recruit${filteredIds.length === 1 ? '' : 's'} showing`
+        : 'No recruits match these filters yet.';
+
+      recruitList.innerHTML = filtered.map(recruit => `
+        <div class="recruit-card ${cardColorClass(recruit)} ${String(recruit.id) === String(activeId) ? 'active' : ''}" data-id="${recruit.id}">
+          <div class="recruit-card-topline">
+            <div class="card-left">
+              <input class="card-check" type="checkbox" data-check-id="${recruit.id}" ${recruit.selected ? 'checked' : ''} />
+              ${recruit.headshot ? `<img class="card-thumb" src="${recruit.headshot}" alt="${recruit.name} thumb" />` : `<div class="card-thumb-placeholder">${(recruit.name || '?').charAt(0).toUpperCase()}</div>`}
+              <div>
+                <div class="recruit-name-row">
+                  <div class="recruit-name">${recruit.name}</div>
+                  <button class="star-btn ${recruit.favorite ? 'star-on' : ''}" data-star-id="${recruit.id}" type="button">★</button>
+                  <button class="pin-btn ${recruit.pinned ? 'pin-on' : ''}" data-pin-id="${recruit.id}" type="button">${recruit.pinned ? "📌" : "📍"}</button>
+                </div>
+                <div class="recruit-meta">${cardMeta(recruit)}</div>
+                ${recruit.callPlanPST ? `
+                  <div class="scheduled-call-visual">
+                    <span class="scheduled-call-top">Planned Call</span>
+                    <span class="scheduled-call-time">${recruit.callPlanPST} PST</span>
+                    <span class="scheduled-call-origin">${recruit.callPlanLocal ? recruit.callPlanLocal.replace('T', ' @ ') : ''}${recruit.callPlanTimezone ? ` • ${recruit.callPlanTimezone.split('/').pop().replace('_', ' ')}` : ''}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+            <div class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.priority || recruit.status || 'Active'}</div>
+          </div>
+          <div class="tag-row">
+            <span class="tag">${recruit.club || 'No Club'}</span>
+            ${recruit.lastContactDate ? `<span class="tag">Last Contact: ${recruit.lastContactDate}</span>` : ''}
+            ${recruit.nextActionDue ? `<span class="tag">Due: ${recruit.nextActionDue}</span>` : ''}
+            ${(recruit.tags || []).slice(0, 2).map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.recruit-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('[data-star-id],[data-pin-id],[data-check-id]')) return;
+          selectedRecruitId = card.dataset.id;
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+
+      document.querySelectorAll('[data-star-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.starId;
+          recruitDetails[id].favorite = !recruitDetails[id].favorite;
+          recruitDetails[id].updatedAt = new Date().toISOString();
+          saveData();
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+
+      document.querySelectorAll('[data-pin-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.pinId;
+          recruitDetails[id].pinned = !recruitDetails[id].pinned;
+          recruitDetails[id].updatedAt = new Date().toISOString();
+          saveData();
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+
+      document.querySelectorAll('[data-check-id]').forEach(box => {
+        box.addEventListener('click', (e) => e.stopPropagation());
+        box.addEventListener('change', () => {
+          const id = box.dataset.checkId;
+          recruitDetails[id].selected = box.checked;
+          saveData();
+          updateBulkBar();
+        });
+      });
+
+      updateBulkBar();
+
+      if (selectedRecruitId && recruitDetails[selectedRecruitId]) {
+        renderDetail(recruitDetails[selectedRecruitId], selectedRecruitId);
+      } else {
+        detailPanel.innerHTML = '<div class="section"><h5>No Recruit Selected</h5><p>Import a sheet or add a recruit to get started.</p></div>';
+      }
+
+      saveData();
+    }
+
+    function selectedIds() {
+      return Object.entries(recruitDetails).filter(([,r]) => r.selected).map(([id]) => id);
+    }
+
+    function updateBulkBar() {
+      const ids = selectedIds();
+      const countText = document.getElementById('bulkCountText');
+      countText.textContent = `${ids.length} selected`;
+      bulkBar.classList.toggle('active', ids.length > 0);
+    }
+
+    function detectDuplicates(recruits) {
+      const seen = new Map();
+      recruits.forEach(r => {
+        const key = `${String(r.name || '').trim().toLowerCase()}|${String(r.club || '').trim().toLowerCase()}`;
+        if (!key || key === '|') return;
+        seen.set(key, (seen.get(key) || 0) + 1);
+      });
+      recruits.forEach(r => {
+        const key = `${String(r.name || '').trim().toLowerCase()}|${String(r.club || '').trim().toLowerCase()}`;
+        const duplicate = (seen.get(key) || 0) > 1;
+        if (duplicate) {
+          if (!r.tags.includes('Possible Duplicate')) r.tags.push('Possible Duplicate');
+        } else {
+          r.tags = (r.tags || []).filter(tag => tag !== 'Possible Duplicate');
+        }
+      });
+    }
+
+    function resetAllFilters() {
+      filterState.group = '';
+      filterState.priority = '';
+      filterState.june15Call = '';
+      filterState.classYear = '';
+      filterState.shortcut = '';
+      searchInput.value = '';
+      classSelect.value = '';
+      positionSelect.value = '';
+      statusSelect.value = '';
+      sortBySelect.value = 'pinned';
+      rebuildRecruitList(selectedRecruitId);
+    }
+
+    showAllBtn.addEventListener('click', resetAllFilters);
+    resetFiltersBtn.addEventListener('click', resetAllFilters);
+
+    sidebarToggle.addEventListener('click', () => {
+      appShell.classList.toggle('sidebar-collapsed');
+      saveSidebarState();
     });
-  
 
-    // ===== RECRUIT IMPORT + ADD + EDIT FUNCTIONALITY =====
+    compactBtn.addEventListener('click', () => {
+      appShell.classList.toggle('compact-mode');
+      saveSidebarState();
+    });
 
-    const importBtn = document.querySelector('.btn.secondary');
-    const addBtn = document.querySelector('.btn:not(.secondary)');
+    searchInput.addEventListener('input', () => rebuildRecruitList(selectedRecruitId));
+    classSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
+    positionSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
+    statusSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
+    sortBySelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
 
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.csv';
-    fileInput.style.display = 'none';
-    document.body.appendChild(fileInput);
+    document.getElementById('bulkClearBtn').addEventListener('click', () => {
+      Object.values(recruitDetails).forEach(r => r.selected = false);
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkFavoriteBtn').addEventListener('click', () => {
+      selectedIds().forEach(id => {
+        recruitDetails[id].favorite = !recruitDetails[id].favorite;
+        recruitDetails[id].updatedAt = new Date().toISOString();
+      });
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkDeleteBtn').addEventListener('click', () => {
+      const ids = selectedIds();
+      if (!ids.length) return;
+      if (!window.confirm(`Delete ${ids.length} selected recruits?`)) return;
+      ids.forEach(id => delete recruitDetails[id]);
+      selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkPrioritySelect').addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (!value) return;
+      selectedIds().forEach(id => {
+        recruitDetails[id].priority = value;
+        recruitDetails[id].status = value;
+        recruitDetails[id].updatedAt = new Date().toISOString();
+      });
+      e.target.value = '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkJune15CallSelect').addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (!value) return;
+      selectedIds().forEach(id => {
+        recruitDetails[id].june15Call = value;
+        recruitDetails[id].updatedAt = new Date().toISOString();
+      });
+      e.target.value = '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    function exportFiltered() {
+      const rows = filteredIds.map(id => recruitDetails[id]);
+      const headers = [
+        'fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','wroteToUs',
+        'q1','q2','q3','q4','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email'
+      ];
+      const csv = [
+        headers.join(','),
+        ...rows.map(r => headers.map(h => {
+          const map = {
+            fullName: r.name,
+            classYear: r.classYear,
+            group: r.group,
+            position: r.position,
+            city: r.city,
+            state: r.state,
+            club: r.club,
+            priority: r.priority,
+            status: r.status,
+            june15Call: r.june15Call,
+            rating: r.rating,
+            wroteToUs: r.wroteToUs,
+            q1: r.q1,
+            q2: r.q2,
+            q3: r.q3,
+            q4: r.q4,
+            lastContactDate: r.lastContactDate,
+            nextActionDue: r.nextActionDue,
+            visitStatus: r.visitStatus,
+            campAttended: r.campAttended,
+            filmLink: r.filmLink,
+            profileLink: r.profileLink,
+            phone: r.phone,
+            email: r.email
+          };
+          const v = String(map[h] ?? '').replace(/"/g, '""');
+          return `"${v}"`;
+        }).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'filtered_recruits.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    exportBtn.addEventListener('click', exportFiltered);
 
     const modal = document.createElement('div');
     modal.id = 'recruitModal';
     modal.style.cssText = 'position:fixed;inset:0;background:rgba(16,24,38,0.55);display:none;align-items:center;justify-content:center;padding:24px;z-index:9999;';
     modal.innerHTML = `
-      <div style="background:#fff;border-radius:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+      <div style="background:#fff;border-radius:18px;max-width:980px;width:100%;max-height:90vh;overflow:auto;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
         <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
           <h3 id="modalTitle" style="margin:0;font-size:24px;">Add Recruit</h3>
-          <button id="closeRecruitModal" style="border:none;background:#eef2f7;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:700;">Close</button>
+          <button id="closeRecruitModal" class="btn secondary" type="button">Close</button>
         </div>
         <form id="recruitForm" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
           <input type="hidden" id="formRecruitId" />
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Full Name</label><input id="formName" required style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Class Year</label><input id="formClassYear" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Group</label><input id="formGroup" placeholder="Liberos, Middles, Setters, Pins..." style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Position</label><input id="formPosition" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">City</label><input id="formCity" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">State</label><input id="formState" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Club</label><input id="formClub" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Priority / Status</label><input id="formPriority" placeholder="Priority, Warm, Watch List..." style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Phone</label><input id="formPhone" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Email</label><input id="formEmail" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Profile Link</label><input id="formProfileLink" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Owner</label><input id="formOwner" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Rating</label><input id="formRating" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Wrote To Us</label><input id="formWroteToUs" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Height</label><input id="formHeight" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Graduation Year</label><input id="formGraduationYear" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q1</label><select id="formQ1" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2</label><select id="formQ2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3</label><select id="formQ3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
-          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4</label><select id="formQ4" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Headshot</label><input id="formHeadshot" type="file" accept="image/*" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /><div id="headshotCurrent" style="font-size:12px;color:#64748b;margin-top:6px;"></div></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Tags</label><input id="formTags" placeholder="comma separated" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Summary</label><textarea id="formSummary" rows="3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes</label><textarea id="formNotes" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Evaluation</label><textarea id="formEvaluation" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Follow Up / Next Actions</label><textarea id="formFollowUp" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q1 Answer</label><textarea id="formQ1Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2 Answer</label><textarea id="formQ2Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3 Answer</label><textarea id="formQ3Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4 Answer</label><textarea id="formQ4Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Academics</label><textarea id="formAcademics" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
-          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Visit Status</label><textarea id="formVisitStatus" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Full Name</label><input id="formName" class="modal-field" required /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Class Year</label><input id="formClassYear" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Group</label><input id="formGroup" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Position</label><input id="formPosition" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">City</label><input id="formCity" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">State</label><input id="formState" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Club</label><input id="formClub" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Priority / Status</label><input id="formPriority" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Phone</label><input id="formPhone" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Email</label><input id="formEmail" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Profile Link</label><input id="formProfileLink" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Film Link</label><input id="formFilmLink" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">June 15 Call</label><input id="formJune15Call" class="modal-field" placeholder="Leisa, Jerome, Orlando, Kelsey" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Rating</label><input id="formRating" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Wrote To Us</label><input id="formWroteToUs" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Height</label><input id="formHeight" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Graduation Year</label><input id="formGraduationYear" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Last Contact Date</label><input id="formLastContactDate" type="date" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Next Action Due</label><input id="formNextActionDue" type="date" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Planned Call Date + Time</label><input id="formCallPlanLocal" type="datetime-local" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Call Timezone</label>
+            <select id="formCallPlanTimezone" class="modal-field">
+              <option value="">Select timezone</option>
+              <option value="America/Los_Angeles">Pacific</option>
+              <option value="America/Denver">Mountain</option>
+              <option value="America/Chicago">Central</option>
+              <option value="America/New_York">Eastern</option>
+              <option value="Pacific/Honolulu">Hawaii</option>
+            </select>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">PST Conversion</label><input id="formCallPlanPST" class="modal-field" readonly /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q1</label><select id="formQ1" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2</label><select id="formQ2" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3</label><select id="formQ3" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4</label><select id="formQ4" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Camp Attended</label><select id="formCampAttended" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Favorite</label><select id="formFavorite" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Pinned</label><select id="formPinned" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Headshot</label><input id="formHeadshot" type="file" accept="image/*" class="modal-field" /><div id="headshotCurrent" class="muted-small" style="margin-top:6px;"></div></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Tags</label><input id="formTags" class="modal-field" placeholder="comma separated" /></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Summary</label><textarea id="formSummary" rows="3" class="modal-field"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes</label><textarea id="formNotes" rows="3" class="modal-field" placeholder="separate with commas or semicolons"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes History</label><textarea id="formNotesHistory" rows="3" class="modal-field" placeholder="one note per line"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Evaluation</label><textarea id="formEvaluation" rows="3" class="modal-field" placeholder="separate with commas or semicolons"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Follow Up / Next Actions</label><textarea id="formFollowUp" rows="3" class="modal-field" placeholder="separate with commas or semicolons"></textarea></div>
+
+          ${[1,2,3,4].map(q => `
+            ${[1,2,3].map(i => `
+              <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q${q} Question ${i}</label><input id="formQ${q}Question${i}" class="modal-field" /></div>
+              <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q${q} Answer ${i}</label><textarea id="formQ${q}Answer${i}" rows="2" class="modal-field"></textarea></div>
+            `).join('')}
+          `).join('')}
+
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Academics</label><textarea id="formAcademics" rows="2" class="modal-field"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Visit Status</label><textarea id="formVisitStatus" rows="2" class="modal-field"></textarea></div>
           <div style="grid-column:1 / -1;display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
-            <button type="button" id="deleteRecruitBtn" style="display:none;border:none;background:#fee2e2;color:#991b1b;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:700;">Delete Recruit</button>
-            <button type="submit" style="border:none;background:#b5121b;color:white;padding:12px 18px;border-radius:12px;cursor:pointer;font-weight:700;">Save Recruit</button>
+            <button type="button" id="deleteRecruitBtn" class="btn secondary" style="display:none;">Delete Recruit</button>
+            <button type="submit" class="btn">Save Recruit</button>
           </div>
         </form>
       </div>
@@ -1124,28 +2111,41 @@
       phone: document.getElementById('formPhone'),
       email: document.getElementById('formEmail'),
       profileLink: document.getElementById('formProfileLink'),
-      owner: document.getElementById('formOwner'),
+      filmLink: document.getElementById('formFilmLink'),
+      june15Call: document.getElementById('formJune15Call'),
       rating: document.getElementById('formRating'),
       wroteToUs: document.getElementById('formWroteToUs'),
       height: document.getElementById('formHeight'),
       graduationYear: document.getElementById('formGraduationYear'),
+      lastContactDate: document.getElementById('formLastContactDate'),
+      nextActionDue: document.getElementById('formNextActionDue'),
+      callPlanLocal: document.getElementById('formCallPlanLocal'),
+      callPlanTimezone: document.getElementById('formCallPlanTimezone'),
+      callPlanPST: document.getElementById('formCallPlanPST'),
       q1: document.getElementById('formQ1'),
       q2: document.getElementById('formQ2'),
       q3: document.getElementById('formQ3'),
       q4: document.getElementById('formQ4'),
+      campAttended: document.getElementById('formCampAttended'),
+      favorite: document.getElementById('formFavorite'),
+      pinned: document.getElementById('formPinned'),
+      headshot: document.getElementById('formHeadshot'),
       tags: document.getElementById('formTags'),
       summary: document.getElementById('formSummary'),
       notes: document.getElementById('formNotes'),
+      notesHistory: document.getElementById('formNotesHistory'),
       evaluation: document.getElementById('formEvaluation'),
       followUp: document.getElementById('formFollowUp'),
       academics: document.getElementById('formAcademics'),
-      visitStatus: document.getElementById('formVisitStatus'),
-      headshot: document.getElementById('formHeadshot'),
-      q1Answer: document.getElementById('formQ1Answer'),
-      q2Answer: document.getElementById('formQ2Answer'),
-      q3Answer: document.getElementById('formQ3Answer'),
-      q4Answer: document.getElementById('formQ4Answer')
+      visitStatus: document.getElementById('formVisitStatus')
     };
+
+    for (let q = 1; q <= 4; q++) {
+      for (let i = 1; i <= 3; i++) {
+        formEls[`q${q}Question${i}`] = document.getElementById(`formQ${q}Question${i}`);
+        formEls[`q${q}Answer${i}`] = document.getElementById(`formQ${q}Answer${i}`);
+      }
+    }
 
     function openRecruitModal(id = '') {
       const recruit = id ? recruitDetails[id] : null;
@@ -1165,93 +2165,125 @@
       formEls.phone.value = recruit?.phone || '';
       formEls.email.value = recruit?.email || '';
       formEls.profileLink.value = recruit?.profileLink || '';
-      formEls.owner.value = recruit?.owner || '';
+      formEls.filmLink.value = recruit?.filmLink || '';
+      formEls.june15Call.value = recruit?.june15Call || '';
       formEls.rating.value = recruit?.rating || '';
       formEls.wroteToUs.value = recruit?.wroteToUs || '';
       formEls.height.value = recruit?.height || '';
       formEls.graduationYear.value = recruit?.graduationYear || recruit?.classYear || '';
+      formEls.lastContactDate.value = recruit?.lastContactDate || '';
+      formEls.nextActionDue.value = recruit?.nextActionDue || '';
+      formEls.callPlanLocal.value = recruit?.callPlanLocal || '';
+      formEls.callPlanTimezone.value = recruit?.callPlanTimezone || '';
+      formEls.callPlanPST.value = recruit?.callPlanPST ? recruit.callPlanPST + ' PST' : '';
+      refreshCallPlanPSTField();
       formEls.q1.value = String(!!recruit?.q1);
       formEls.q2.value = String(!!recruit?.q2);
       formEls.q3.value = String(!!recruit?.q3);
       formEls.q4.value = String(!!recruit?.q4);
+      formEls.campAttended.value = String(!!recruit?.campAttended);
+      formEls.favorite.value = String(!!recruit?.favorite);
+      formEls.pinned.value = String(!!recruit?.pinned);
       formEls.tags.value = (recruit?.tags || []).join(', ');
-      document.getElementById('headshotCurrent').textContent = recruit?.headshot ? 'Current headshot loaded.' : 'No headshot uploaded yet.';
       formEls.summary.value = recruit?.summary || '';
       formEls.notes.value = (recruit?.notes || []).join('; ');
+      formEls.notesHistory.value = (recruit?.notesHistory || []).map(item => item.text || '').join('\n');
       formEls.evaluation.value = (recruit?.evaluation || []).join('; ');
       formEls.followUp.value = recruit?.followUp || (recruit?.actions || []).join('; ');
       formEls.academics.value = recruit?.academics || '';
       formEls.visitStatus.value = recruit?.visitStatus || '';
-      formEls.q1Answer.value = recruit?.q1Answer || '';
-      formEls.q2Answer.value = recruit?.q2Answer || '';
-      formEls.q3Answer.value = recruit?.q3Answer || '';
-      formEls.q4Answer.value = recruit?.q4Answer || '';
       formEls.headshot.value = '';
+      for (let q = 1; q <= 4; q++) {
+        for (let i = 1; i <= 3; i++) {
+          formEls[`q${q}Question${i}`].value = recruit?.[`q${q}Question${i}`] || '';
+          formEls[`q${q}Answer${i}`].value = recruit?.[`q${q}Answer${i}`] || '';
+        }
+      }
+      document.getElementById('headshotCurrent').textContent = recruit?.headshot ? 'Current headshot loaded.' : 'No headshot uploaded yet.';
     }
 
-    function closeRecruitModal() {
-      modal.style.display = 'none';
-    }
+    function closeRecruitModal() { modal.style.display = 'none'; }
 
     closeRecruitModalBtn.addEventListener('click', closeRecruitModal);
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) closeRecruitModal();
-    });
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeRecruitModal(); });
 
-    importBtn.addEventListener('click', () => fileInput.click());
     addBtn.addEventListener('click', () => openRecruitModal());
+    importBtn.addEventListener('click', () => fileInput.click());
 
     recruitForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = formEls.id.value || String(Date.now());
       let existingHeadshot = recruitDetails[id]?.headshot || '';
+
       if (formEls.headshot.files && formEls.headshot.files[0]) {
         existingHeadshot = await new Promise((resolve) => {
           const reader = new FileReader();
           reader.onload = (evt) => resolve(evt.target.result);
           reader.readAsDataURL(formEls.headshot.files[0]);
         });
-      };
-      const row = {
-        fullName: formEls.name.value,
+      }
+
+      const notesHistoryLines = String(formEls.notesHistory.value || '')
+        .split('\n')
+        .map(v => v.trim())
+        .filter(Boolean)
+        .map(text => ({ date: new Date().toISOString().slice(0,10), text }));
+
+      recruitDetails[id] = {
+        ...(recruitDetails[id] || {}),
+        name: formEls.name.value,
         classYear: formEls.classYear.value,
         group: formEls.group.value,
         position: formEls.position.value,
         city: formEls.city.value,
         state: formEls.state.value,
         club: formEls.club.value,
-        priority: formEls.priority.value,
-        status: formEls.priority.value,
-        phone: formEls.phone.value,
-        email: formEls.email.value,
-        profileLink: formEls.profileLink.value,
-        owner: formEls.owner.value,
+        status: formEls.priority.value || 'Active',
+        priority: formEls.priority.value || 'Active',
+        june15Call: formEls.june15Call.value,
         rating: formEls.rating.value,
         wroteToUs: formEls.wroteToUs.value,
-        height: formEls.height.value,
-        graduationYear: formEls.graduationYear.value,
-        q1: formEls.q1.value,
-        q2: formEls.q2.value,
-        q3: formEls.q3.value,
-        q4: formEls.q4.value,
-        tags: formEls.tags.value,
+        q1: formEls.q1.value === 'true',
+        q2: formEls.q2.value === 'true',
+        q3: formEls.q3.value === 'true',
+        q4: formEls.q4.value === 'true',
+        tags: splitMulti(formEls.tags.value),
         summary: formEls.summary.value,
-        notes: formEls.notes.value,
-        evaluation: formEls.evaluation.value,
-        followUp: formEls.followUp.value,
+        notes: splitMulti(formEls.notes.value),
+        notesHistory: notesHistoryLines.length ? notesHistoryLines : (recruitDetails[id]?.notesHistory || []),
+        evaluation: splitMulti(formEls.evaluation.value),
+        actions: splitMulti(formEls.followUp.value),
         academics: formEls.academics.value,
         visitStatus: formEls.visitStatus.value,
-        q1Answer: formEls.q1Answer.value,
-        q2Answer: formEls.q2Answer.value,
-        q3Answer: formEls.q3Answer.value,
-        q4Answer: formEls.q4Answer.value,
-        headshot: existingHeadshot
+        followUp: formEls.followUp.value,
+        nextActionDue: formEls.nextActionDue.value,
+        lastContactDate: formEls.lastContactDate.value,
+        callPlanLocal: formEls.callPlanLocal.value,
+        callPlanTimezone: formEls.callPlanTimezone.value,
+        callPlanPST: formEls.callPlanLocal.value && formEls.callPlanTimezone.value ? formatInPSTFromLocal(formEls.callPlanLocal.value, formEls.callPlanTimezone.value) : '',
+        email: formEls.email.value,
+        phone: formEls.phone.value,
+        profileLink: formEls.profileLink.value,
+        filmLink: formEls.filmLink.value,
+        headshot: existingHeadshot,
+        height: formEls.height.value,
+        graduationYear: formEls.graduationYear.value,
+        favorite: formEls.favorite.value === 'true',
+        pinned: formEls.pinned.value === 'true',
+        campAttended: formEls.campAttended.value === 'true',
+        updatedAt: new Date().toISOString(),
+        selected: recruitDetails[id]?.selected || false
       };
 
-      recruitDetails[id] = buildRecruitFromRow(row);
-      recruitDetails[id].height = formEls.height.value;
-      recruitDetails[id].graduationYear = formEls.graduationYear.value;
-      recruitDetails[id].headshot = existingHeadshot;
+      for (let q = 1; q <= 4; q++) {
+        for (let i = 1; i <= 3; i++) {
+          recruitDetails[id][`q${q}Question${i}`] = formEls[`q${q}Question${i}`].value;
+          recruitDetails[id][`q${q}Answer${i}`] = formEls[`q${q}Answer${i}`].value;
+        }
+      }
+
+      selectedRecruitId = id;
+      saveData();
       rebuildRecruitList(id);
       closeRecruitModal();
     });
@@ -1259,12 +2291,12 @@
     deleteRecruitBtn.addEventListener('click', () => {
       const id = formEls.id.value;
       if (!id) return;
-      const confirmed = window.confirm('Delete this recruit?');
-      if (!confirmed) return;
+      if (!window.confirm('Delete this recruit?')) return;
       delete recruitDetails[id];
+      selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
       closeRecruitModal();
-      const firstId = Object.keys(recruitDetails)[0] || '';
-      rebuildRecruitList(firstId);
     });
 
     fileInput.addEventListener('change', (e) => {
@@ -1272,13 +2304,9 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(event) {
-        const text = event.target.result.replace(/
-/g, '
-').replace(//g, '
-');
-        const lines = text.split('
-').filter(line => line.trim() !== '');
+      reader.onload = (event) => {
+        const text = String(event.target.result || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        const lines = text.split('\n').filter(line => line.trim() !== '');
         if (lines.length < 2) {
           alert('This file does not have enough rows to import.');
           return;
@@ -1290,16 +2318,10 @@
         for (let i = 1; i < lines.length; i++) {
           const values = parseCsvLine(lines[i]);
           const row = {};
-          headers.forEach((header, index) => {
-            row[header] = values[index] || '';
-          });
-
+          headers.forEach((header, index) => { row[header] = values[index] || ''; });
           if (!row.fullName && !row.name && !row.recruitName) continue;
-
           const id = String(Date.now() + i);
           recruitDetails[id] = buildRecruitFromRow(row);
-          recruitDetails[id].height = row.height || '';
-          recruitDetails[id].graduationYear = row.graduationYear || row.classYear || '';
           importedIds.push(id);
         }
 
@@ -1308,7 +2330,9 @@
           return;
         }
 
-        rebuildRecruitList(importedIds[0]);
+        selectedRecruitId = importedIds[0];
+        saveData();
+        rebuildRecruitList(selectedRecruitId);
         alert(`Imported ${importedIds.length} recruits.`);
       };
 
@@ -1316,111 +2340,145 @@
       fileInput.value = '';
     });
 
-    function getAllRecruits() {
-      return Object.entries(recruitDetails).map(([id, recruit]) => ({ id, ...recruit }));
-    }
+    function updateCountdown() {
+      const now = new Date();
+      let diff = TARGET_DATE.getTime() - now.getTime();
+      if (diff < 0) diff = 0;
 
-    function rebuildRecruitList(activeId) {
-      const searchTerm = (searchInput.value || '').toLowerCase().trim();
-      const classValue = classSelect.value;
-      const positionValue = positionSelect.value;
-      const statusValue = statusSelect.value;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
 
-      const recruits = getAllRecruits().filter(recruit => {
-        const matchesSearch = !searchTerm || [
-          recruit.name,
-          recruit.club,
-          recruit.city,
-          recruit.state,
-          recruit.position,
-          recruit.group,
-          recruit.summary,
-          (recruit.notes || []).join(' '),
-          (recruit.tags || []).join(' '),
-          recruit.email,
-          recruit.phone
-        ].join(' ').toLowerCase().includes(searchTerm);
+      const parts = [
+        ['daysValue', 'boxDays', days],
+        ['hoursValue', 'boxHours', hours],
+        ['minutesValue', 'boxMinutes', minutes],
+        ['secondsValue', 'boxSeconds', seconds]
+      ];
 
-        const matchesClass = classValue === 'All Classes' || classValue === '' || recruit.classYear === classValue;
-        const matchesPosition = positionValue === 'All Positions' || positionValue === '' || recruit.position === positionValue;
-        const matchesStatus = statusValue === 'All Statuses' || statusValue === '' || recruit.status === statusValue || recruit.priority === statusValue;
-
-        return matchesSearch && matchesClass && matchesPosition && matchesStatus;
+      parts.forEach(([valueId, boxId, value]) => {
+        const el = document.getElementById(valueId);
+        const box = document.getElementById(boxId);
+        if (!el.dataset.prev || el.dataset.prev !== String(value)) {
+          box.classList.remove('bump');
+          void box.offsetWidth;
+          box.classList.add('bump');
+        }
+        el.dataset.prev = String(value);
+        el.textContent = String(value).padStart(2, '0');
       });
 
-      recruitList.innerHTML = recruits.map(recruit => `
-        <div class="recruit-card ${String(recruit.id) === String(activeId) ? 'active' : ''}" data-id="${recruit.id}">
-          <div class="recruit-top">
-            <div>
-              <div class="recruit-name">${recruit.name}</div>
-              <div class="recruit-meta">${cardMeta(recruit)}</div>
-            </div>
-            <div class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.priority || recruit.status || 'Active'}</div>
-          </div>
-          <div class="tag-row">
-            ${(recruit.tags || []).slice(0, 4).map(tag => `<span class="tag">${tag}</span>`).join('')}
-          </div>
-        </div>
-      `).join('');
+      const totalWindow = TARGET_DATE.getTime() - YEAR_START.getTime();
+      const elapsed = Math.max(0, Math.min(totalWindow, now.getTime() - YEAR_START.getTime()));
+      const progress = totalWindow ? (elapsed / totalWindow) * 100 : 100;
+      document.getElementById('countdownProgress').style.width = `${progress.toFixed(2)}%`;
+      document.getElementById('progressText').textContent = `${progress.toFixed(1)}% of the countdown window complete`;
+      document.getElementById('countdownStatus').textContent = diff === 0 ? 'June 15, 2026 is here' : 'Stay ready for contact day';
 
-      cards = document.querySelectorAll('.recruit-card');
-      attachCardListeners();
-
-      const selectedRecruit = recruitDetails[activeId] || (recruits[0] ? recruitDetails[recruits[0].id] : null);
-      if (selectedRecruit) {
-        renderDetail(selectedRecruit, activeId || recruits[0]?.id);
-        setTimeout(() => {
-          const editBtn = document.getElementById('editRecruitBtn');
-          if (editBtn) {
-            editBtn.onclick = () => openRecruitModal(String(activeId || recruits[0]?.id || ''));
-          }
-        }, 0);
-        if (!document.querySelector('.recruit-card.active') && recruits[0]) {
-          const firstCard = document.querySelector(`.recruit-card[data-id="${recruits[0].id}"]`);
-          if (firstCard) firstCard.classList.add('active');
-        }
-      } else {
-        detailPanel.innerHTML = '<div class="section"><h5>No Recruit Selected</h5><p>Import a sheet or add a recruit to get started.</p></div>';
+      if (diff === 0 && !window.__june15ConfettiTriggered) {
+        window.__june15ConfettiTriggered = true;
+        launchConfetti();
       }
     }
 
-    function attachCardListeners() {
-      cards = document.querySelectorAll('.recruit-card');
-      cards.forEach(card => {
-        card.onclick = () => {
-          cards.forEach(c => c.classList.remove('active'));
-          card.classList.add('active');
-          renderDetail(recruitDetails[card.dataset.id], card.dataset.id);
-          setTimeout(() => {
-            const editBtn = document.getElementById('editRecruitBtn');
-            if (editBtn) {
-              editBtn.onclick = () => openRecruitModal(String(card.dataset.id));
-            }
-          }, 0);
+    function launchConfetti() {
+      const colors = ['#C41230', '#002D62', '#ffffff', '#d4af37'];
+      for (let i = 0; i < 120; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDuration = `${3 + Math.random() * 3}s`;
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 7000);
+      }
+    }
+
+
+    function formatInPSTFromLocal(localValue, timeZone) {
+      if (!localValue || !timeZone) return '';
+      const [datePart, timePart] = localValue.split('T');
+      if (!datePart || !timePart) return '';
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+
+      function zonedTimeToUtc(y, m, d, h, min, tz) {
+        const approxUtc = new Date(Date.UTC(y, m - 1, d, h, min));
+        const dtf = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hourCycle: 'h23'
+        });
+        const parts = Object.fromEntries(dtf.formatToParts(approxUtc).filter(p => p.type !== 'literal').map(p => [p.type, p.value]));
+        const asUTC = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute, +parts.second);
+        const offset = asUTC - approxUtc.getTime();
+        return new Date(Date.UTC(y, m - 1, d, h, min) - offset);
+      }
+
+      const utcDate = zonedTimeToUtc(year, month, day, hour, minute, timeZone);
+      return new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Los_Angeles',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }).format(utcDate).replace(',', '');
+    }
+
+    function refreshCallPlanPSTField() {
+      formEls.callPlanPST.value = formEls.callPlanLocal.value && formEls.callPlanTimezone.value
+        ? formatInPSTFromLocal(formEls.callPlanLocal.value, formEls.callPlanTimezone.value) + ' PST'
+        : '';
+    }
+
+    formEls.callPlanLocal.addEventListener('input', refreshCallPlanPSTField);
+    formEls.callPlanLocal.addEventListener('change', refreshCallPlanPSTField);
+    formEls.callPlanTimezone.addEventListener('input', refreshCallPlanPSTField);
+    formEls.callPlanTimezone.addEventListener('change', refreshCallPlanPSTField);
+
+    const countdownToggleBtn = document.getElementById('countdownToggleBtn');
+    const countdownSection = document.getElementById('countdownSection');
+    const countdownCollapseKey = 'recruit_dashboard_countdown_collapsed_v1';
+    if (localStorage.getItem(countdownCollapseKey) === 'true') {
+      countdownSection.classList.add('collapsed');
+      countdownToggleBtn.textContent = 'Expand Countdown';
+    }
+    countdownToggleBtn.addEventListener('click', () => {
+      countdownSection.classList.toggle('collapsed');
+      const collapsed = countdownSection.classList.contains('collapsed');
+      countdownToggleBtn.textContent = collapsed ? 'Expand Countdown' : 'Collapse Countdown';
+      localStorage.setItem(countdownCollapseKey, String(collapsed));
+    });
+
+    const sidebarBoxStateKey = "recruit_dashboard_sidebar_boxes_v1";
+    function loadSidebarBoxes() {
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(sidebarBoxStateKey) || "{}"); } catch (e) {}
+      document.querySelectorAll('.sidebar-box[data-box-key]').forEach(box => {
+        const key = box.dataset.boxKey;
+        const btn = box.querySelector('.sidebar-box-toggle');
+        const setState = (collapsed) => {
+          box.classList.toggle('collapsed', collapsed);
+          if (btn) btn.textContent = collapsed ? '+' : '−';
+          saved[key] = collapsed;
+          localStorage.setItem(sidebarBoxStateKey, JSON.stringify(saved));
         };
+        setState(Boolean(saved[key]));
+        if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); setState(!box.classList.contains('collapsed')); });
+        const header = box.querySelector('.sidebar-box-header');
+        if (header) header.addEventListener('click', () => setState(!box.classList.contains('collapsed')));
       });
     }
 
-    searchInput.addEventListener('input', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
-    classSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
-    positionSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
-    statusSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
-
-    function updateCountdown() {
-      const now = new Date();
-      let target = new Date(now.getFullYear(), 5, 15);
-      if (now > target) target = new Date(now.getFullYear() + 1, 5, 15);
-      const diff = target.getTime() - now.getTime();
-      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-      const dayEl = document.getElementById('countdownDays');
-      const labelEl = document.getElementById('countdownLabel');
-      if (!dayEl || !labelEl) return;
-      dayEl.textContent = days <= 0 ? 'TODAY' : days;
-      labelEl.textContent = days <= 0 ? 'June 15 is here' : 'days until June 15';
-    }
-
+    loadSidebarState();
+    loadSidebarBoxes();
     updateCountdown();
-    rebuildRecruitList('1');
-</script>
+    setInterval(updateCountdown, 1000);
+    rebuildRecruitList(selectedRecruitId);
+  </script>
 </body>
 </html>
