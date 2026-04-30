@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recruit Dashboard Prototype</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --line: #d9e0ea;
+      --text: #18212f;
+      --muted: #5d6b82;
+      --accent: #b5121b;
+      --accent-soft: #fdecef;
+      --good: #1d7a46;
+      --warn: #9a6700;
+      --shadow: 0 8px 24px rgba(18, 32, 56, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #101826;
+      color: white;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: #b7c3d6;
+      font-size: 14px;
+    }
+
+    .nav-box,
+    .summary-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .nav-box h3,
+    .summary-box h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: #eef3fb;
+    }
+
+    .nav-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 14px;
+      color: #d9e3f2;
+    }
+
+    .nav-item:last-child { border-bottom: none; }
+
+    .summary-stat {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #bdc8d9;
+      margin-bottom: 6px;
+    }
+
+    .stat-card .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .main {
+      padding: 24px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    .btn {
+      border: none;
+      background: var(--accent);
+      color: white;
+      padding: 11px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .control input,
+    .control select {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: white;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .panel-header {
+      padding: 18px 18px 0;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .panel-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .recruit-list {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      max-height: calc(100vh - 250px);
+      overflow: auto;
+    }
+
+    .recruit-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .recruit-card:hover,
+    .recruit-card.active {
+      transform: translateY(-2px);
+      border-color: #c7a4a6;
+      box-shadow: 0 10px 24px rgba(181, 18, 27, 0.08);
+    }
+
+    .recruit-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .recruit-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .recruit-meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.priority { background: #fff2f2; color: #9f1c1c; }
+    .badge.warm { background: #fff7e8; color: var(--warn); }
+    .badge.good { background: #ebfff3; color: var(--good); }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      background: #f1f4f9;
+      color: #405067;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .detail {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .detail-scroll {
+      padding: 18px;
+      overflow: auto;
+      max-height: calc(100vh - 250px);
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff7f8, #ffffff);
+      border: 1px solid #f2d9dc;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .hero h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .hero p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: white;
+    }
+
+    .mini .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .mini .value {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: white;
+    }
+
+    .section h5 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .section p,
+    .section li {
+      color: #334155;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    @media (max-width: 1100px) {
+      .app,
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .main { padding: 16px; }
+      .controls,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Recruit Board</h1>
+        <p>Organize, filter, and review athlete profiles in one place.</p>
+      </div>
+
+      <div class="summary-box">
+        <h3>Class Snapshot</h3>
+        <div class="summary-stat">
+          <div class="stat-card">
+            <div class="label">Total Recruits</div>
+            <div class="value">48</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Priority</div>
+            <div class="value">12</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Uncommitted</div>
+            <div class="value">31</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Need Follow-Up</div>
+            <div class="value">9</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-box">
+        <h3>Quick Views</h3>
+        <div class="nav-item"><span>2027 Class</span><strong>22</strong></div>
+        <div class="nav-item"><span>Middle Blockers</span><strong>8</strong></div>
+        <div class="nav-item"><span>Setters</span><strong>6</strong></div>
+        <div class="nav-item"><span>California Recruits</span><strong>15</strong></div>
+        <div class="nav-item"><span>Visited Campus</span><strong>11</strong></div>
+        <div class="nav-item"><span>High Academic Fit</span><strong>18</strong></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2>Fresno State Recruiting Dashboard</h2>
+          <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
+        </div>
+        <div class="actions">
+          <button class="btn secondary">Import Sheet</button>
+          <button class="btn">Add Recruit</button>
+        </div>
+      </div>
+
+      <section class="controls">
+        <div class="control">
+          <label for="search">Search</label>
+          <input id="search" type="text" placeholder="Search by name, club, city, notes..." />
+        </div>
+        <div class="control">
+          <label for="classYear">Class</label>
+          <select id="classYear">
+            <option>All Classes</option>
+            <option>2026</option>
+            <option selected>2027</option>
+            <option>2028</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="position">Position</label>
+          <select id="position">
+            <option>All Positions</option>
+            <option>Setter</option>
+            <option>Libero</option>
+            <option>Outside</option>
+            <option>Middle</option>
+            <option>Opposite</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="status">Recruit Status</label>
+          <select id="status">
+            <option>All Statuses</option>
+            <option>Priority</option>
+            <option>Warm</option>
+            <option>Watch List</option>
+            <option>Committed Elsewhere</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Recruit List</h3>
+            <p>Click a card to view the full profile.</p>
+          </div>
+          <div class="recruit-list" id="recruitList">
+            <div class="recruit-card active" data-id="1">
+              <div class="recruit-top">
+                <div>
+                  <div class="recruit-name">Shannon Kirchhardt</div>
+                  <div class="recruit-meta">2027 • Outside Hitter • San Diego, CA</div>
+                </div>
+                <div class="badge priority">Priority</div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">High academic fit</span>
+                <span class="tag">Strong family connection</span>
+                <span class="tag">Club leader</span>
+              </div>
+            </div>
+
+            <div class="recruit-card" data-id="2">
+              <div class="recruit-top">
+                <div>
+                  <div class="recruit-name">Anna Holladay Craft</div>
+                  <div class="recruit-meta">2027 • Setter • Phoenix, AZ</div>
+                </div>
+                <div class="badge warm">Warm</div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Good communicator</span>
+                <span class="tag">Needs follow-up</span>
+                <span class="tag">Multi-sport</span>
+              </div>
+            </div>
+
+            <div class="recruit-card" data-id="3">
+              <div class="recruit-top">
+                <div>
+                  <div class="recruit-name">Brooklyn Rummler</div>
+                  <div class="recruit-meta">2027 • Libero • Boise, ID</div>
+                </div>
+                <div class="badge good">Watch List</div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Elite defender</span>
+                <span class="tag">Film requested</span>
+                <span class="tag">Fast riser</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel detail">
+          <div class="panel-header">
+            <h3>Recruit Profile</h3>
+            <p>This panel can hold everything your staff needs at a glance.</p>
+          </div>
+          <div class="detail-scroll" id="detailPanel">
+            <div class="hero">
+              <h4>Shannon Kirchhardt</h4>
+              <p>2027 • Outside Hitter • San Diego, California • Coast Volleyball Club</p>
+              <div class="tag-row">
+                <span class="badge priority">Top Priority</span>
+                <span class="tag">3.9 GPA</span>
+                <span class="tag">Campus interest high</span>
+                <span class="tag">Unofficial visit complete</span>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="mini"><div class="label">Height</div><div class="value">6'0"</div></div>
+              <div class="mini"><div class="label">Approach Touch</div><div class="value">9'10"</div></div>
+              <div class="mini"><div class="label">Graduation Year</div><div class="value">2027</div></div>
+              <div class="mini"><div class="label">Recruiting Stage</div><div class="value">Heavy Evaluation</div></div>
+              <div class="mini"><div class="label">Phone</div><div class="value">(555) 201-4455</div></div>
+              <div class="mini"><div class="label">Email</div><div class="value">shannon@example.com</div></div>
+            </div>
+
+            <div class="section">
+              <h5>Quick Summary</h5>
+              <p>High-upside outside hitter with strong academics, confident communication, and clear family support. She has shown real interest in Fresno State and responded well in prior calls.</p>
+            </div>
+
+            <div class="section">
+              <h5>Key Notes</h5>
+              <ul>
+                <li>Really values team culture and strong player relationships.</li>
+                <li>Wants a balance of competitive volleyball and a strong academic environment.</li>
+                <li>Parents are engaged and supportive in the recruiting process.</li>
+                <li>Staff should follow up after next tournament weekend.</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <h5>Evaluation Areas</h5>
+              <ul>
+                <li>Terminal attacking potential from the left pin</li>
+                <li>Serve receive consistency under pressure</li>
+                <li>Leadership presence and communication tone</li>
+                <li>Physical development over next 12 months</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <h5>Next Action Items</h5>
+              <ul>
+                <li>Send personal follow-up message before next contact window.</li>
+                <li>Review most recent match film with staff notes attached.</li>
+                <li>Track upcoming tournament schedule and assign evaluator.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const cards = document.querySelectorAll('.recruit-card');
+    const detailPanel = document.getElementById('detailPanel');
+
+    const recruitDetails = {
+      1: {
+        name: 'Shannon Kirchhardt',
+        subtitle: '2027 • Outside Hitter • San Diego, California • Coast Volleyball Club',
+        status: 'Top Priority',
+        chips: ['3.9 GPA', 'Campus interest high', 'Unofficial visit complete'],
+        stats: [
+          ['Height', "6'0\""],
+          ['Approach Touch', "9'10\""],
+          ['Graduation Year', '2027'],
+          ['Recruiting Stage', 'Heavy Evaluation'],
+          ['Phone', '(555) 201-4455'],
+          ['Email', 'shannon@example.com']
+        ],
+        summary: 'High-upside outside hitter with strong academics, confident communication, and clear family support. She has shown real interest in Fresno State and responded well in prior calls.',
+        notes: [
+          'Really values team culture and strong player relationships.',
+          'Wants a balance of competitive volleyball and a strong academic environment.',
+          'Parents are engaged and supportive in the recruiting process.',
+          'Staff should follow up after next tournament weekend.'
+        ],
+        evaluation: [
+          'Terminal attacking potential from the left pin',
+          'Serve receive consistency under pressure',
+          'Leadership presence and communication tone',
+          'Physical development over next 12 months'
+        ],
+        actions: [
+          'Send personal follow-up message before next contact window.',
+          'Review most recent match film with staff notes attached.',
+          'Track upcoming tournament schedule and assign evaluator.'
+        ]
+      },
+      2: {
+        name: 'Anna Holladay Craft',
+        subtitle: '2027 • Setter • Phoenix, Arizona • Valley Elite',
+        status: 'Warm',
+        chips: ['Good communicator', 'Needs follow-up', 'Multi-sport athlete'],
+        stats: [
+          ['Height', "5'10\""],
+          ['Block Touch', "9'2\""],
+          ['Graduation Year', '2027'],
+          ['Recruiting Stage', 'Relationship Build'],
+          ['Phone', '(555) 401-2258'],
+          ['Email', 'anna@example.com']
+        ],
+        summary: 'Smart floor leader with good pace control and strong communication habits. She could become a really clean fit if the relationship continues to build.',
+        notes: [
+          'Interested in programs that prioritize player development.',
+          'Wants clear communication from coaching staffs.',
+          'Academic interest leans toward health sciences.',
+          'Follow up after spring evaluation period.'
+        ],
+        evaluation: [
+          'Tempo variety across all attacker connections',
+          'Defensive competitiveness and second-contact quality',
+          'Leadership presence with older teammates',
+          'Consistency when pushed out of system'
+        ],
+        actions: [
+          'Schedule another call with more position-specific conversation.',
+          'Collect latest tournament film clips.',
+          'Update relationship notes after next contact.'
+        ]
+      },
+      3: {
+        name: 'Brooklyn Rummler',
+        subtitle: '2027 • Libero • Boise, Idaho • Idaho One',
+        status: 'Watch List',
+        chips: ['Elite defender', 'Film requested', 'Fast riser'],
+        stats: [
+          ['Height', "5'6\""],
+          ['Passing Grade', 'High'],
+          ['Graduation Year', '2027'],
+          ['Recruiting Stage', 'Early Evaluation'],
+          ['Phone', '(555) 338-1984'],
+          ['Email', 'brooklyn@example.com']
+        ],
+        summary: 'Instinctive libero with good range and a strong motor. Still early, but the defensive ceiling looks worth tracking closely.',
+        notes: [
+          'Very competitive and loves being in serve receive pressure moments.',
+          'Family is open to out-of-state options.',
+          'Would benefit from more full-match film for evaluation.',
+          'Academic profile still being gathered.'
+        ],
+        evaluation: [
+          'Serve receive posture and angle control',
+          'Ability to defend hard-driven swings',
+          'Vocal organization in the backcourt',
+          'Ball control in transition'
+        ],
+        actions: [
+          'Request full-match film and measurable updates.',
+          'Add notes after next club event.',
+          'Keep on staff radar through summer period.'
+        ]
+      }
+    };
+
+    function renderDetail(recruit) {
+      const statHtml = recruit.stats.map(([label, value]) => `
+        <div class="mini">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </div>
+      `).join('');
+
+      const chipHtml = recruit.chips.map(chip => `<span class="tag">${chip}</span>`).join('');
+      const notesHtml = recruit.notes.map(item => `<li>${item}</li>`).join('');
+      const evalHtml = recruit.evaluation.map(item => `<li>${item}</li>`).join('');
+      const actionsHtml = recruit.actions.map(item => `<li>${item}</li>`).join('');
+
+      detailPanel.innerHTML = `
+        <div class="hero">
+          <h4>${recruit.name}</h4>
+          <p>${recruit.subtitle}</p>
+          <div class="tag-row">
+            <span class="badge priority">${recruit.status}</span>
+            ${chipHtml}
+          </div>
+        </div>
+
+        <div class="detail-grid">${statHtml}</div>
+
+        <div class="section">
+          <h5>Quick Summary</h5>
+          <p>${recruit.summary}</p>
+        </div>
+
+        <div class="section">
+          <h5>Key Notes</h5>
+          <ul>${notesHtml}</ul>
+        </div>
+
+        <div class="section">
+          <h5>Evaluation Areas</h5>
+          <ul>${evalHtml}</ul>
+        </div>
+
+        <div class="section">
+          <h5>Next Action Items</h5>
+          <ul>${actionsHtml}</ul>
+        </div>
+      `;
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        renderDetail(recruitDetails[card.dataset.id]);
+      });
+    });
+  </script>
+</body>
+</html>
