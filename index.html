@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recruit Dashboard Prototype</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --panel: #ffffff;
+      --line: #d9e0ea;
+      --text: #18212f;
+      --muted: #5d6b82;
+      --accent: #b5121b;
+      --accent-soft: #fdecef;
+      --good: #1d7a46;
+      --warn: #9a6700;
+      --shadow: 0 8px 24px rgba(18, 32, 56, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 330px 1fr;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #101826;
+      color: white;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: #b7c3d6;
+      font-size: 14px;
+    }
+
+    .nav-box,
+    .summary-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .nav-box h3,
+    .summary-box h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: #eef3fb;
+    }
+
+    .nav-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      font-size: 14px;
+      color: #d9e3f2;
+    }
+
+    .nav-item:last-child { border-bottom: none; }
+
+    .summary-stat {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #bdc8d9;
+      margin-bottom: 6px;
+    }
+
+    .stat-card .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .main {
+      padding: 24px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+    }
+
+    .btn {
+      border: none;
+      background: var(--accent);
+      color: white;
+      padding: 11px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .control input,
+    .control select {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: white;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr;
+      gap: 20px;
+      min-height: 0;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .panel-header {
+      padding: 18px 18px 0;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .panel-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .recruit-list {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      max-height: calc(100vh - 250px);
+      overflow: auto;
+    }
+
+    .recruit-card {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+
+    .recruit-card:hover,
+    .recruit-card.active {
+      transform: translateY(-2px);
+      border-color: #c7a4a6;
+      box-shadow: 0 10px 24px rgba(181, 18, 27, 0.08);
+    }
+
+    .recruit-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .recruit-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .recruit-meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.priority { background: #fff2f2; color: #9f1c1c; }
+    .badge.warm { background: #fff7e8; color: var(--warn); }
+    .badge.good { background: #ebfff3; color: var(--good); }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .tag {
+      background: #f1f4f9;
+      color: #405067;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .detail {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .detail-scroll {
+      padding: 18px;
+      overflow: auto;
+      max-height: calc(100vh - 250px);
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff7f8, #ffffff);
+      border: 1px solid #f2d9dc;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .hero h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .hero p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: white;
+    }
+
+    .mini .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .mini .value {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: white;
+    }
+
+    .section h5 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .section p,
+    .section li {
+      color: #334155;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    @media (max-width: 1100px) {
+      .app,
+      .content {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .sidebar {
+        min-height: auto;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .main { padding: 16px; }
+      .controls,
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Recruit Board</h1>
+        <p>Organize, filter, and review athlete profiles in one place.</p>
+      </div>
+
+      <div class="summary-box">
+        <h3>Class Snapshot</h3>
+        <div class="summary-stat">
+          <div class="stat-card">
+            <div class="label">Total Recruits</div>
+            <div class="value">48</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Priority</div>
+            <div class="value">12</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Uncommitted</div>
+            <div class="value">31</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Need Follow-Up</div>
+            <div class="value">9</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-box">
+        <h3>Quick Views</h3>
+        <div class="nav-item"><span>2027 Class</span><strong>22</strong></div>
+        <div class="nav-item"><span>Middle Blockers</span><strong>8</strong></div>
+        <div class="nav-item"><span>Setters</span><strong>6</strong></div>
+        <div class="nav-item"><span>California Recruits</span><strong>15</strong></div>
+        <div class="nav-item"><span>Visited Campus</span><strong>11</strong></div>
+        <div class="nav-item"><span>High Academic Fit</span><strong>18</strong></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2>Fresno State Recruiting Dashboard</h2>
+          <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
+        </div>
+        <div class="actions">
+          <button class="btn secondary">Import Sheet</button>
+          <button class="btn">Add Recruit</button>
+        </div>
+      </div>
+
+      <section class="controls">
+        <div class="control">
+          <label for="search">Search</label>
+          <input id="search" type="text" placeholder="Search by name, club, city, notes..." />
+        </div>
+        <div class="control">
+          <label for="classYear">Class</label>
+          <select id="classYear">
+            <option>All Classes</option>
+            <option>2026</option>
+            <option selected>2027</option>
+            <option>2028</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="position">Position</label>
+          <select id="position">
+            <option>All Positions</option>
+            <option>Setter</option>
+            <option>Libero</option>
+            <option>Outside</option>
+            <option>Middle</option>
+            <option>Opposite</option>
+          </select>
+        </div>
+        <div class="control">
+          <label for="status">Recruit Status</label>
+          <select id="status">
+            <option>All Statuses</option>
+            <option>Priority</option>
+            <option>Warm</option>
+            <option>Watch List</option>
+            <option>Committed Elsewhere</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Recruit List</h3>
+            <p>Click a card to view the full profile.</p>
+          </div>
+          <div class="recruit-list" id="recruitList">
+            <div class="recruit-card active" data-id="1">
+              <div class="recruit-top">
+                <div>
+                  <div class="recruit-name">Shannon Kirchhardt</div>
+                  <div class="recruit-meta">2027 • Outside Hitter • San Diego, CA</div>
+                </div>
+                <div class="badge priority">Priority</div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">High academic fit</span>
+                <span class="tag">Strong family connection</span>
+                <span class="tag">Club leader</span>
+              </div>
+            </div>
+
+            <div class="recruit-card" data-id="2">
+              <div class="recruit-top">
+                <div>
+                  <div class="recruit-name">Anna Holladay Craft</div>
+                  <div class="recruit-meta">2027 • Setter • Phoenix, AZ</div>
+                </div>
+                <div class="badge warm">Warm</div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Good communicator</span>
+                <span class="tag">Needs follow-up</span>
+                <span class="tag">Multi-sport</span>
+              </div>
+            </div>
+
+            <div class="recruit-card" data-id="3">
+              <div class="recruit-top">
+                <div>
+                  <div class="recruit-name">Brooklyn Rummler</div>
+                  <div class="recruit-meta">2027 • Libero • Boise, ID</div>
+                </div>
+                <div class="badge good">Watch List</div>
+              </div>
+              <div class="tag-row">
+                <span class="tag">Elite defender</span>
+                <span class="tag">Film requested</span>
+                <span class="tag">Fast riser</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel detail">
+          <div class="panel-header">
+            <h3>Recruit Profile</h3>
+            <p>This panel can hold everything your staff needs at a glance.</p>
+          </div>
+          <div class="detail-scroll" id="detailPanel">
+            <div class="hero">
+              <h4>Shannon Kirchhardt</h4>
+              <p>2027 • Outside Hitter • San Diego, California • Coast Volleyball Club</p>
+              <div class="tag-row">
+                <span class="badge priority">Top Priority</span>
+                <span class="tag">3.9 GPA</span>
+                <span class="tag">Campus interest high</span>
+                <span class="tag">Unofficial visit complete</span>
+              </div>
+            </div>
+
+            <div class="detail-grid">
+              <div class="mini"><div class="label">Height</div><div class="value">6'0"</div></div>
+              <div class="mini"><div class="label">Approach Touch</div><div class="value">9'10"</div></div>
+              <div class="mini"><div class="label">Graduation Year</div><div class="value">2027</div></div>
+              <div class="mini"><div class="label">Recruiting Stage</div><div class="value">Heavy Evaluation</div></div>
+              <div class="mini"><div class="label">Phone</div><div class="value">(555) 201-4455</div></div>
+              <div class="mini"><div class="label">Email</div><div class="value">shannon@example.com</div></div>
+            </div>
+
+            <div class="section">
+              <h5>Quick Summary</h5>
+              <p>High-upside outside hitter with strong academics, confident communication, and clear family support. She has shown real interest in Fresno State and responded well in prior calls.</p>
+            </div>
+
+            <div class="section">
+              <h5>Key Notes</h5>
+              <ul>
+                <li>Really values team culture and strong player relationships.</li>
+                <li>Wants a balance of competitive volleyball and a strong academic environment.</li>
+                <li>Parents are engaged and supportive in the recruiting process.</li>
+                <li>Staff should follow up after next tournament weekend.</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <h5>Evaluation Areas</h5>
+              <ul>
+                <li>Terminal attacking potential from the left pin</li>
+                <li>Serve receive consistency under pressure</li>
+                <li>Leadership presence and communication tone</li>
+                <li>Physical development over next 12 months</li>
+              </ul>
+            </div>
+
+            <div class="section">
+              <h5>Next Action Items</h5>
+              <ul>
+                <li>Send personal follow-up message before next contact window.</li>
+                <li>Review most recent match film with staff notes attached.</li>
+                <li>Track upcoming tournament schedule and assign evaluator.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    let cards = document.querySelectorAll('.recruit-card');
+    const detailPanel = document.getElementById('detailPanel');
+    const recruitList = document.getElementById('recruitList');
+    const searchInput = document.getElementById('search');
+    const classSelect = document.getElementById('classYear');
+    const positionSelect = document.getElementById('position');
+    const statusSelect = document.getElementById('status');
+
+    const recruitDetails = {
+      1: {
+        name: 'Shannon Kirchhardt',
+        classYear: '2027',
+        position: 'Outside Hitter',
+        city: 'San Diego',
+        state: 'California',
+        club: 'Coast Volleyball Club',
+        group: 'Pins',
+        status: 'Top Priority',
+        priority: 'Priority',
+        owner: 'OJ',
+        rating: '5',
+        wroteToUs: '10',
+        q1: true,
+        q2: true,
+        q3: false,
+        q4: false,
+        tags: ['3.9 GPA', 'Campus interest high', 'Unofficial visit complete'],
+        stats: [
+          ['Height', "6'0\""],
+          ['Approach Touch', "9'10\""],
+          ['Graduation Year', '2027'],
+          ['Recruiting Stage', 'Heavy Evaluation'],
+          ['Phone', '(555) 201-4455'],
+          ['Email', 'shannon@example.com']
+        ],
+        summary: 'High-upside outside hitter with strong academics, confident communication, and clear family support. She has shown real interest in Fresno State and responded well in prior calls.',
+        notes: [
+          'Really values team culture and strong player relationships.',
+          'Wants a balance of competitive volleyball and a strong academic environment.',
+          'Parents are engaged and supportive in the recruiting process.',
+          'Staff should follow up after next tournament weekend.'
+        ],
+        evaluation: [
+          'Terminal attacking potential from the left pin',
+          'Serve receive consistency under pressure',
+          'Leadership presence and communication tone',
+          'Physical development over next 12 months'
+        ],
+        actions: [
+          'Send personal follow-up message before next contact window.',
+          'Review most recent match film with staff notes attached.',
+          'Track upcoming tournament schedule and assign evaluator.'
+        ],
+        academics: 'High academic fit',
+        visitStatus: 'Unofficial visit complete',
+        followUp: 'Follow up after next tournament weekend.',
+        email: 'shannon@example.com',
+        phone: '(555) 201-4455',
+        profileLink: ''
+      },
+      2: {
+        name: 'Anna Holladay Craft',
+        classYear: '2027',
+        position: 'Setter',
+        city: 'Phoenix',
+        state: 'Arizona',
+        club: 'Valley Elite',
+        group: 'Setters',
+        status: 'Warm',
+        priority: 'Warm',
+        owner: 'OJ',
+        rating: '4',
+        wroteToUs: '5',
+        q1: true,
+        q2: true,
+        q3: false,
+        q4: false,
+        tags: ['Good communicator', 'Needs follow-up', 'Multi-sport athlete'],
+        stats: [
+          ['Height', "5'10\""],
+          ['Block Touch', "9'2\""],
+          ['Graduation Year', '2027'],
+          ['Recruiting Stage', 'Relationship Build'],
+          ['Phone', '(555) 401-2258'],
+          ['Email', 'anna@example.com']
+        ],
+        summary: 'Smart floor leader with good pace control and strong communication habits. She could become a really clean fit if the relationship continues to build.',
+        notes: [
+          'Interested in programs that prioritize player development.',
+          'Wants clear communication from coaching staffs.',
+          'Academic interest leans toward health sciences.',
+          'Follow up after spring evaluation period.'
+        ],
+        evaluation: [
+          'Tempo variety across all attacker connections',
+          'Defensive competitiveness and second-contact quality',
+          'Leadership presence with older teammates',
+          'Consistency when pushed out of system'
+        ],
+        actions: [
+          'Schedule another call with more position-specific conversation.',
+          'Collect latest tournament film clips.',
+          'Update relationship notes after next contact.'
+        ],
+        academics: 'Health sciences interest',
+        visitStatus: '',
+        followUp: 'Follow up after spring evaluation period.',
+        email: 'anna@example.com',
+        phone: '(555) 401-2258',
+        profileLink: ''
+      },
+      3: {
+        name: 'Brooklyn Rummler',
+        classYear: '2027',
+        position: 'Libero',
+        city: 'Boise',
+        state: 'Idaho',
+        club: 'Idaho One',
+        group: 'Liberos',
+        status: 'Watch List',
+        priority: 'Watch List',
+        owner: 'OJ',
+        rating: '5',
+        wroteToUs: '2',
+        q1: true,
+        q2: false,
+        q3: false,
+        q4: false,
+        tags: ['Elite defender', 'Film requested', 'Fast riser'],
+        stats: [
+          ['Height', "5'6\""],
+          ['Passing Grade', 'High'],
+          ['Graduation Year', '2027'],
+          ['Recruiting Stage', 'Early Evaluation'],
+          ['Phone', '(555) 338-1984'],
+          ['Email', 'brooklyn@example.com']
+        ],
+        summary: 'Instinctive libero with good range and a strong motor. Still early, but the defensive ceiling looks worth tracking closely.',
+        notes: [
+          'Very competitive and loves being in serve receive pressure moments.',
+          'Family is open to out-of-state options.',
+          'Would benefit from more full-match film for evaluation.',
+          'Academic profile still being gathered.'
+        ],
+        evaluation: [
+          'Serve receive posture and angle control',
+          'Ability to defend hard-driven swings',
+          'Vocal organization in the backcourt',
+          'Ball control in transition'
+        ],
+        actions: [
+          'Request full-match film and measurable updates.',
+          'Add notes after next club event.',
+          'Keep on staff radar through summer period.'
+        ],
+        academics: '',
+        visitStatus: '',
+        followUp: 'Request full-match film and measurable updates.',
+        email: 'brooklyn@example.com',
+        phone: '(555) 338-1984',
+        profileLink: ''
+      }
+    };
+
+    function badgeClassFromStatus(status) {
+      const value = String(status || '').toLowerCase();
+      if (value.includes('priority')) return 'priority';
+      if (value.includes('warm')) return 'warm';
+      return 'good';
+    }
+
+    function formatBool(value) {
+      return value ? 'Yes' : 'No';
+    }
+
+    function parseYesNo(value) {
+      const v = String(value || '').trim().toLowerCase();
+      return ['yes', 'y', 'true', '1', 'x', 'check', 'checked', '√'].includes(v);
+    }
+
+    function splitMulti(value) {
+      if (!value) return [];
+      return String(value)
+        .split(/\||;|,/)
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    function parseCsvLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+
+      result.push(current);
+      return result.map(cell => cell.trim());
+    }
+
+    function profileSubtitle(recruit) {
+      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', '), recruit.club].filter(Boolean).join(' • ');
+    }
+
+    function cardMeta(recruit) {
+      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', ')].filter(Boolean).join(' • ');
+    }
+
+    function buildRecruitFromRow(row) {
+      const name = row.fullName || row.name || row.recruitName || 'Unknown Recruit';
+      const priority = row.priority || row.status || row.group || 'Imported';
+      const tags = splitMulti(row.tags);
+      const notes = splitMulti(row.notes || row.summary || '');
+      const evaluation = splitMulti(row.evaluation || row.eval || '');
+      const actions = splitMulti(row.followUp || row.actions || row.nextAction || '');
+
+      const stats = [
+        ['Height', row.height || ''],
+        ['Graduation Year', row.graduationYear || row.classYear || ''],
+        ['Phone', row.phone || ''],
+        ['Email', row.email || ''],
+        ['Owner', row.owner || ''],
+        ['Rating', row.rating || ''],
+        ['Wrote To Us', row.wroteToUs || ''],
+        ['Q1', formatBool(parseYesNo(row.q1))],
+        ['Q2', formatBool(parseYesNo(row.q2))],
+        ['Q3', formatBool(parseYesNo(row.q3))],
+        ['Q4', formatBool(parseYesNo(row.q4))]
+      ].filter(([, value]) => value !== '');
+
+      return {
+        name,
+        classYear: row.classYear || row.graduationYear || '',
+        position: row.position || '',
+        city: row.city || '',
+        state: row.state || '',
+        club: row.club || '',
+        group: row.group || '',
+        status: priority,
+        priority,
+        owner: row.owner || '',
+        rating: row.rating || '',
+        wroteToUs: row.wroteToUs || '',
+        q1: parseYesNo(row.q1),
+        q2: parseYesNo(row.q2),
+        q3: parseYesNo(row.q3),
+        q4: parseYesNo(row.q4),
+        tags,
+        stats,
+        summary: row.summary || row.notes || 'Imported recruit profile.',
+        notes,
+        evaluation,
+        actions,
+        academics: row.academics || '',
+        visitStatus: row.visitStatus || '',
+        followUp: row.followUp || '',
+        email: row.email || '',
+        phone: row.phone || '',
+        profileLink: row.profileLink || ''
+      };
+    }
+
+    function renderDetail(recruit, recruitId) {
+      const statHtml = (recruit.stats || []).map(([label, value]) => `
+        <div class="mini">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </div>
+      `).join('');
+
+      const chipHtml = (recruit.tags || []).map(chip => `<span class="tag">${chip}</span>`).join('');
+      const notesHtml = ((recruit.notes && recruit.notes.length ? recruit.notes : ['No notes added yet.'])).map(item => `<li>${item}</li>`).join('');
+      const evalHtml = ((recruit.evaluation && recruit.evaluation.length ? recruit.evaluation : ['No evaluation notes added yet.'])).map(item => `<li>${item}</li>`).join('');
+      const actionsHtml = ((recruit.actions && recruit.actions.length ? recruit.actions : ['No next actions added yet.'])).map(item => `<li>${item}</li>`).join('');
+      const profileLinkHtml = recruit.profileLink ? `<a href="${recruit.profileLink}" target="_blank" rel="noopener noreferrer">Open profile link</a>` : 'No profile link added.';
+
+      detailPanel.innerHTML = `
+        <div class="hero">
+          <h4>${recruit.name}</h4>
+          <p>${profileSubtitle(recruit)}</p>
+          <div class="tag-row">
+            <span class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.status || 'Active'}</span>
+            ${chipHtml}
+          </div>
+        </div>
+
+        <div class="detail-grid">${statHtml}</div>
+
+        <div class="section" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <h5>Quick Summary</h5>
+            <p style="margin:8px 0 0;">${recruit.summary || 'No summary added yet.'}</p>
+          </div>
+          <button class="btn secondary" id="editRecruitBtn" type="button">Edit Recruit</button>
+        </div>
+
+        <div class="section">
+          <h5>Quick Summary</h5>
+          <p>${recruit.summary || 'No summary added yet.'}</p>
+        </div>
+
+        <div class="section">
+          <h5>Recruiting Info</h5>
+          <ul>
+            <li><strong>Group:</strong> ${recruit.group || '—'}</li>
+            <li><strong>Owner:</strong> ${recruit.owner || '—'}</li>
+            <li><strong>Rating:</strong> ${recruit.rating || '—'}</li>
+            <li><strong>Wrote To Us:</strong> ${recruit.wroteToUs || '—'}</li>
+            <li><strong>Academics:</strong> ${recruit.academics || '—'}</li>
+            <li><strong>Visit Status:</strong> ${recruit.visitStatus || '—'}</li>
+            <li><strong>Profile Link:</strong> ${profileLinkHtml}</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h5>Contact Timeline</h5>
+          <ul>
+            <li><strong>Q1:</strong> ${formatBool(recruit.q1)}</li>
+            <li><strong>Q2:</strong> ${formatBool(recruit.q2)}</li>
+            <li><strong>Q3:</strong> ${formatBool(recruit.q3)}</li>
+            <li><strong>Q4:</strong> ${formatBool(recruit.q4)}</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h5>Key Notes</h5>
+          <ul>${notesHtml}</ul>
+        </div>
+
+        <div class="section">
+          <h5>Evaluation Areas</h5>
+          <ul>${evalHtml}</ul>
+        </div>
+
+        <div class="section">
+          <h5>Next Action Items</h5>
+          <ul>${actionsHtml}</ul>
+        </div>
+      `;
+    }
+
+    cards.forEach(card => {
+      card.addEventListener('click', () => {
+        cards.forEach(c => c.classList.remove('active'));
+        card.classList.add('active');
+        renderDetail(recruitDetails[card.dataset.id]);
+      });
+    });
+  
+
+    // ===== RECRUIT IMPORT + ADD + EDIT FUNCTIONALITY =====
+
+    const importBtn = document.querySelector('.btn.secondary');
+    const addBtn = document.querySelector('.btn:not(.secondary)');
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+    const modal = document.createElement('div');
+    modal.id = 'recruitModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(16,24,38,0.55);display:none;align-items:center;justify-content:center;padding:24px;z-index:9999;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:18px;max-width:900px;width:100%;max-height:90vh;overflow:auto;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+          <h3 id="modalTitle" style="margin:0;font-size:24px;">Add Recruit</h3>
+          <button id="closeRecruitModal" style="border:none;background:#eef2f7;border-radius:10px;padding:10px 12px;cursor:pointer;font-weight:700;">Close</button>
+        </div>
+        <form id="recruitForm" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
+          <input type="hidden" id="formRecruitId" />
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Full Name</label><input id="formName" required style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Class Year</label><input id="formClassYear" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Group</label><input id="formGroup" placeholder="Liberos, Middles, Setters, Pins..." style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Position</label><input id="formPosition" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">City</label><input id="formCity" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">State</label><input id="formState" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Club</label><input id="formClub" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Priority / Status</label><input id="formPriority" placeholder="Priority, Warm, Watch List..." style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Phone</label><input id="formPhone" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Email</label><input id="formEmail" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Profile Link</label><input id="formProfileLink" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Owner</label><input id="formOwner" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Rating</label><input id="formRating" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Wrote To Us</label><input id="formWroteToUs" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Height</label><input id="formHeight" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Graduation Year</label><input id="formGraduationYear" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q1</label><select id="formQ1" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2</label><select id="formQ2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3</label><select id="formQ3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4</label><select id="formQ4" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Tags</label><input id="formTags" placeholder="comma separated" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Summary</label><textarea id="formSummary" rows="3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes</label><textarea id="formNotes" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Evaluation</label><textarea id="formEvaluation" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Follow Up / Next Actions</label><textarea id="formFollowUp" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Academics</label><textarea id="formAcademics" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Visit Status</label><textarea id="formVisitStatus" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+            <button type="button" id="deleteRecruitBtn" style="display:none;border:none;background:#fee2e2;color:#991b1b;padding:12px 16px;border-radius:12px;cursor:pointer;font-weight:700;">Delete Recruit</button>
+            <button type="submit" style="border:none;background:#b5121b;color:white;padding:12px 18px;border-radius:12px;cursor:pointer;font-weight:700;">Save Recruit</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalTitle = document.getElementById('modalTitle');
+    const recruitForm = document.getElementById('recruitForm');
+    const closeRecruitModalBtn = document.getElementById('closeRecruitModal');
+    const deleteRecruitBtn = document.getElementById('deleteRecruitBtn');
+
+    const formEls = {
+      id: document.getElementById('formRecruitId'),
+      name: document.getElementById('formName'),
+      classYear: document.getElementById('formClassYear'),
+      group: document.getElementById('formGroup'),
+      position: document.getElementById('formPosition'),
+      city: document.getElementById('formCity'),
+      state: document.getElementById('formState'),
+      club: document.getElementById('formClub'),
+      priority: document.getElementById('formPriority'),
+      phone: document.getElementById('formPhone'),
+      email: document.getElementById('formEmail'),
+      profileLink: document.getElementById('formProfileLink'),
+      owner: document.getElementById('formOwner'),
+      rating: document.getElementById('formRating'),
+      wroteToUs: document.getElementById('formWroteToUs'),
+      height: document.getElementById('formHeight'),
+      graduationYear: document.getElementById('formGraduationYear'),
+      q1: document.getElementById('formQ1'),
+      q2: document.getElementById('formQ2'),
+      q3: document.getElementById('formQ3'),
+      q4: document.getElementById('formQ4'),
+      tags: document.getElementById('formTags'),
+      summary: document.getElementById('formSummary'),
+      notes: document.getElementById('formNotes'),
+      evaluation: document.getElementById('formEvaluation'),
+      followUp: document.getElementById('formFollowUp'),
+      academics: document.getElementById('formAcademics'),
+      visitStatus: document.getElementById('formVisitStatus')
+    };
+
+    function openRecruitModal(id = '') {
+      const recruit = id ? recruitDetails[id] : null;
+      modal.style.display = 'flex';
+      modalTitle.textContent = recruit ? 'Edit Recruit' : 'Add Recruit';
+      deleteRecruitBtn.style.display = recruit ? 'inline-flex' : 'none';
+
+      formEls.id.value = id || '';
+      formEls.name.value = recruit?.name || '';
+      formEls.classYear.value = recruit?.classYear || '';
+      formEls.group.value = recruit?.group || '';
+      formEls.position.value = recruit?.position || '';
+      formEls.city.value = recruit?.city || '';
+      formEls.state.value = recruit?.state || '';
+      formEls.club.value = recruit?.club || '';
+      formEls.priority.value = recruit?.priority || recruit?.status || '';
+      formEls.phone.value = recruit?.phone || '';
+      formEls.email.value = recruit?.email || '';
+      formEls.profileLink.value = recruit?.profileLink || '';
+      formEls.owner.value = recruit?.owner || '';
+      formEls.rating.value = recruit?.rating || '';
+      formEls.wroteToUs.value = recruit?.wroteToUs || '';
+      formEls.height.value = recruit?.height || '';
+      formEls.graduationYear.value = recruit?.graduationYear || recruit?.classYear || '';
+      formEls.q1.value = String(!!recruit?.q1);
+      formEls.q2.value = String(!!recruit?.q2);
+      formEls.q3.value = String(!!recruit?.q3);
+      formEls.q4.value = String(!!recruit?.q4);
+      formEls.tags.value = (recruit?.tags || []).join(', ');
+      formEls.summary.value = recruit?.summary || '';
+      formEls.notes.value = (recruit?.notes || []).join('; ');
+      formEls.evaluation.value = (recruit?.evaluation || []).join('; ');
+      formEls.followUp.value = recruit?.followUp || (recruit?.actions || []).join('; ');
+      formEls.academics.value = recruit?.academics || '';
+      formEls.visitStatus.value = recruit?.visitStatus || '';
+    }
+
+    function closeRecruitModal() {
+      modal.style.display = 'none';
+    }
+
+    closeRecruitModalBtn.addEventListener('click', closeRecruitModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeRecruitModal();
+    });
+
+    importBtn.addEventListener('click', () => fileInput.click());
+    addBtn.addEventListener('click', () => openRecruitModal());
+
+    recruitForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const id = formEls.id.value || String(Date.now());
+      const row = {
+        fullName: formEls.name.value,
+        classYear: formEls.classYear.value,
+        group: formEls.group.value,
+        position: formEls.position.value,
+        city: formEls.city.value,
+        state: formEls.state.value,
+        club: formEls.club.value,
+        priority: formEls.priority.value,
+        status: formEls.priority.value,
+        phone: formEls.phone.value,
+        email: formEls.email.value,
+        profileLink: formEls.profileLink.value,
+        owner: formEls.owner.value,
+        rating: formEls.rating.value,
+        wroteToUs: formEls.wroteToUs.value,
+        height: formEls.height.value,
+        graduationYear: formEls.graduationYear.value,
+        q1: formEls.q1.value,
+        q2: formEls.q2.value,
+        q3: formEls.q3.value,
+        q4: formEls.q4.value,
+        tags: formEls.tags.value,
+        summary: formEls.summary.value,
+        notes: formEls.notes.value,
+        evaluation: formEls.evaluation.value,
+        followUp: formEls.followUp.value,
+        academics: formEls.academics.value,
+        visitStatus: formEls.visitStatus.value
+      };
+
+      recruitDetails[id] = buildRecruitFromRow(row);
+      recruitDetails[id].height = formEls.height.value;
+      recruitDetails[id].graduationYear = formEls.graduationYear.value;
+      rebuildRecruitList(id);
+      closeRecruitModal();
+    });
+
+    deleteRecruitBtn.addEventListener('click', () => {
+      const id = formEls.id.value;
+      if (!id) return;
+      const confirmed = window.confirm('Delete this recruit?');
+      if (!confirmed) return;
+      delete recruitDetails[id];
+      closeRecruitModal();
+      const firstId = Object.keys(recruitDetails)[0] || '';
+      rebuildRecruitList(firstId);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const text = event.target.result.replace(/
+/g, '
+').replace(//g, '
+');
+        const lines = text.split('
+').filter(line => line.trim() !== '');
+        if (lines.length < 2) {
+          alert('This file does not have enough rows to import.');
+          return;
+        }
+
+        const headers = parseCsvLine(lines[0]);
+        const importedIds = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = parseCsvLine(lines[i]);
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index] || '';
+          });
+
+          if (!row.fullName && !row.name && !row.recruitName) continue;
+
+          const id = String(Date.now() + i);
+          recruitDetails[id] = buildRecruitFromRow(row);
+          recruitDetails[id].height = row.height || '';
+          recruitDetails[id].graduationYear = row.graduationYear || row.classYear || '';
+          importedIds.push(id);
+        }
+
+        if (!importedIds.length) {
+          alert('No recruits were imported. Make sure your CSV has a fullName column.');
+          return;
+        }
+
+        rebuildRecruitList(importedIds[0]);
+        alert(`Imported ${importedIds.length} recruits.`);
+      };
+
+      reader.readAsText(file);
+      fileInput.value = '';
+    });
+
+    function getAllRecruits() {
+      return Object.entries(recruitDetails).map(([id, recruit]) => ({ id, ...recruit }));
+    }
+
+    function rebuildRecruitList(activeId) {
+      const searchTerm = (searchInput.value || '').toLowerCase().trim();
+      const classValue = classSelect.value;
+      const positionValue = positionSelect.value;
+      const statusValue = statusSelect.value;
+
+      const recruits = getAllRecruits().filter(recruit => {
+        const matchesSearch = !searchTerm || [
+          recruit.name,
+          recruit.club,
+          recruit.city,
+          recruit.state,
+          recruit.position,
+          recruit.group,
+          recruit.summary,
+          (recruit.notes || []).join(' '),
+          (recruit.tags || []).join(' '),
+          recruit.email,
+          recruit.phone
+        ].join(' ').toLowerCase().includes(searchTerm);
+
+        const matchesClass = classValue === 'All Classes' || classValue === '' || recruit.classYear === classValue;
+        const matchesPosition = positionValue === 'All Positions' || positionValue === '' || recruit.position === positionValue;
+        const matchesStatus = statusValue === 'All Statuses' || statusValue === '' || recruit.status === statusValue || recruit.priority === statusValue;
+
+        return matchesSearch && matchesClass && matchesPosition && matchesStatus;
+      });
+
+      recruitList.innerHTML = recruits.map(recruit => `
+        <div class="recruit-card ${String(recruit.id) === String(activeId) ? 'active' : ''}" data-id="${recruit.id}">
+          <div class="recruit-top">
+            <div>
+              <div class="recruit-name">${recruit.name}</div>
+              <div class="recruit-meta">${cardMeta(recruit)}</div>
+            </div>
+            <div class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.priority || recruit.status || 'Active'}</div>
+          </div>
+          <div class="tag-row">
+            ${(recruit.tags || []).slice(0, 4).map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      cards = document.querySelectorAll('.recruit-card');
+      attachCardListeners();
+
+      const selectedRecruit = recruitDetails[activeId] || (recruits[0] ? recruitDetails[recruits[0].id] : null);
+      if (selectedRecruit) {
+        renderDetail(selectedRecruit, activeId || recruits[0]?.id);
+        setTimeout(() => {
+          const editBtn = document.getElementById('editRecruitBtn');
+          if (editBtn) {
+            editBtn.onclick = () => openRecruitModal(String(activeId || recruits[0]?.id || ''));
+          }
+        }, 0);
+        if (!document.querySelector('.recruit-card.active') && recruits[0]) {
+          const firstCard = document.querySelector(`.recruit-card[data-id="${recruits[0].id}"]`);
+          if (firstCard) firstCard.classList.add('active');
+        }
+      } else {
+        detailPanel.innerHTML = '<div class="section"><h5>No Recruit Selected</h5><p>Import a sheet or add a recruit to get started.</p></div>';
+      }
+    }
+
+    function attachCardListeners() {
+      cards = document.querySelectorAll('.recruit-card');
+      cards.forEach(card => {
+        card.onclick = () => {
+          cards.forEach(c => c.classList.remove('active'));
+          card.classList.add('active');
+          renderDetail(recruitDetails[card.dataset.id], card.dataset.id);
+          setTimeout(() => {
+            const editBtn = document.getElementById('editRecruitBtn');
+            if (editBtn) {
+              editBtn.onclick = () => openRecruitModal(String(card.dataset.id));
+            }
+          }, 0);
+        };
+      });
+    }
+
+    searchInput.addEventListener('input', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
+    classSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
+    positionSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
+    statusSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
+
+    rebuildRecruitList('1');
+</script>
+</body>
+</html>
