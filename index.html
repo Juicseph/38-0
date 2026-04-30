@@ -316,6 +316,37 @@
       padding: 18px;
     }
 
+    .hero-top {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .headshot {
+      width:84px;
+      height:84px;
+      border-radius:18px;
+      object-fit:cover;
+      background:#eef2f7;
+      border:1px solid #d9e0ea;
+      display:block;
+    }
+
+    .headshot-placeholder {
+      width:84px;
+      height:84px;
+      border-radius:18px;
+      background:#eef2f7;
+      border:1px solid #d9e0ea;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:28px;
+      font-weight:800;
+      color:#64748b;
+    }
+
     .hero h4 {
       margin: 0;
       font-size: 24px;
@@ -453,6 +484,17 @@
           <button class="btn">Add Recruit</button>
         </div>
       </div>
+
+      <section class="panel" style="padding:16px 18px;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Important Date</div>
+          <div style="font-size:24px;font-weight:800;margin-top:4px;">June 15 Contact Day</div>
+        </div>
+        <div style="text-align:right;">
+          <div id="countdownDays" style="font-size:34px;font-weight:800;color:var(--accent);line-height:1;">--</div>
+          <div id="countdownLabel" style="font-size:13px;color:var(--muted);margin-top:4px;">days until June 15</div>
+        </div>
+      </section>
 
       <section class="controls">
         <div class="control">
@@ -842,6 +884,10 @@
       const notes = splitMulti(row.notes || row.summary || '');
       const evaluation = splitMulti(row.evaluation || row.eval || '');
       const actions = splitMulti(row.followUp || row.actions || row.nextAction || '');
+      const q1Answer = row.q1Answer || row.q1Notes || row.q1_response || '';
+      const q2Answer = row.q2Answer || row.q2Notes || row.q2_response || '';
+      const q3Answer = row.q3Answer || row.q3Notes || row.q3_response || '';
+      const q4Answer = row.q4Answer || row.q4Notes || row.q4_response || '';
 
       const stats = [
         ['Height', row.height || ''],
@@ -885,7 +931,12 @@
         followUp: row.followUp || '',
         email: row.email || '',
         phone: row.phone || '',
-        profileLink: row.profileLink || ''
+        profileLink: row.profileLink || '',
+        q1Answer,
+        q2Answer,
+        q3Answer,
+        q4Answer,
+        headshot: row.headshot || row.headshotUrl || ''
       };
     }
 
@@ -905,8 +956,13 @@
 
       detailPanel.innerHTML = `
         <div class="hero">
-          <h4>${recruit.name}</h4>
-          <p>${profileSubtitle(recruit)}</p>
+          <div class="hero-top">
+            ${recruit.headshot ? `<img class="headshot" src="${recruit.headshot}" alt="${recruit.name} headshot" />` : `<div class="headshot-placeholder">${(recruit.name || '?').charAt(0).toUpperCase()}</div>`}
+            <div>
+              <h4>${recruit.name}</h4>
+              <p>${profileSubtitle(recruit)}</p>
+            </div>
+          </div>
           <div class="tag-row">
             <span class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.status || 'Active'}</span>
             ${chipHtml}
@@ -948,6 +1004,16 @@
             <li><strong>Q2:</strong> ${formatBool(recruit.q2)}</li>
             <li><strong>Q3:</strong> ${formatBool(recruit.q3)}</li>
             <li><strong>Q4:</strong> ${formatBool(recruit.q4)}</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h5>Q1–Q4 Answers</h5>
+          <ul>
+            <li><strong>Q1 Answer:</strong> ${recruit.q1Answer || '—'}</li>
+            <li><strong>Q2 Answer:</strong> ${recruit.q2Answer || '—'}</li>
+            <li><strong>Q3 Answer:</strong> ${recruit.q3Answer || '—'}</li>
+            <li><strong>Q4 Answer:</strong> ${recruit.q4Answer || '—'}</li>
           </ul>
         </div>
 
@@ -1019,11 +1085,16 @@
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2</label><select id="formQ2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3</label><select id="formQ3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4</label><select id="formQ4" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Headshot</label><input id="formHeadshot" type="file" accept="image/*" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /><div id="headshotCurrent" style="font-size:12px;color:#64748b;margin-top:6px;"></div></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Tags</label><input id="formTags" placeholder="comma separated" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;" /></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Summary</label><textarea id="formSummary" rows="3" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes</label><textarea id="formNotes" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Evaluation</label><textarea id="formEvaluation" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Follow Up / Next Actions</label><textarea id="formFollowUp" rows="3" placeholder="separate with commas or semicolons" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q1 Answer</label><textarea id="formQ1Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2 Answer</label><textarea id="formQ2Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3 Answer</label><textarea id="formQ3Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4 Answer</label><textarea id="formQ4Answer" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Academics</label><textarea id="formAcademics" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Visit Status</label><textarea id="formVisitStatus" rows="2" style="width:100%;padding:12px;border:1px solid #d9e0ea;border-radius:12px;"></textarea></div>
           <div style="grid-column:1 / -1;display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
@@ -1068,7 +1139,12 @@
       evaluation: document.getElementById('formEvaluation'),
       followUp: document.getElementById('formFollowUp'),
       academics: document.getElementById('formAcademics'),
-      visitStatus: document.getElementById('formVisitStatus')
+      visitStatus: document.getElementById('formVisitStatus'),
+      headshot: document.getElementById('formHeadshot'),
+      q1Answer: document.getElementById('formQ1Answer'),
+      q2Answer: document.getElementById('formQ2Answer'),
+      q3Answer: document.getElementById('formQ3Answer'),
+      q4Answer: document.getElementById('formQ4Answer')
     };
 
     function openRecruitModal(id = '') {
@@ -1099,12 +1175,18 @@
       formEls.q3.value = String(!!recruit?.q3);
       formEls.q4.value = String(!!recruit?.q4);
       formEls.tags.value = (recruit?.tags || []).join(', ');
+      document.getElementById('headshotCurrent').textContent = recruit?.headshot ? 'Current headshot loaded.' : 'No headshot uploaded yet.';
       formEls.summary.value = recruit?.summary || '';
       formEls.notes.value = (recruit?.notes || []).join('; ');
       formEls.evaluation.value = (recruit?.evaluation || []).join('; ');
       formEls.followUp.value = recruit?.followUp || (recruit?.actions || []).join('; ');
       formEls.academics.value = recruit?.academics || '';
       formEls.visitStatus.value = recruit?.visitStatus || '';
+      formEls.q1Answer.value = recruit?.q1Answer || '';
+      formEls.q2Answer.value = recruit?.q2Answer || '';
+      formEls.q3Answer.value = recruit?.q3Answer || '';
+      formEls.q4Answer.value = recruit?.q4Answer || '';
+      formEls.headshot.value = '';
     }
 
     function closeRecruitModal() {
@@ -1119,9 +1201,17 @@
     importBtn.addEventListener('click', () => fileInput.click());
     addBtn.addEventListener('click', () => openRecruitModal());
 
-    recruitForm.addEventListener('submit', (e) => {
+    recruitForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const id = formEls.id.value || String(Date.now());
+      let existingHeadshot = recruitDetails[id]?.headshot || '';
+      if (formEls.headshot.files && formEls.headshot.files[0]) {
+        existingHeadshot = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (evt) => resolve(evt.target.result);
+          reader.readAsDataURL(formEls.headshot.files[0]);
+        });
+      };
       const row = {
         fullName: formEls.name.value,
         classYear: formEls.classYear.value,
@@ -1150,12 +1240,18 @@
         evaluation: formEls.evaluation.value,
         followUp: formEls.followUp.value,
         academics: formEls.academics.value,
-        visitStatus: formEls.visitStatus.value
+        visitStatus: formEls.visitStatus.value,
+        q1Answer: formEls.q1Answer.value,
+        q2Answer: formEls.q2Answer.value,
+        q3Answer: formEls.q3Answer.value,
+        q4Answer: formEls.q4Answer.value,
+        headshot: existingHeadshot
       };
 
       recruitDetails[id] = buildRecruitFromRow(row);
       recruitDetails[id].height = formEls.height.value;
       recruitDetails[id].graduationYear = formEls.graduationYear.value;
+      recruitDetails[id].headshot = existingHeadshot;
       rebuildRecruitList(id);
       closeRecruitModal();
     });
@@ -1179,7 +1275,8 @@
       reader.onload = function(event) {
         const text = event.target.result.replace(/
 /g, '
-').replace(//g, '
+').replace(/
+/g, '
 ');
         const lines = text.split('
 ').filter(line => line.trim() !== '');
@@ -1310,6 +1407,20 @@
     positionSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
     statusSelect.addEventListener('change', () => rebuildRecruitList(document.querySelector('.recruit-card.active')?.dataset.id));
 
+    function updateCountdown() {
+      const now = new Date();
+      let target = new Date(now.getFullYear(), 5, 15);
+      if (now > target) target = new Date(now.getFullYear() + 1, 5, 15);
+      const diff = target.getTime() - now.getTime();
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      const dayEl = document.getElementById('countdownDays');
+      const labelEl = document.getElementById('countdownLabel');
+      if (!dayEl || !labelEl) return;
+      dayEl.textContent = days <= 0 ? 'TODAY' : days;
+      labelEl.textContent = days <= 0 ? 'June 15 is here' : 'days until June 15';
+    }
+
+    updateCountdown();
     rebuildRecruitList('1');
 </script>
 </body>
