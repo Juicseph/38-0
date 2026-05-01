@@ -558,12 +558,17 @@
     @media (max-width:1450px){
       .board-view{grid-template-columns:repeat(2,minmax(260px,1fr));}
     }
-    .app.sidebar-collapsed{grid-template-columns:96px 1fr}
-    .app.sidebar-collapsed .sidebar{padding:18px 12px}
-    .app.sidebar-collapsed .sidebar p,
+    .app.sidebar-collapsed{grid-template-columns:84px 1fr}
+    .app.sidebar-collapsed .sidebar{padding:14px 10px;overflow:hidden;align-content:start}
+    .app.sidebar-collapsed .sidebar > :not(:first-child){display:none !important}
+    .app.sidebar-collapsed .sidebar h1,
+    .app.sidebar-collapsed .sidebar p{display:none !important}
+    .app.sidebar-collapsed .sidebar > div:first-child{justify-content:center !important}
+    .app.sidebar-collapsed .sidebar > div:first-child > div{display:none !important}
+    .app.sidebar-collapsed .small-white-btn{margin:0 auto;width:52px;height:52px;border-radius:18px;font-size:24px;display:grid;place-items:center}
     .app.sidebar-collapsed .sidebar-box,
     .app.sidebar-collapsed .sidebar-action,
-    .app.sidebar-collapsed #callStreakSidebarBox{display:none}
+    .app.sidebar-collapsed #callStreakSidebarBox{display:none !important}
     .app.sidebar-collapsed .sidebar h1{font-size:20px}
     .sidebar-reopen-btn{
       position:fixed;
@@ -688,6 +693,14 @@
     #callStreakSidebarMount .call-streak-sidebar.minimal{min-height:auto;border:1px solid rgba(255,255,255,.12);box-shadow:none;background:rgba(255,255,255,.06)}
     #callStreakSidebarMount .mini-streak-title,#callStreakSidebarMount #callStreakValue,#callStreakSidebarMount #callsTodayKpi,#callStreakSidebarMount #callsTodayLabel,#callStreakSidebarMount #callStreakNote{color:#fff}
     #callStreakSidebarMount #callsTodayLabel,#callStreakSidebarMount #callStreakNote{color:#c7d3e3!important}
+    #callStreakSidebarBox .sidebar-box-header{margin-bottom:8px}
+    #callStreakSidebarBox h3{font-size:13px}
+    #callStreakSidebarMount .mini-streak-bar{padding:8px 10px;border-radius:12px;gap:8px}
+    #callStreakSidebarMount .mini-streak-title{font-size:10px;letter-spacing:.08em}
+    #callStreakSidebarMount #callStreakValue{font-size:14px;line-height:1.1}
+    #callStreakSidebarMount #callsTodayKpi{font-size:15px !important;line-height:1}
+    #callStreakSidebarMount #callsTodayLabel{font-size:10px !important}
+    #callStreakSidebarMount #callStreakNote{font-size:11px;line-height:1.35;margin-top:6px !important}
     .call-streak-sidebar .pulse-card{padding:12px}
     #recruitingPulse > #callStreakMiniCard{display:none!important}
     .sidebar .controls,.sidebar .quick-filters{box-shadow:none;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:#fff}
@@ -710,7 +723,49 @@
     .main > .content-panel[style*="padding:14px 16px"]{margin-top:-4px}
     .daily-sheet{margin-top:0}
     .content{margin-top:0}
+
+    /* sidebar filter cleanup */
+    .sidebar{overflow-x:hidden}
+    .sidebar #sidebarFiltersBody{display:grid;gap:12px}
+    .sidebar #sidebarFiltersBody > *{min-width:0}
+    .sidebar .quick-filter-main,.sidebar .quick-filter-side{gap:14px}
+    .sidebar .quick-filter-group{display:grid;grid-template-columns:1fr;gap:8px;padding-top:4px}
+    .sidebar .quick-filter-label{padding-top:0;font-size:11px}
+    .sidebar .chip-row{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start}
+    .sidebar .filter-chip{background:#fff;color:var(--navy);border:1px solid rgba(255,255,255,.2);padding:6px 8px;font-size:11px;line-height:1.15;min-height:30px;max-width:100%}
+    .sidebar .filter-chip span:first-child{min-width:0;overflow-wrap:anywhere}
+    .sidebar .filter-chip.active{background:var(--red-soft);color:var(--red);border-color:#f3bcc8}
+    .sidebar .filter-count{background:#eef2f7;color:#405067;padding:2px 6px;font-size:10px}
+    .sidebar .active-filter-list{display:flex;flex-wrap:wrap;gap:6px;min-height:18px;font-size:12px;color:#fff}
+    .sidebar .filter-side-card{padding:10px}
+    .sidebar .filter-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+    .sidebar .filter-metric{padding:8px;border-radius:12px}
+    .sidebar .filter-metric .label{font-size:10px;margin-bottom:4px}
+    .sidebar .filter-metric .value{font-size:16px;line-height:1}
+    .sidebar .filter-side-card .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .sidebar .filter-side-card .actions .btn{width:100%;padding:10px 8px;font-size:12px;justify-content:center}
+    .sidebar-helper-note{display:none}
     @media (max-width:1100px){.recruiting-pulse{grid-template-columns:1fr}.pulse-card.wide{grid-column:auto}}
+
+    /* v5 sidebar tightening */
+    .sidebar .quick-filter-body{grid-template-columns:1fr !important;gap:12px !important}
+    .sidebar .quick-filter-main,.sidebar .quick-filter-side{display:grid;grid-template-columns:1fr;gap:12px}
+    .sidebar .quick-filter-side{margin-top:2px}
+    .sidebar .quick-filter-group{gap:6px;padding-top:0}
+    .sidebar .chip-row{display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;max-width:100%}
+    .sidebar .filter-chip{display:inline-flex;align-items:center;justify-content:space-between;gap:6px;max-width:100%;min-height:0;padding:6px 10px;border-radius:999px;font-size:11px;line-height:1.15;white-space:normal}
+    .sidebar .filter-chip span:first-child{display:block;overflow-wrap:break-word;word-break:break-word}
+    .sidebar .filter-side-card{padding:10px;gap:8px}
+    .sidebar .filter-side-card h4{font-size:11px;line-height:1.2}
+    .sidebar .active-filter-list{min-height:0;font-size:11px;line-height:1.25}
+    .sidebar .active-filter-empty{font-size:11px;line-height:1.25}
+    .sidebar .filter-metric-grid{grid-template-columns:1fr 1fr;gap:8px}
+    .sidebar .filter-metric{padding:8px 10px;min-width:0}
+    .sidebar .filter-metric .label{font-size:10px;line-height:1.1}
+    .sidebar .filter-metric .value{font-size:15px}
+    .sidebar .filter-side-card .actions{display:grid;grid-template-columns:1fr !important;gap:8px}
+    .sidebar .filter-side-card .actions .btn{width:100%;padding:9px 10px;font-size:11px;line-height:1.2;white-space:normal}
+
 
   </style>
 </head>
@@ -2810,7 +2865,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const snapshotBox = document.getElementById('snapshotBox');
       if(sidebarHost && controls && controls.parentElement !== sidebarHost) sidebarHost.appendChild(controls);
       if(sidebarHost && quickFilters && quickFilters.parentElement !== sidebarHost) sidebarHost.appendChild(quickFilters);
-      if(snapshotBox && callStreak && callStreak.parentElement !== appShell.querySelector('.sidebar')) snapshotBox.insertAdjacentElement('afterend', callStreak);
+      const streakMount = document.getElementById('callStreakSidebarMount');
+      if(streakMount && callStreak && callStreak.parentElement !== streakMount) streakMount.appendChild(callStreak);
     }
 
     function initPulseCollapseButtons(){
