@@ -1,0 +1,3299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fresno State Recruit Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --line: #d7deea;
+      --text: #10213a;
+      --muted: #5f7088;
+      --navy: #002D62;
+      --red: #C41230;
+      --red-soft: #fff1f4;
+      --gold: #d4af37;
+      --good: #18794e;
+      --warn: #9a6700;
+      --shadow: 0 10px 30px rgba(16, 33, 58, 0.08);
+      --radius: 18px;
+      --sidebar-width: 330px;
+      --sidebar-collapsed-width: 88px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-width) 1fr;
+      min-height: 100vh;
+      transition: grid-template-columns .2s ease;
+    }
+
+    
+    .app.sidebar-collapsed {
+      grid-template-columns: var(--sidebar-collapsed-width) 1fr;
+    }
+
+    .app.sidebar-collapsed .sidebar {
+      padding-left: 10px;
+      padding-right: 10px;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .app.sidebar-collapsed .brand {
+      display: none;
+    }
+
+    .app.sidebar-collapsed .sidebar-top {
+      justify-content: center;
+    }
+
+    .app.sidebar-collapsed .sidebar-toggle {
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    .app.sidebar-collapsed .sidebar-actions {
+      gap: 8px;
+    }
+
+    .app.sidebar-collapsed .sidebar-action-btn {
+      min-height: 44px;
+      justify-content: center;
+      padding: 10px 8px;
+      border-radius: 12px;
+    }
+
+    .app.sidebar-collapsed .sidebar-action-btn::before {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .app.sidebar-collapsed #showAllBtn::before { content: "⌂"; }
+    .app.sidebar-collapsed #resetFiltersBtn::before { content: "↺"; }
+
+    .app.sidebar-collapsed .sidebar-box {
+      padding: 0;
+      min-height: 44px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .app.sidebar-collapsed .sidebar-box-header {
+      margin-bottom: 0;
+      min-height: 44px;
+      justify-content: center;
+      padding: 0;
+    }
+
+    .app.sidebar-collapsed .sidebar-box-header h3 {
+      display: none;
+    }
+
+    .app.sidebar-collapsed .sidebar-box-toggle {
+      width: 100%;
+      height: 44px;
+      border: none;
+      border-radius: 0;
+      background: transparent;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app.sidebar-collapsed .sidebar-box-body {
+      display: none !important;
+    }
+
+    .app.sidebar-collapsed .summary-stat,
+    .app.sidebar-collapsed .filter-section,
+    .app.sidebar-collapsed .sidebar-home-text,
+    .app.sidebar-collapsed .brand p {
+      display: none !important;
+    }
+
+
+    .sidebar {
+      background: var(--navy);
+      color: white;
+      padding: 20px 16px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    .sidebar-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-toggle {
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(255,255,255,0.08);
+      color: white;
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.1;
+    }
+
+    .brand p {
+      margin: 8px 0 0;
+      color: #c2d0e4;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    
+    .sidebar-box-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      margin-bottom:10px;
+    }
+    .sidebar-box-header h3 { margin:0; }
+    .sidebar-box-toggle {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.12);
+      color: white;
+      border-radius: 10px;
+      padding: 4px 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .sidebar-box.collapsed .sidebar-box-body { display:none; }
+    .pin-btn { opacity:.45; }
+    .pin-btn.pin-on { opacity:1; }
+
+    .sidebar-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.10);
+      border-radius: 16px;
+      padding: 14px;
+    }
+
+    .sidebar-box h3 {
+      margin: 0 0 12px;
+      font-size: 15px;
+      color: #f1f5fb;
+    }
+
+    .summary-stat {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.08);
+      border-radius: 14px;
+      padding: 12px;
+    }
+
+    .stat-card .label {
+      font-size: 12px;
+      color: #c5d1e2;
+      margin-bottom: 6px;
+    }
+
+    .stat-card .value {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .sidebar-actions,
+    .filter-section {
+      display: grid;
+      gap: 8px;
+    }
+
+    .sidebar-action-btn,
+    .filter-btn {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.05);
+      color: white;
+      border-radius: 12px;
+      padding: 11px 12px;
+      cursor: pointer;
+      font-weight: 700;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .filter-btn.active,
+    .sidebar-action-btn.active {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.24);
+    }
+
+    .filter-count {
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 4px 8px;
+      min-width: 28px;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .main {
+      padding: 24px;
+      display: grid;
+      grid-template-rows: auto auto auto auto auto;
+      align-content: start;
+      gap: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .topbar h2 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    .topbar p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button, select, input, textarea { font: inherit; }
+
+    .btn {
+      border: none;
+      background: var(--red);
+      color: white;
+      padding: 11px 16px;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn.secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    
+    
+    
+    .hero-countdown {
+      position: relative;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,0.14), transparent 26%),
+        linear-gradient(135deg, #001f46 0%, var(--navy) 44%, #143f7b 70%, var(--red) 100%);
+      color: white;
+      border-radius: 24px;
+      padding: 18px 20px;
+      overflow: hidden;
+      box-shadow: 0 16px 36px rgba(0,45,98,0.22);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .hero-countdown::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+      transform: translateX(-100%);
+      animation: heroSweep 5s linear infinite;
+      pointer-events: none;
+    }
+
+    @keyframes heroSweep {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(220%); }
+    }
+
+    .contact-day-hero {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.2fr auto;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .contact-day-title {
+      font-size: 26px;
+      font-weight: 900;
+      line-height: 1.04;
+      margin-top: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .contact-day-subtitle {
+      margin-top: 8px;
+      font-size: 14px;
+      opacity: .93;
+      max-width: 700px;
+    }
+
+    .urgency-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .urgency-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .countdown-side {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 10px;
+    }
+
+    .countdown-toggle-wrap {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .countdown-toggle-wrap .btn.secondary {
+      background: rgba(255,255,255,0.95);
+      border: none;
+    }
+
+    .compact-countdown-wrap {
+      margin-top: 16px;
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .ring-wrap {
+      position: relative;
+      width: 160px;
+      height: 160px;
+      margin: 0 auto;
+      display: grid;
+      place-items: center;
+    }
+
+    .ring-svg {
+      width: 160px;
+      height: 160px;
+      transform: rotate(-90deg);
+    }
+
+    .ring-track {
+      fill: none;
+      stroke: rgba(255,255,255,0.18);
+      stroke-width: 12;
+    }
+
+    .ring-progress {
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 12;
+      stroke-linecap: round;
+      stroke-dasharray: 439.82;
+      stroke-dashoffset: 439.82;
+      transition: stroke-dashoffset .8s ease;
+      filter: drop-shadow(0 0 8px rgba(255,255,255,0.25));
+    }
+
+    .ring-center {
+      position: absolute;
+      inset: 20px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      backdrop-filter: blur(6px);
+    }
+
+    .ring-days {
+      font-size: 40px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .ring-days-label {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .9;
+    }
+
+    .flip-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(84px, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .flip-card {
+      position: relative;
+      min-height: 82px;
+      border-radius: 16px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.14);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+
+    .flip-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+      background: rgba(255,255,255,0.14);
+    }
+
+    .flip-value {
+      font-size: 30px;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      transition: transform .18s ease;
+    }
+
+    .flip-card.bump .flip-value {
+      transform: translateY(-2px) scale(1.06);
+    }
+
+    .flip-label {
+      margin-top: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      opacity: .88;
+    }
+
+    .countdown-progress-wrap {
+      margin-top: 2px;
+    }
+
+    .countdown-progress-bar {
+      height: 10px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .countdown-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffffff, #ffd7df 45%, #ff8ea2 100%);
+      border-radius: 999px;
+      transition: width .8s ease;
+    }
+
+    .countdown-meta {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.9);
+      flex-wrap: wrap;
+    }
+
+    .track-countdown-wrap,
+    .track-header,
+    .track-days-left,
+    .track-meta-right,
+    .bulldog-track,
+    .track-line,
+    .track-progress,
+    .track-markers,
+    .track-marker,
+    .track-marker-label,
+    .track-start,
+    .track-finish,
+    .bulldog-runner,
+    .finish-flag,
+    .track-footer {
+      display: none;
+    }
+
+
+    .countdown-grid,
+    .countdown-box,
+    .countdown-value,
+    .countdown-label,
+    .progress-wrap,
+    .progress-bar,
+    .progress-fill,
+    .countdown-meta {
+      display: none;
+    }
+
+
+    
+    .hero-countdown.collapsed #countdownContent { display:none; }
+    .hero-countdown.collapsed { padding-bottom: 18px; }
+
+    .scheduled-call-visual {
+      margin-top: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #fff2f4, #ffe2e8);
+      border: 1px solid #f3bcc8;
+      color: var(--red);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 12px;
+      line-height: 1.1;
+    }
+
+    .scheduled-call-top {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+      opacity: 0.9;
+    }
+
+    .scheduled-call-time {
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .scheduled-call-origin {
+      font-size: 10px;
+      color: #8a3042;
+      font-weight: 700;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .scheduled-call {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      margin-top:6px;
+      font-size:12px;
+      color: var(--red);
+      font-weight:700;
+      background: var(--red-soft);
+      border-radius:999px;
+      padding:4px 8px;
+    }
+
+    .controls {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+      gap: 12px;
+    }
+
+    .control {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .control input, .control select {
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: white;
+    }
+
+
+    .call-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eef4ff;
+      border: 1px solid #c9d8f5;
+      color: #18407c;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1.2;
+      max-width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .call-chip .call-label {
+      color: #5c7091;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+      font-size: 10px;
+    }
+
+    .call-chip .call-time {
+      color: #18407c;
+      font-weight: 800;
+    }
+
+    .call-chip .call-zone {
+      color: #6b7f9f;
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    .sidebar-box.collapsible-box {
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .collapse-header {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: #f1f5fb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      cursor: pointer;
+      text-align: left;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .collapse-header:hover {
+      background: rgba(255,255,255,0.05);
+    }
+
+    .collapse-chevron {
+      transition: transform .18s ease;
+      opacity: .9;
+      font-size: 14px;
+    }
+
+    .collapsible-box.collapsed .collapse-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .collapse-body {
+      padding: 0 14px 14px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .collapsible-box.collapsed .collapse-body {
+      display: none;
+    }
+
+    
+    
+    .compact-filter-bar.collapsed .compact-filter-groups {
+      display: none;
+    }
+
+    .compact-filter-toggle {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    
+    .snapshot-filter-card {
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
+      border: 1px solid transparent;
+    }
+
+    .snapshot-filter-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.16);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.10);
+    }
+
+    .snapshot-filter-card.active {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.22);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.10) inset;
+    }
+
+    .class-snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .class-snapshot-grid .stat-card .value {
+      font-size: 20px;
+    }
+
+    .compact-filter-bar {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .compact-filter-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .compact-filter-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .compact-filter-groups {
+      display: grid;
+      gap: 10px;
+    }
+
+    .compact-filter-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .compact-filter-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding-top: 8px;
+    }
+
+    .compact-filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1;
+    }
+
+    .filter-chip.active {
+      background: var(--red-soft);
+      border-color: #f3bcc8;
+      color: var(--red);
+    }
+
+    .filter-chip-count {
+      display: inline-flex;
+      min-width: 20px;
+      height: 20px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #4b5e78;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 0 6px;
+    }
+
+    .filter-chip.active .filter-chip-count {
+      background: rgba(196,18,48,0.12);
+      color: var(--red);
+    }
+
+    .bulk-bar {
+      display: none;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .bulk-bar.active { display: flex; }
+
+    .bulk-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 0.9fr 1.25fr;
+      gap: 20px;
+      min-height: 0;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 0;
+    }
+
+    .panel-header {
+      padding: 18px 18px 0;
+    }
+
+    .panel-header h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .panel-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .recruit-list {
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      max-height: 70vh;
+      overflow: auto;
+    }
+
+    .recruit-card {
+      border: 1px solid var(--line);
+      border-left: 6px solid #d7deea;
+      border-radius: 16px;
+      padding: 14px 14px 14px 12px;
+      background: #fff;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .recruit-card:hover,
+    .recruit-card.active {
+      transform: translateY(-2px);
+      border-color: #d8aab4;
+      box-shadow: 0 10px 24px rgba(196,18,48,0.08);
+    }
+
+    .card-color-priority { border-left-color: var(--red); }
+    .card-color-warm { border-left-color: #f0ad1b; }
+    .card-color-watch { border-left-color: #1b7f57; }
+    .card-color-default { border-left-color: #9db1c8; }
+
+    .recruit-card-topline {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .card-left {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      min-width: 0;
+    }
+
+    .card-check {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      margin-top: 2px;
+      flex: 0 0 auto;
+    }
+
+    .card-thumb,
+    .card-thumb-placeholder {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      flex: 0 0 auto;
+    }
+
+    .card-thumb {
+      object-fit: cover;
+      border: 1px solid var(--line);
+    }
+
+    .card-thumb-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef2f7;
+      border: 1px solid var(--line);
+      color: #64748b;
+      font-weight: 800;
+    }
+
+    .recruit-name-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .recruit-name {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .star-btn, .pin-btn {
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .star-on { color: var(--gold); }
+    .pin-on { color: var(--red); }
+
+    .recruit-meta {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .badge.priority { background: #fff2f2; color: #9f1c1c; }
+    .badge.warm { background: #fff7e8; color: var(--warn); }
+    .badge.good { background: #ebfff3; color: var(--good); }
+    .badge.neutral { background: #eef2f7; color: #475569; }
+
+    .tag-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      background: #f1f4f9;
+      color: #405067;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    
+    .tag.club-tag {
+      background: #eaf2ff;
+      color: #18407c;
+      border: 1px solid #c9d8f5;
+    }
+
+    .offer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .offer-badge.offered {
+      background: #eef4ff;
+      color: #18407c;
+      border: 1px solid #c9d8f5;
+    }
+
+    .offer-badge.committed-here {
+      background: #ebfff3;
+      color: #18794e;
+      border: 1px solid #b7e4c7;
+    }
+
+    .offer-badge.committed-elsewhere {
+      background: #fff2f2;
+      color: #b42318;
+      border: 1px solid #f2b8b5;
+    }
+
+    .detail {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .detail-scroll {
+      padding: 18px;
+      overflow: auto;
+      max-height: 70vh;
+      display: grid;
+      gap: 16px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, #fff7f8, #ffffff);
+      border: 1px solid #f2d9dc;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .hero-top {
+      display:flex;
+      align-items:flex-start;
+      gap:14px;
+      flex-wrap:nowrap;
+    }
+
+    .hero-top > div:last-child {
+      min-width: 0;
+      flex: 1 1 auto;
+      padding-top: 2px;
+    }
+
+    .headshot {
+      width:56px;
+      height:56px;
+      min-width:56px;
+      min-height:56px;
+      border-radius:14px;
+      object-fit:cover;
+      object-position:center;
+      background:#eef2f7;
+      border:1px solid #d9e0ea;
+      display:block;
+      flex: 0 0 56px;
+    }
+
+    .headshot-placeholder {
+      width:56px;
+      height:56px;
+      min-width:56px;
+      min-height:56px;
+      border-radius:14px;
+      background:#eef2f7;
+      border:1px solid #d9e0ea;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:20px;
+      font-weight:800;
+      color:#64748b;
+      flex: 0 0 56px;
+    }
+
+    .hero h4 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    .hero p {
+      margin: 6px 0 0;
+      color: var(--muted);
+    }
+
+    .detail-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .mini {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      background: white;
+    }
+
+    .mini .label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .mini .value {
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: white;
+    }
+
+    .section h5 {
+      margin: 0 0 10px;
+      font-size: 15px;
+    }
+
+    .section p,
+    .section li {
+      color: #334155;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .section ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .timeline {
+      display: grid;
+      gap: 10px;
+    }
+
+    .timeline-item {
+      border-left: 3px solid #d7deea;
+      padding-left: 10px;
+    }
+
+    .timeline-date {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .modal-field {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d9e0ea;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .compact-mode .recruit-list { gap: 10px; }
+    .compact-mode .recruit-card { padding: 10px 10px 10px 8px; }
+    .compact-mode .recruit-name { font-size: 16px; }
+    .compact-mode .tag { padding: 4px 8px; font-size: 11px; }
+    .compact-mode .card-thumb,
+    .compact-mode .card-thumb-placeholder { width: 34px; height: 34px; border-radius: 10px; }
+
+    .confetti-piece {
+      position: fixed;
+      width: 10px;
+      height: 16px;
+      top: -20px;
+      opacity: 0.9;
+      z-index: 9999;
+      animation: confettiFall linear forwards;
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(110vh) rotate(720deg);
+        opacity: 1;
+      }
+    }
+
+    @media (max-width: 1100px) {
+      .app, .content { grid-template-columns: 1fr; }
+      .app.sidebar-collapsed { grid-template-columns: 1fr; }
+      .controls { grid-template-columns: 1fr 1fr; }
+      .sidebar { min-height: auto; }
+    }
+
+    @media (max-width: 700px) {
+      .main { padding: 16px; }
+      .controls,
+      .detail-grid,
+      .summary-stat {
+        grid-template-columns: 1fr;
+      }
+      .content { grid-template-columns: 1fr; }
+      .compact-filter-row {
+        grid-template-columns: 1fr;
+      }
+      .compact-filter-label {
+        padding-top: 0;
+      }
+      .contact-day-hero {
+        grid-template-columns: 1fr;
+      }
+      .countdown-side {
+        align-items: stretch;
+      }
+      .hero-top {
+        flex-wrap: wrap;
+      }
+      .compact-countdown-wrap {
+        grid-template-columns: 1fr;
+      }
+      .flip-grid {
+        grid-template-columns: repeat(2, minmax(84px, 1fr));
+      }
+      .ring-wrap {
+        width: 140px;
+        height: 140px;
+      }
+      .ring-svg {
+        width: 140px;
+        height: 140px;
+      }
+      .ring-center {
+        inset: 18px;
+      }
+      .ring-days {
+        font-size: 34px;
+      }
+    }
+  
+
+    .live-sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef4ff;
+      border: 1px solid #c9d8f5;
+      color: #18407c;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .live-sync-status.error {
+      background: #fff2f2;
+      border-color: #f2b8b5;
+      color: #b42318;
+    }
+
+    .password-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,0.10), transparent 24%),
+        linear-gradient(135deg, #001f46 0%, #002D62 45%, #143f7b 68%, #C41230 100%);
+    }
+
+    .password-card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(255,255,255,0.97);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .password-card h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.05;
+      color: #002D62;
+    }
+
+    .password-card p {
+      margin: 0 0 16px;
+      color: #4b5e78;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .password-row {
+      display: grid;
+      gap: 12px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid #d7deea;
+      font-size: 16px;
+    }
+
+    .password-error {
+      color: #b42318;
+      font-size: 13px;
+      min-height: 18px;
+      font-weight: 700;
+    }
+
+    .app.locked {
+      visibility: hidden;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="password-gate" id="passwordGate">
+    <div class="password-card">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef4ff;color:#002D62;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;">Fresno State Recruit Board</div>
+      <h1>Protected Access</h1>
+      <p>Enter the password to view the recruiting dashboard.</p>
+      <form class="password-row" id="passwordForm">
+        <input class="password-input" id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password" />
+        <button class="btn" type="submit">Unlock Dashboard</button>
+        <div class="password-error" id="passwordError"></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="app locked" id="appShell">
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="brand">
+          <h1>Recruit Board</h1>
+          <p>Organize, filter, and review athlete profiles in one place.</p>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle" type="button">☰</button>
+      </div>
+
+      <div class="sidebar-actions">
+        <button class="sidebar-action-btn" id="showAllBtn" type="button"><span class="sidebar-home-text">Show All Recruits</span></button>
+        <button class="sidebar-action-btn" id="resetFiltersBtn" type="button"><span>Reset Filters</span></button>
+      </div>
+
+      <div class="sidebar-box" data-box-key="snapshot">
+        <div class="sidebar-box-header"><h3>Class Snapshot</h3><button class="sidebar-box-toggle" type="button">−</button></div>
+        <div class="sidebar-box-body">
+          <div class="class-snapshot-grid">
+            <div class="stat-card snapshot-filter-card active" data-snapshot-filter=""><div class="label">Total</div><div class="value" id="totalRecruitsStat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2026"><div class="label">2026</div><div class="value" id="class2026Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2027"><div class="label">2027</div><div class="value" id="class2027Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2028"><div class="label">2028</div><div class="value" id="class2028Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2029"><div class="label">2029</div><div class="value" id="class2029Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2030"><div class="label">2030</div><div class="value" id="class2030Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2031"><div class="label">2031</div><div class="value" id="class2031Stat">0</div></div>
+          </div>
+        </div>
+      </div>
+
+      
+      
+      
+      
+      
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div>
+          <h2>Fresno State Recruiting Dashboard</h2>
+          <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
+        </div>
+        <div class="actions">
+          <span class="live-sync-status" id="liveSyncStatus">Live Sheet: Not Connected</span>
+          <button class="btn secondary" id="refreshLiveBtn">Refresh Live</button>
+          <button class="btn secondary" id="importBtn">Import Sheet</button>
+          <button class="btn secondary" id="exportBtn">Export Filtered</button>
+          <button class="btn secondary" id="compactBtn">Compact Mode</button>
+          <button class="btn" id="addBtn">Add Recruit</button>
+        </div>
+      </div>
+
+      <section class="hero-countdown" id="countdownSection">
+        <div class="contact-day-hero">
+          <div>
+            <div class="pulse-banner">June 15 Contact Day</div>
+            <div class="contact-day-title">Everything Builds Toward Contact Day.</div>
+            <div class="contact-day-subtitle">Track urgency, stay ahead of calls, and keep Fresno State recruiting organized before the biggest contact day on the board.</div>
+            <div class="urgency-row">
+              <span class="urgency-pill">High Priority Window</span>
+              <span class="urgency-pill">Prepare Calls Early</span>
+              <span class="urgency-pill">Staff Alignment Matters</span>
+            </div>
+          </div>
+          <div class="countdown-side">
+            <div class="countdown-toggle-wrap">
+              <button class="btn secondary" id="countdownToggleBtn" type="button">Collapse Countdown</button>
+            </div>
+          </div>
+        </div>
+
+        
+<div id="countdownContent">
+          <div class="compact-countdown-wrap">
+            <div class="ring-wrap">
+              <svg class="ring-svg" viewBox="0 0 160 160" aria-hidden="true">
+                <circle class="ring-track" cx="80" cy="80" r="70"></circle>
+                <circle class="ring-progress" id="ringProgress" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="ring-center">
+                <div class="ring-days" id="daysLeftNumber">--</div>
+                <div class="ring-days-label">Days Left</div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flip-grid">
+                <div class="flip-card" id="flipDays"><div><div class="flip-value" id="flipDaysValue">--</div><div class="flip-label">Days</div></div></div>
+                <div class="flip-card" id="flipHours"><div><div class="flip-value" id="flipHoursValue">--</div><div class="flip-label">Hours</div></div></div>
+                <div class="flip-card" id="flipMinutes"><div><div class="flip-value" id="flipMinutesValue">--</div><div class="flip-label">Minutes</div></div></div>
+                <div class="flip-card" id="flipSeconds"><div><div class="flip-value" id="flipSecondsValue">--</div><div class="flip-label">Seconds</div></div></div>
+              </div>
+
+              <div class="countdown-progress-wrap">
+                <div class="countdown-progress-bar">
+                  <div class="countdown-progress-fill" id="countdownProgress"></div>
+                </div>
+                <div class="countdown-meta">
+                  <span id="countdownStatus">Stay ready for contact day.</span>
+                  <span id="progressText">Loading progress…</span>
+                  <span id="hoursMinutesText">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="controls">
+        <div class="control">
+          <label for="search">Search</label>
+          <input id="search" type="text" placeholder="Search by name, club, city, notes..." />
+        </div>
+        <div class="control">
+          <label for="classYear">Class</label>
+          <select id="classYear"><option value="">All Classes</option></select>
+        </div>
+        <div class="control">
+          <label for="position">Position</label>
+          <select id="position"><option value="">All Positions</option></select>
+        </div>
+        <div class="control">
+          <label for="status">Recruit Status</label>
+          <select id="status"><option value="">All Statuses</option></select>
+        </div>
+        <div class="control">
+          <label for="sortBy">Sort By</label>
+          <select id="sortBy">
+            <option value="pinned">Pinned / Favorites</option>
+            <option value="rating">Rating</option>
+            <option value="classYear">Class</option>
+            <option value="position">Position</option>
+            <option value="june15Call">June 15 Call</option>
+            <option value="recentlyUpdated">Recently Updated</option>
+            <option value="nextActionDue">Next Action Due</option>
+            <option value="lastContactDate">Last Contact</option>
+            <option value="name">Name</option>
+          </select>
+        </div>
+      </section>
+
+      <section class="compact-filter-bar" id="compactFilterBar">
+        <div class="compact-filter-top">
+          <div class="compact-filter-title">Quick Filters</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="compact-filter-toggle" id="toggleQuickFiltersBtn" type="button">Collapse Filters</button>
+            <button class="btn secondary" id="clearCompactFiltersBtn" type="button">Clear Quick Filters</button>
+          </div>
+        </div>
+        <div class="compact-filter-groups">
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Group</div>
+            <div class="compact-filter-chips" id="quickViewsSection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Priority</div>
+            <div class="compact-filter-chips" id="prioritySection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">June 15 Call</div>
+            <div class="compact-filter-chips" id="ownerSection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Class</div>
+            <div class="compact-filter-chips" id="classFilterSection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Shortcuts</div>
+            <div class="compact-filter-chips" id="statusShortcutSection"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bulk-bar" id="bulkBar">
+        <div><strong id="bulkCountText">0 selected</strong></div>
+        <div class="bulk-actions">
+          <select id="bulkPrioritySelect">
+            <option value="">Set Priority</option>
+            <option value="Priority">Priority</option>
+            <option value="Warm">Warm</option>
+            <option value="Watch List">Watch List</option>
+          </select>
+          <select id="bulkJune15CallSelect">
+            <option value="">Set June 15 Call</option>
+            <option value="Leisa">Leisa</option>
+            <option value="Jerome">Jerome</option>
+            <option value="Orlando">Orlando</option>
+            <option value="Kelsey">Kelsey</option>
+          </select>
+          <button class="btn secondary" id="bulkFavoriteBtn" type="button">Toggle Favorite</button>
+          <button class="btn secondary" id="bulkDeleteBtn" type="button">Delete Selected</button>
+          <button class="btn ghost" id="bulkClearBtn" type="button">Clear Selection</button>
+        </div>
+      </section>
+
+      <section class="content">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>Recruit List</h3>
+            <p id="recruitListCount">Click a card to view the full profile.</p>
+          </div>
+          <div class="recruit-list" id="recruitList"></div>
+        </div>
+
+        <div class="panel detail">
+          <div class="panel-header">
+            <h3>Recruit Profile</h3>
+            <p>This panel can hold everything your staff needs at a glance.</p>
+          </div>
+          <div class="detail-scroll" id="detailPanel"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'recruit_dashboard_data_v4';
+    const LIVE_SHEET_WEBAPP_URL = 'PASTE_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE';
+    const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
+    const LIVE_SYNC_AUTO_REFRESH_MS = 0;
+    const SIDEBAR_STATE_KEY = 'recruit_dashboard_sidebar_collapsed_v4';
+    const COMPACT_MODE_KEY = 'recruit_dashboard_compact_v4';
+    const TARGET_DATE = new Date('2026-06-15T00:00:00');
+    const YEAR_START = new Date('2025-06-15T00:00:00');
+
+    const defaultRecruits = {
+      1: {
+        name: 'Shannon Kirchhardt',
+        classYear: '2027',
+        position: 'Outside Hitter',
+        city: 'San Diego',
+        state: 'California',
+        club: 'Coast Volleyball Club',
+        group: 'Pins',
+        status: 'Top Priority',
+        priority: 'Priority',
+        june15Call: 'Orlando',
+        rating: '5',
+        wroteToUs: '10',
+        q1: true, q2: true, q3: false, q4: false,
+        q1Question1: '', q1Answer1: '',
+        q1Question2: '', q1Answer2: '',
+        q1Question3: '', q1Answer3: '',
+        q2Question1: '', q2Answer1: '',
+        q2Question2: '', q2Answer2: '',
+        q2Question3: '', q2Answer3: '',
+        q3Question1: '', q3Answer1: '',
+        q3Question2: '', q3Answer2: '',
+        q3Question3: '', q3Answer3: '',
+        q4Question1: '', q4Answer1: '',
+        q4Question2: '', q4Answer2: '',
+        q4Question3: '', q4Answer3: '',
+        tags: ['3.9 GPA', 'Campus interest high', 'Unofficial visit complete'],
+        summary: 'High-upside outside hitter with strong academics, confident communication, and clear family support.',
+        notes: ['Really values team culture and strong player relationships.', 'Wants a balance of competitive volleyball and a strong academic environment.'],
+        notesHistory: [{date: '2026-04-25', text: 'Follow-up after next tournament weekend.'}],
+        evaluation: ['Terminal attacking potential from the left pin', 'Serve receive consistency under pressure'],
+        actions: ['Send personal follow-up message before next contact window.'],
+        academics: 'High Academic Fit',
+        visitStatus: 'Visited Campus',
+        followUp: 'Follow up after next tournament weekend.',
+        nextActionDue: '2026-05-10',
+        lastContactDate: '2026-04-22',
+        email: 'shannon@example.com',
+        phone: '(555) 201-4455',
+        profileLink: '',
+        filmLink: '',
+        headshot: '',
+        height: '6\'0"',
+        graduationYear: '2027',
+        favorite: true,
+        pinned: true,
+        campAttended: true,
+        updatedAt: '2026-04-30T14:00:00',
+        callPlanLocal: '',
+        callPlanTimezone: '',
+        callPlanPST: '',
+        offerStatus: '',
+        selected: false
+      },
+      2: {
+        name: 'Anna Holladay Craft',
+        classYear: '2027',
+        position: 'Setter',
+        city: 'Phoenix',
+        state: 'Arizona',
+        club: 'Valley Elite',
+        group: 'Setters',
+        status: 'Warm',
+        priority: 'Warm',
+        june15Call: 'Orlando',
+        rating: '4',
+        wroteToUs: '5',
+        q1: true, q2: true, q3: false, q4: false,
+        q1Question1: '', q1Answer1: '',
+        q1Question2: '', q1Answer2: '',
+        q1Question3: '', q1Answer3: '',
+        q2Question1: '', q2Answer1: '',
+        q2Question2: '', q2Answer2: '',
+        q2Question3: '', q2Answer3: '',
+        q3Question1: '', q3Answer1: '',
+        q3Question2: '', q3Answer2: '',
+        q3Question3: '', q3Answer3: '',
+        q4Question1: '', q4Answer1: '',
+        q4Question2: '', q4Answer2: '',
+        q4Question3: '', q4Answer3: '',
+        tags: ['Good communicator', 'Needs follow-up', 'Multi-sport athlete'],
+        summary: 'Smart floor leader with good pace control and strong communication habits.',
+        notes: ['Interested in programs that prioritize player development.', 'Academic interest leans toward health sciences.'],
+        notesHistory: [{date: '2026-04-27', text: 'Needs more detailed setter conversation.'}],
+        evaluation: ['Tempo variety across all attacker connections'],
+        actions: ['Collect latest tournament film clips.'],
+        academics: 'Health sciences interest',
+        visitStatus: '',
+        followUp: 'Follow up after spring evaluation period.',
+        nextActionDue: '2026-05-18',
+        lastContactDate: '2026-04-20',
+        email: 'anna@example.com',
+        phone: '(555) 401-2258',
+        profileLink: '',
+        filmLink: '',
+        headshot: '',
+        height: '5\'10"',
+        graduationYear: '2027',
+        favorite: false,
+        pinned: false,
+        campAttended: false,
+        updatedAt: '2026-04-28T10:00:00',
+        callPlanLocal: '',
+        callPlanTimezone: '',
+        callPlanPST: '',
+        offerStatus: '',
+        selected: false
+      },
+      3: {
+        name: 'Brooklyn Rummler',
+        classYear: '2027',
+        position: 'Libero',
+        city: 'Boise',
+        state: 'Idaho',
+        club: 'Idaho One',
+        group: 'Liberos',
+        status: 'Watch List',
+        priority: 'Watch List',
+        june15Call: 'Jerome',
+        rating: '5',
+        wroteToUs: '2',
+        q1: true, q2: false, q3: false, q4: false,
+        q1Question1: '', q1Answer1: '',
+        q1Question2: '', q1Answer2: '',
+        q1Question3: '', q1Answer3: '',
+        q2Question1: '', q2Answer1: '',
+        q2Question2: '', q2Answer2: '',
+        q2Question3: '', q2Answer3: '',
+        q3Question1: '', q3Answer1: '',
+        q3Question2: '', q3Answer2: '',
+        q3Question3: '', q3Answer3: '',
+        q4Question1: '', q4Answer1: '',
+        q4Question2: '', q4Answer2: '',
+        q4Question3: '', q4Answer3: '',
+        tags: ['Elite defender', 'Film requested', 'Fast riser'],
+        summary: 'Instinctive libero with good range and a strong motor.',
+        notes: ['Would benefit from more full-match film for evaluation.'],
+        notesHistory: [{date: '2026-04-21', text: 'Need full-match film and measurables.'}],
+        evaluation: ['Serve receive posture and angle control'],
+        actions: ['Request full-match film and measurable updates.'],
+        academics: '',
+        visitStatus: '',
+        followUp: 'Request full-match film and measurable updates.',
+        nextActionDue: '2026-05-05',
+        lastContactDate: '2026-04-15',
+        email: 'brooklyn@example.com',
+        phone: '(555) 338-1984',
+        profileLink: '',
+        filmLink: '',
+        headshot: '',
+        height: '5\'6"',
+        graduationYear: '2027',
+        favorite: true,
+        pinned: false,
+        campAttended: false,
+        updatedAt: '2026-04-26T09:30:00',
+        callPlanLocal: '',
+        callPlanTimezone: '',
+        callPlanPST: '',
+        offerStatus: '',
+        selected: false
+      }
+    };
+
+    let recruitDetails = loadData();
+    let selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+    let filteredIds = [];
+
+    const filterState = { group:'', priority:'', june15Call:'', classYear:'', shortcut:'' };
+
+    const detailPanel = document.getElementById('detailPanel');
+    const recruitList = document.getElementById('recruitList');
+    const searchInput = document.getElementById('search');
+    const classSelect = document.getElementById('classYear');
+    const positionSelect = document.getElementById('position');
+    const statusSelect = document.getElementById('status');
+    const sortBySelect = document.getElementById('sortBy');
+    const importBtn = document.getElementById('importBtn');
+    const exportBtn = document.getElementById('exportBtn');
+    const addBtn = document.getElementById('addBtn');
+    const refreshLiveBtn = document.getElementById('refreshLiveBtn');
+    const liveSyncStatus = document.getElementById('liveSyncStatus');
+    const compactBtn = document.getElementById('compactBtn');
+    const appShell = document.getElementById('appShell');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const showAllBtn = document.getElementById('showAllBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+    const bulkBar = document.getElementById('bulkBar');
+
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.csv';
+    fileInput.style.display = 'none';
+    document.body.appendChild(fileInput);
+
+
+    function setLiveStatus(message, isError = false) {
+      if (!liveSyncStatus) return;
+      liveSyncStatus.textContent = message;
+      liveSyncStatus.classList.toggle('error', Boolean(isError));
+    }
+
+    function rowFromRecruit(recruit) {
+      return {
+        fullName: recruit.name || '',
+        classYear: recruit.classYear || '',
+        group: recruit.group || '',
+        position: recruit.position || '',
+        city: recruit.city || '',
+        state: recruit.state || '',
+        club: recruit.club || '',
+        priority: recruit.priority || '',
+        status: recruit.status || '',
+        june15Call: recruit.june15Call || '',
+        rating: recruit.rating || '',
+        offerStatus: recruit.offerStatus || '',
+        wroteToUs: recruit.wroteToUs || '',
+        q1: recruit.q1 || false,
+        q2: recruit.q2 || false,
+        q3: recruit.q3 || false,
+        q4: recruit.q4 || false,
+        lastContactDate: recruit.lastContactDate || '',
+        nextActionDue: recruit.nextActionDue || '',
+        visitStatus: recruit.visitStatus || '',
+        campAttended: recruit.campAttended || false,
+        filmLink: recruit.filmLink || '',
+        profileLink: recruit.profileLink || '',
+        phone: recruit.phone || '',
+        email: recruit.email || '',
+        callPlanLocal: recruit.callPlanLocal || '',
+        callPlanTimezone: recruit.callPlanTimezone || '',
+        callPlanPST: recruit.callPlanPST || '',
+        tags: Array.isArray(recruit.tags) ? recruit.tags.join(', ') : (recruit.tags || ''),
+        summary: recruit.summary || '',
+        notes: Array.isArray(recruit.notes) ? recruit.notes.join('; ') : (recruit.notes || ''),
+        evaluation: Array.isArray(recruit.evaluation) ? recruit.evaluation.join('; ') : (recruit.evaluation || ''),
+        followUp: recruit.followUp || (Array.isArray(recruit.actions) ? recruit.actions.join('; ') : ''),
+        academics: recruit.academics || '',
+        q1Question1: recruit.q1Question1 || '', q1Answer1: recruit.q1Answer1 || '',
+        q1Question2: recruit.q1Question2 || '', q1Answer2: recruit.q1Answer2 || '',
+        q1Question3: recruit.q1Question3 || '', q1Answer3: recruit.q1Answer3 || '',
+        q2Question1: recruit.q2Question1 || '', q2Answer1: recruit.q2Answer1 || '',
+        q2Question2: recruit.q2Question2 || '', q2Answer2: recruit.q2Answer2 || '',
+        q2Question3: recruit.q2Question3 || '', q2Answer3: recruit.q2Answer3 || '',
+        q3Question1: recruit.q3Question1 || '', q3Answer1: recruit.q3Answer1 || '',
+        q3Question2: recruit.q3Question2 || '', q3Answer2: recruit.q3Answer2 || '',
+        q3Question3: recruit.q3Question3 || '', q3Answer3: recruit.q3Answer3 || '',
+        q4Question1: recruit.q4Question1 || '', q4Answer1: recruit.q4Answer1 || '',
+        q4Question2: recruit.q4Question2 || '', q4Answer2: recruit.q4Answer2 || '',
+        q4Question3: recruit.q4Question3 || '', q4Answer3: recruit.q4Answer3 || '',
+        updatedAt: recruit.updatedAt || '',
+        favorite: recruit.favorite || false,
+        pinned: recruit.pinned || false,
+        headshot: recruit.headshot || ''
+      };
+    }
+
+    function normalizeLivePayload(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.data)) return data.data;
+      if (data && Array.isArray(data.recruits)) return data.recruits;
+      if (data && Array.isArray(data.rows)) return data.rows;
+      return [];
+    }
+
+    async function fetchLiveSheetData() {
+      if (!LIVE_SYNC_ENABLED) {
+        setLiveStatus('Live Sheet: URL Needed', true);
+        return false;
+      }
+
+      try {
+        setLiveStatus('Live Sheet: Refreshing...');
+        const response = await fetch(LIVE_SHEET_WEBAPP_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const rows = normalizeLivePayload(data);
+
+        if (!rows.length) {
+          setLiveStatus('Live Sheet: No Rows Found', true);
+          return false;
+        }
+
+        const nextDetails = {};
+        rows.forEach((row, index) => {
+          const id = String(row.id || row.recruitId || row.fullName || row.name || index + 1) + '_' + index;
+          nextDetails[id] = buildRecruitFromRow(row);
+        });
+
+        recruitDetails = nextDetails;
+        selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+        saveData();
+        rebuildRecruitList(selectedRecruitId);
+        setLiveStatus(`Live Sheet: ${rows.length} Loaded`);
+        return true;
+      } catch (error) {
+        console.error(error);
+        setLiveStatus('Live Sheet: Refresh Failed', true);
+        return false;
+      }
+    }
+
+    function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
+
+    function loadData() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) return JSON.parse(saved);
+      } catch (error) {}
+      return deepClone(defaultRecruits);
+    }
+
+    function saveData() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
+    }
+
+    function loadSidebarState() {
+      try {
+        if (localStorage.getItem(SIDEBAR_STATE_KEY) === 'true') appShell.classList.add('sidebar-collapsed');
+        if (localStorage.getItem(COMPACT_MODE_KEY) === 'true') appShell.classList.add('compact-mode');
+      } catch (error) {}
+    }
+
+    function saveSidebarState() {
+      localStorage.setItem(SIDEBAR_STATE_KEY, String(appShell.classList.contains('sidebar-collapsed')));
+      localStorage.setItem(COMPACT_MODE_KEY, String(appShell.classList.contains('compact-mode')));
+    }
+
+
+    function offerBadgeClass(value) {
+      const v = String(value || '').toLowerCase();
+      if (v.includes('offered')) return 'offered';
+      if (v.includes('committed here')) return 'committed-here';
+      if (v.includes('committed elsewhere')) return 'committed-elsewhere';
+      return '';
+    }
+
+    function badgeClassFromStatus(status) {
+      const value = String(status || '').toLowerCase();
+      if (value.includes('priority')) return 'priority';
+      if (value.includes('warm')) return 'warm';
+      if (value.includes('watch')) return 'good';
+      return 'neutral';
+    }
+
+    function cardColorClass(recruit) {
+      const value = String(recruit.priority || recruit.status || '').toLowerCase();
+      if (value.includes('priority')) return 'card-color-priority';
+      if (value.includes('warm')) return 'card-color-warm';
+      if (value.includes('watch')) return 'card-color-watch';
+      return 'card-color-default';
+    }
+
+    function parseYesNo(value) {
+      const v = String(value || '').trim().toLowerCase();
+      return ['yes','y','true','1','x','check','checked','√'].includes(v);
+    }
+
+    function splitMulti(value) {
+      if (!value) return [];
+      return String(value).split(/\||;|,/).map(item => item.trim()).filter(Boolean);
+    }
+
+    function parseCsvLine(line) {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      for (let i = 0; i < line.length; i++) {
+        const char = line[i];
+        const next = line[i + 1];
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            current += '"';
+            i++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+        } else if (char === ',' && !inQuotes) {
+          result.push(current);
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current);
+      return result.map(cell => cell.trim());
+    }
+
+    function profileSubtitle(recruit) {
+      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', '), recruit.club]
+        .filter(Boolean).join(' • ');
+    }
+
+    function cardMeta(recruit) {
+      return [recruit.classYear, recruit.position, [recruit.city, recruit.state].filter(Boolean).join(', '), recruit.club]
+        .filter(Boolean).join(' • ');
+    }
+
+    function buildRecruitFromRow(row) {
+      const priority = row.priority || row.status || row.group || 'Imported';
+      return {
+        name: row.fullName || row.name || row.recruitName || 'Unknown Recruit',
+        classYear: row.classYear || row.graduationYear || '',
+        position: row.position || '',
+        city: row.city || '',
+        state: row.state || '',
+        club: row.club || '',
+        group: row.group || '',
+        status: row.status || priority,
+        priority,
+        june15Call: row.june15Call || row.owner || '',
+        rating: row.rating || '',
+        wroteToUs: row.wroteToUs || '',
+        q1: parseYesNo(row.q1), q2: parseYesNo(row.q2), q3: parseYesNo(row.q3), q4: parseYesNo(row.q4),
+        q1Question1: row.q1Question1 || '', q1Answer1: row.q1Answer1 || '',
+        q1Question2: row.q1Question2 || '', q1Answer2: row.q1Answer2 || '',
+        q1Question3: row.q1Question3 || '', q1Answer3: row.q1Answer3 || '',
+        q2Question1: row.q2Question1 || '', q2Answer1: row.q2Answer1 || '',
+        q2Question2: row.q2Question2 || '', q2Answer2: row.q2Answer2 || '',
+        q2Question3: row.q2Question3 || '', q2Answer3: row.q2Answer3 || '',
+        q3Question1: row.q3Question1 || '', q3Answer1: row.q3Answer1 || '',
+        q3Question2: row.q3Question2 || '', q3Answer2: row.q3Answer2 || '',
+        q3Question3: row.q3Question3 || '', q3Answer3: row.q3Answer3 || '',
+        q4Question1: row.q4Question1 || '', q4Answer1: row.q4Answer1 || '',
+        q4Question2: row.q4Question2 || '', q4Answer2: row.q4Answer2 || '',
+        q4Question3: row.q4Question3 || '', q4Answer3: row.q4Answer3 || '',
+        tags: splitMulti(row.tags),
+        summary: row.summary || row.notes || 'Imported recruit profile.',
+        notes: splitMulti(row.notes || ''),
+        notesHistory: splitMulti(row.notesHistory || '').map(text => ({date: new Date().toISOString().slice(0,10), text})),
+        evaluation: splitMulti(row.evaluation || row.eval || ''),
+        actions: splitMulti(row.followUp || row.actions || row.nextAction || ''),
+        academics: row.academics || '',
+        visitStatus: row.visitStatus || '',
+        followUp: row.followUp || '',
+        nextActionDue: row.nextActionDue || '',
+        lastContactDate: row.lastContactDate || '',
+        email: row.email || '',
+        phone: row.phone || '',
+        profileLink: row.profileLink || '',
+        filmLink: row.filmLink || '',
+        headshot: row.headshot || row.headshotUrl || '',
+        height: row.height || '',
+        graduationYear: row.graduationYear || row.classYear || '',
+        callPlanLocal: row.callPlanLocal || '',
+        callPlanTimezone: row.callPlanTimezone || '',
+        callPlanPST: row.callPlanPST || ((row.callPlanLocal && row.callPlanTimezone) ? formatInPSTFromLocal(row.callPlanLocal, row.callPlanTimezone) : ''),
+        favorite: parseYesNo(row.favorite),
+        pinned: parseYesNo(row.pinned),
+        campAttended: parseYesNo(row.campAttended),
+        updatedAt: row.updatedAt || new Date().toISOString(),
+        selected: false
+      };
+    }
+
+    function renderDetail(recruit, recruitId) {
+      const statHtml = [
+        ['Height', recruit.height || '—'],
+        ['Graduation Year', recruit.graduationYear || recruit.classYear || '—'],
+        ['Phone', recruit.phone || '—'],
+        ['Email', recruit.email || '—'],
+        ['June 15 Call', recruit.june15Call || '—'],
+        ['Rating', recruit.rating || '—'],
+        ['Last Contact', recruit.lastContactDate || '—'],
+        ['Next Action Due', recruit.nextActionDue || '—'],
+        ['Planned Call (PST)', recruit.callPlanPST ? recruit.callPlanPST + ' PST' : '—']
+      ].map(([label, value]) => `
+        <div class="mini">
+          <div class="label">${label}</div>
+          <div class="value">${value}</div>
+        </div>
+      `).join('');
+
+      const chipHtml = (recruit.tags || []).map(chip => `<span class="tag">${chip}</span>`).join('');
+      const notesHtml = ((recruit.notes && recruit.notes.length ? recruit.notes : ['No notes added yet.'])).map(item => `<li>${item}</li>`).join('');
+      const evalHtml = ((recruit.evaluation && recruit.evaluation.length ? recruit.evaluation : ['No evaluation notes added yet.'])).map(item => `<li>${item}</li>`).join('');
+      const actionsHtml = ((recruit.actions && recruit.actions.length ? recruit.actions : ['No next actions added yet.'])).map(item => `<li>${item}</li>`).join('');
+      const historyHtml = ((recruit.notesHistory && recruit.notesHistory.length ? recruit.notesHistory : [{date:'—', text:'No notes history yet.'}]))
+        .slice().reverse()
+        .map(item => `<div class="timeline-item"><div class="timeline-date">${item.date || '—'}</div><div>${item.text || '—'}</div></div>`).join('');
+
+      detailPanel.innerHTML = `
+        <div class="hero">
+          <div class="hero-top">
+            ${recruit.headshot ? `<img class="headshot" src="${recruit.headshot}" alt="${recruit.name} headshot" />` : `<div class="headshot-placeholder">${(recruit.name || '?').charAt(0).toUpperCase()}</div>`}
+            <div>
+              <h4>${recruit.name}</h4>
+              <p>${profileSubtitle(recruit)}</p>
+            </div>
+          </div>
+          <div class="tag-row">
+            <span class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.status || 'Active'}</span>
+            <span class="tag club-tag">${recruit.club || 'No Club'}</span>
+            ${chipHtml}
+          </div>
+          ${recruit.callPlanPST ? `<div class="call-chip"><span class="call-label">Call</span><span class="call-time">${recruit.callPlanPST}</span><span class="call-zone">PST</span></div>` : ''}
+          <div class="detail-actions">
+            <button class="btn secondary" id="editRecruitBtn" type="button">Edit Recruit</button>
+            <button class="btn secondary" id="favoriteRecruitBtn" type="button">${recruit.favorite ? 'Unfavorite' : 'Favorite'}</button>
+            <button class="btn secondary" id="pinRecruitBtn" type="button">${recruit.pinned ? 'Unpin' : 'Pin'}</button>
+            ${recruit.phone ? `<a class="btn secondary" href="tel:${recruit.phone}">Call</a>` : ''}
+            ${recruit.email ? `<a class="btn secondary" href="mailto:${recruit.email}">Email</a>` : ''}
+            ${recruit.filmLink ? `<a class="btn secondary" href="${recruit.filmLink}" target="_blank" rel="noopener noreferrer">Film</a>` : ''}
+            ${recruit.profileLink ? `<a class="btn secondary" href="${recruit.profileLink}" target="_blank" rel="noopener noreferrer">Profile</a>` : ''}
+          </div>
+        </div>
+
+        <div class="detail-grid">${statHtml}</div>
+
+        <div class="section">
+          <h5>Quick Summary</h5>
+          <p>${recruit.summary || 'No summary added yet.'}</p>
+        </div>
+
+        <div class="section">
+          <h5>Recruiting Info</h5>
+          <ul>
+            <li><strong>Group:</strong> ${recruit.group || '—'}</li>
+            <li><strong>June 15 Call:</strong> ${recruit.june15Call || '—'}</li>
+            <li><strong>Club:</strong> ${recruit.club || '—'}</li>
+            <li><strong>Offer / Commitment:</strong> ${recruit.offerStatus || '—'}</li>
+            <li><strong>Rating:</strong> ${recruit.rating || '—'}</li>
+            <li><strong>Wrote To Us:</strong> ${recruit.wroteToUs || '—'}</li>
+            <li><strong>Academics:</strong> ${recruit.academics || '—'}</li>
+            <li><strong>Visit Status:</strong> ${recruit.visitStatus || '—'}</li>
+            <li><strong>Camp Attended:</strong> ${recruit.campAttended ? 'Yes' : 'No'}</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h5>Contact Timeline</h5>
+          <ul>
+            <li><strong>Q1:</strong> ${recruit.q1 ? 'Complete' : 'Not Complete'}</li>
+            <li><strong>Q2:</strong> ${recruit.q2 ? 'Complete' : 'Not Complete'}</li>
+            <li><strong>Q3:</strong> ${recruit.q3 ? 'Complete' : 'Not Complete'}</li>
+            <li><strong>Q4:</strong> ${recruit.q4 ? 'Complete' : 'Not Complete'}</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h5>Recruit Status Timeline</h5>
+          <div class="timeline">
+            <div class="timeline-item"><div class="timeline-date">${recruit.updatedAt ? recruit.updatedAt.slice(0,10) : '—'}</div><div>Last updated</div></div>
+            <div class="timeline-item"><div class="timeline-date">${recruit.lastContactDate || '—'}</div><div>Last contact</div></div>
+            <div class="timeline-item"><div class="timeline-date">${recruit.nextActionDue || '—'}</div><div>Next action due</div></div>
+            <div class="timeline-item"><div class="timeline-date">${recruit.visitStatus || '—'}</div><div>Visit tracker</div></div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h5>Q1–Q4 Questions + Answers</h5>
+          <ul>
+            <li><strong>Q1 Question 1:</strong> ${recruit.q1Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q1Answer1 || '—'}</li>
+            <li><strong>Q1 Question 2:</strong> ${recruit.q1Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q1Answer2 || '—'}</li>
+            <li><strong>Q1 Question 3:</strong> ${recruit.q1Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q1Answer3 || '—'}</li>
+            <li><strong>Q2 Question 1:</strong> ${recruit.q2Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q2Answer1 || '—'}</li>
+            <li><strong>Q2 Question 2:</strong> ${recruit.q2Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q2Answer2 || '—'}</li>
+            <li><strong>Q2 Question 3:</strong> ${recruit.q2Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q2Answer3 || '—'}</li>
+            <li><strong>Q3 Question 1:</strong> ${recruit.q3Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q3Answer1 || '—'}</li>
+            <li><strong>Q3 Question 2:</strong> ${recruit.q3Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q3Answer2 || '—'}</li>
+            <li><strong>Q3 Question 3:</strong> ${recruit.q3Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q3Answer3 || '—'}</li>
+            <li><strong>Q4 Question 1:</strong> ${recruit.q4Question1 || '—'}<br><strong>Answer:</strong> ${recruit.q4Answer1 || '—'}</li>
+            <li><strong>Q4 Question 2:</strong> ${recruit.q4Question2 || '—'}<br><strong>Answer:</strong> ${recruit.q4Answer2 || '—'}</li>
+            <li><strong>Q4 Question 3:</strong> ${recruit.q4Question3 || '—'}<br><strong>Answer:</strong> ${recruit.q4Answer3 || '—'}</li>
+          </ul>
+        </div>
+
+        <div class="section">
+          <h5>Key Notes</h5>
+          <ul>${notesHtml}</ul>
+        </div>
+
+        <div class="section">
+          <h5>Notes History</h5>
+          <div class="timeline">${historyHtml}</div>
+        </div>
+
+        <div class="section">
+          <h5>Evaluation Areas</h5>
+          <ul>${evalHtml}</ul>
+        </div>
+
+        <div class="section">
+          <h5>Next Action Items</h5>
+          <ul>${actionsHtml}</ul>
+        </div>
+      `;
+
+      document.getElementById('editRecruitBtn').onclick = () => openRecruitModal(recruitId);
+      document.getElementById('favoriteRecruitBtn').onclick = () => {
+        recruitDetails[recruitId].favorite = !recruitDetails[recruitId].favorite;
+        recruitDetails[recruitId].updatedAt = new Date().toISOString();
+        saveData();
+        rebuildRecruitList(recruitId);
+      };
+      document.getElementById('pinRecruitBtn').onclick = () => {
+        recruitDetails[recruitId].pinned = !recruitDetails[recruitId].pinned;
+        recruitDetails[recruitId].updatedAt = new Date().toISOString();
+        saveData();
+        rebuildRecruitList(recruitId);
+      };
+    }
+
+    function updateSummary(recruits) {
+      const totalEl = document.getElementById('totalRecruitsStat');
+      if (totalEl) totalEl.textContent = recruits.length;
+
+      ['2026','2027','2028','2029','2030','2031'].forEach(year => {
+        const count = recruits.filter(r => String(r.classYear || '') === year).length;
+        const el = document.getElementById(`class${year}Stat`);
+        if (el) el.textContent = count;
+      });
+    }
+
+    function populateFilterOptions(recruits) {
+      const selectedClass = classSelect.value;
+      const selectedPosition = positionSelect.value;
+      const selectedStatus = statusSelect.value;
+
+      const classYears = [...new Set(recruits.map(r => r.classYear).filter(Boolean))].sort();
+      const positions = [...new Set(recruits.map(r => r.position).filter(Boolean))].sort();
+      const statuses = [...new Set(recruits.map(r => r.status || r.priority).filter(Boolean))].sort();
+
+      classSelect.innerHTML = '<option value="">All Classes</option>' + classYears.map(v => `<option value="${v}">${v}</option>`).join('');
+      positionSelect.innerHTML = '<option value="">All Positions</option>' + positions.map(v => `<option value="${v}">${v}</option>`).join('');
+      statusSelect.innerHTML = '<option value="">All Statuses</option>' + statuses.map(v => `<option value="${v}">${v}</option>`).join('');
+
+      classSelect.value = classYears.includes(selectedClass) ? selectedClass : '';
+      positionSelect.value = positions.includes(selectedPosition) ? selectedPosition : '';
+      statusSelect.value = statuses.includes(selectedStatus) ? selectedStatus : '';
+    }
+
+    function getAllRecruits() {
+      return Object.entries(recruitDetails).map(([id, recruit]) => ({ id, ...recruit }));
+    }
+
+    function countBy(recruits, fn) {
+      const counts = {};
+      recruits.forEach(r => {
+        const key = fn(r);
+        if (!key) return;
+        counts[key] = (counts[key] || 0) + 1;
+      });
+      return counts;
+    }
+
+    function renderFilterButtons(containerId, items, type, activeValue) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = items.map(item => `
+        <button class="filter-chip ${activeValue === item.value ? 'active' : ''}" data-filter-type="${type}" data-filter-value="${item.value}" type="button">
+          <span>${item.label}</span>
+          <span class="filter-chip-count">${item.count}</span>
+        </button>
+      `).join('');
+
+      container.querySelectorAll('.filter-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const filterType = btn.dataset.filterType;
+          const value = btn.dataset.filterValue;
+          filterState[filterType] = filterState[filterType] === value ? '' : value;
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+    }
+
+    function renderSidebarFilters(recruits) {
+      const groupOrder = ['Liberos', 'Middles', 'Setters', 'Pins', 'Camp', 'To Text'];
+      const groupCounts = countBy(recruits, r => r.group);
+      renderFilterButtons('quickViewsSection', groupOrder.map(label => ({label, value: label, count: groupCounts[label] || 0})), 'group', filterState.group);
+
+      const priorityOrder = ['Priority', 'Warm', 'Watch List'];
+      const priorityCounts = countBy(recruits, r => r.priority || r.status);
+      renderFilterButtons('prioritySection', priorityOrder.map(label => ({label, value: label, count: priorityCounts[label] || 0})), 'priority', filterState.priority);
+
+      const ownerOrder = ['Leisa', 'Jerome', 'Orlando', 'Kelsey'];
+      const ownerCounts = countBy(recruits, r => r.june15Call);
+      renderFilterButtons('ownerSection', ownerOrder.map(label => ({label, value: label, count: ownerCounts[label] || 0})), 'june15Call', filterState.june15Call);
+
+      const classOrder = ['2026', '2027', '2028'];
+      const classCounts = countBy(recruits, r => r.classYear);
+      renderFilterButtons('classFilterSection', classOrder.map(label => ({label, value: label, count: classCounts[label] || 0})), 'classYear', filterState.classYear);
+
+      const shortcutItems = [
+        { label: 'Need Follow-Up', value: 'Need Follow-Up', count: recruits.filter(r => (r.followUp || '').trim() || (r.actions || []).length).length },
+        { label: 'Visited Campus', value: 'Visited Campus', count: recruits.filter(r => String(r.visitStatus || '').toLowerCase().includes('visit')).length },
+        { label: 'High Academic Fit', value: 'High Academic Fit', count: recruits.filter(r => String(r.academics || '').toLowerCase().includes('high academic')).length }
+      ];
+      renderFilterButtons('statusShortcutSection', shortcutItems, 'shortcut', filterState.shortcut);
+    }
+
+    function passesShortcutFilter(recruit) {
+      if (!filterState.shortcut) return true;
+      if (filterState.shortcut === 'Need Follow-Up') return Boolean((recruit.followUp || '').trim() || (recruit.actions || []).length);
+      if (filterState.shortcut === 'Visited Campus') return String(recruit.visitStatus || '').toLowerCase().includes('visit');
+      if (filterState.shortcut === 'High Academic Fit') return String(recruit.academics || '').toLowerCase().includes('high academic');
+      return true;
+    }
+
+    function applySort(recruits) {
+      const sortBy = sortBySelect.value;
+      const list = [...recruits];
+
+      list.sort((a, b) => {
+        if (sortBy === 'pinned') {
+          return Number(Boolean(b.pinned)) - Number(Boolean(a.pinned))
+            || Number(Boolean(b.favorite)) - Number(Boolean(a.favorite))
+            || String(a.name).localeCompare(String(b.name));
+        }
+        if (sortBy === 'rating') return Number(b.rating || 0) - Number(a.rating || 0);
+        if (sortBy === 'classYear') return String(a.classYear).localeCompare(String(b.classYear)) || String(a.name).localeCompare(String(b.name));
+        if (sortBy === 'position') return String(a.position).localeCompare(String(b.position)) || String(a.name).localeCompare(String(b.name));
+        if (sortBy === 'june15Call') return String(a.june15Call).localeCompare(String(b.june15Call)) || String(a.name).localeCompare(String(b.name));
+        if (sortBy === 'recentlyUpdated') return String(b.updatedAt || '').localeCompare(String(a.updatedAt || ''));
+        if (sortBy === 'nextActionDue') return String(a.nextActionDue || '9999-99-99').localeCompare(String(b.nextActionDue || '9999-99-99'));
+        if (sortBy === 'lastContactDate') return String(b.lastContactDate || '').localeCompare(String(a.lastContactDate || ''));
+        return String(a.name).localeCompare(String(b.name));
+      });
+
+      // Always surface pinned recruits first a little
+      list.sort((a,b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+      return list;
+    }
+
+    function rebuildRecruitList(activeId) {
+      const recruits = getAllRecruits();
+      populateFilterOptions(recruits);
+      updateSummary(recruits);
+      updateSnapshotFilterState();
+      renderSidebarFilters(recruits);
+      detectDuplicates(recruits);
+
+      const searchTerm = (searchInput.value || '').toLowerCase().trim();
+      const classValue = classSelect.value;
+      const positionValue = positionSelect.value;
+      const statusValue = statusSelect.value;
+
+      let filtered = recruits.filter(recruit => {
+        const haystack = [
+          recruit.name, recruit.club, recruit.city, recruit.state, recruit.position, recruit.group,
+          recruit.summary, recruit.june15Call, (recruit.notes || []).join(' '), (recruit.tags || []).join(' '),
+          recruit.email, recruit.phone
+        ].join(' ').toLowerCase();
+
+        return (!searchTerm || haystack.includes(searchTerm))
+          && (!classValue || recruit.classYear === classValue)
+          && (!positionValue || recruit.position === positionValue)
+          && (!statusValue || recruit.status === statusValue || recruit.priority === statusValue)
+          && (!filterState.group || recruit.group === filterState.group)
+          && (!filterState.priority || recruit.priority === filterState.priority || recruit.status === filterState.priority)
+          && (!filterState.june15Call || recruit.june15Call === filterState.june15Call)
+          && (!filterState.classYear || recruit.classYear === filterState.classYear)
+          && passesShortcutFilter(recruit);
+      });
+
+      filtered = applySort(filtered);
+      filteredIds = filtered.map(r => r.id);
+
+      if (!filteredIds.includes(String(activeId))) activeId = filteredIds[0] || '';
+      selectedRecruitId = activeId;
+
+      document.getElementById('recruitListCount').textContent = filteredIds.length
+        ? `${filteredIds.length} recruit${filteredIds.length === 1 ? '' : 's'} showing`
+        : 'No recruits match these filters yet.';
+
+      recruitList.innerHTML = filtered.map(recruit => `
+        <div class="recruit-card ${cardColorClass(recruit)} ${String(recruit.id) === String(activeId) ? 'active' : ''}" data-id="${recruit.id}">
+          <div class="recruit-card-topline">
+            <div class="card-left">
+              <input class="card-check" type="checkbox" data-check-id="${recruit.id}" ${recruit.selected ? 'checked' : ''} />
+              ${recruit.headshot ? `<img class="card-thumb" src="${recruit.headshot}" alt="${recruit.name} thumb" />` : `<div class="card-thumb-placeholder">${(recruit.name || '?').charAt(0).toUpperCase()}</div>`}
+              <div>
+                <div class="recruit-name-row">
+                  <div class="recruit-name">${recruit.name}</div>
+                  <button class="star-btn ${recruit.favorite ? 'star-on' : ''}" data-star-id="${recruit.id}" type="button">★</button>
+                  <button class="pin-btn ${recruit.pinned ? 'pin-on' : ''}" data-pin-id="${recruit.id}" type="button">${recruit.pinned ? "📌" : "📍"}</button>
+                </div>
+                <div class="recruit-meta">${cardMeta(recruit)}</div>
+                ${recruit.callPlanPST ? `
+                  <div class="scheduled-call-visual">
+                    <span class="scheduled-call-top">Call</span>
+                    <span class="scheduled-call-time">${recruit.callPlanPST} PST</span>
+                    <span class="scheduled-call-origin">${recruit.callPlanTimezone ? recruit.callPlanTimezone.split('/').pop().replace('_', ' ') : ''}</span>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+            <div class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.priority || recruit.status || 'Active'}</div>
+          </div>
+          <div class="tag-row">
+            <span class="tag club-tag">${recruit.club || 'No Club'}</span>
+            ${recruit.lastContactDate ? `<span class="tag">Last Contact: ${recruit.lastContactDate}</span>` : ''}
+            ${recruit.nextActionDue ? `<span class="tag">Due: ${recruit.nextActionDue}</span>` : ''}
+            ${recruit.offerStatus ? `<span class="offer-badge ${offerBadgeClass(recruit.offerStatus)}">${recruit.offerStatus}</span>` : ''}
+            ${(recruit.tags || []).slice(0, 2).map(tag => `<span class="tag">${tag}</span>`).join('')}
+          </div>
+        </div>
+      `).join('');
+
+      document.querySelectorAll('.recruit-card').forEach(card => {
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('[data-star-id],[data-pin-id],[data-check-id]')) return;
+          selectedRecruitId = card.dataset.id;
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+
+      document.querySelectorAll('[data-star-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.starId;
+          recruitDetails[id].favorite = !recruitDetails[id].favorite;
+          recruitDetails[id].updatedAt = new Date().toISOString();
+          saveData();
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+
+      document.querySelectorAll('[data-pin-id]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.pinId;
+          recruitDetails[id].pinned = !recruitDetails[id].pinned;
+          recruitDetails[id].updatedAt = new Date().toISOString();
+          saveData();
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+
+      document.querySelectorAll('[data-check-id]').forEach(box => {
+        box.addEventListener('click', (e) => e.stopPropagation());
+        box.addEventListener('change', () => {
+          const id = box.dataset.checkId;
+          recruitDetails[id].selected = box.checked;
+          saveData();
+          updateBulkBar();
+        });
+      });
+
+      updateBulkBar();
+
+      if (selectedRecruitId && recruitDetails[selectedRecruitId]) {
+        renderDetail(recruitDetails[selectedRecruitId], selectedRecruitId);
+      } else {
+        detailPanel.innerHTML = '<div class="section"><h5>No Recruit Selected</h5><p>Import a sheet or add a recruit to get started.</p></div>';
+      }
+
+      saveData();
+    }
+
+    function selectedIds() {
+      return Object.entries(recruitDetails).filter(([,r]) => r.selected).map(([id]) => id);
+    }
+
+    function updateBulkBar() {
+      const ids = selectedIds();
+      const countText = document.getElementById('bulkCountText');
+      countText.textContent = `${ids.length} selected`;
+      bulkBar.classList.toggle('active', ids.length > 0);
+    }
+
+    function detectDuplicates(recruits) {
+      const seen = new Map();
+      recruits.forEach(r => {
+        const key = `${String(r.name || '').trim().toLowerCase()}|${String(r.club || '').trim().toLowerCase()}`;
+        if (!key || key === '|') return;
+        seen.set(key, (seen.get(key) || 0) + 1);
+      });
+      recruits.forEach(r => {
+        const key = `${String(r.name || '').trim().toLowerCase()}|${String(r.club || '').trim().toLowerCase()}`;
+        const duplicate = (seen.get(key) || 0) > 1;
+        if (duplicate) {
+          if (!r.tags.includes('Possible Duplicate')) r.tags.push('Possible Duplicate');
+        } else {
+          r.tags = (r.tags || []).filter(tag => tag !== 'Possible Duplicate');
+        }
+      });
+    }
+
+
+    function initializeSnapshotFilters() {
+      document.querySelectorAll('.snapshot-filter-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const year = card.dataset.snapshotFilter || '';
+          classSelect.value = year;
+          filterState.classYear = '';
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+    }
+
+    function updateSnapshotFilterState() {
+      document.querySelectorAll('.snapshot-filter-card').forEach(card => {
+        const year = card.dataset.snapshotFilter || '';
+        const active = classSelect.value === year || (!classSelect.value && year === '');
+        card.classList.toggle('active', active);
+      });
+    }
+
+
+    function resetAllFilters() {
+      filterState.group = '';
+      filterState.priority = '';
+      filterState.june15Call = '';
+      filterState.classYear = '';
+      filterState.shortcut = '';
+      searchInput.value = '';
+      classSelect.value = '';
+      positionSelect.value = '';
+      statusSelect.value = '';
+      sortBySelect.value = 'pinned';
+      rebuildRecruitList(selectedRecruitId);
+    }
+
+    showAllBtn.addEventListener('click', resetAllFilters);
+    resetFiltersBtn.addEventListener('click', resetAllFilters);
+    document.getElementById('clearCompactFiltersBtn').addEventListener('click', resetAllFilters);
+
+    const compactFilterBar = document.getElementById('compactFilterBar');
+    const toggleQuickFiltersBtn = document.getElementById('toggleQuickFiltersBtn');
+    const QUICK_FILTERS_COLLAPSE_KEY = 'quick_filters_collapsed_v1';
+    if (localStorage.getItem(QUICK_FILTERS_COLLAPSE_KEY) === 'true') {
+      compactFilterBar.classList.add('collapsed');
+      toggleQuickFiltersBtn.textContent = 'Expand Filters';
+    }
+    toggleQuickFiltersBtn.addEventListener('click', () => {
+      compactFilterBar.classList.toggle('collapsed');
+      const collapsed = compactFilterBar.classList.contains('collapsed');
+      toggleQuickFiltersBtn.textContent = collapsed ? 'Expand Filters' : 'Collapse Filters';
+      localStorage.setItem(QUICK_FILTERS_COLLAPSE_KEY, String(collapsed));
+    });
+
+    sidebarToggle.addEventListener('click', () => {
+      appShell.classList.toggle('sidebar-collapsed');
+      saveSidebarState();
+    });
+
+    compactBtn.addEventListener('click', () => {
+      appShell.classList.toggle('compact-mode');
+      saveSidebarState();
+    });
+
+    searchInput.addEventListener('input', () => rebuildRecruitList(selectedRecruitId));
+    classSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
+    positionSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
+    statusSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
+    sortBySelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
+
+    document.getElementById('bulkClearBtn').addEventListener('click', () => {
+      Object.values(recruitDetails).forEach(r => r.selected = false);
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkFavoriteBtn').addEventListener('click', () => {
+      selectedIds().forEach(id => {
+        recruitDetails[id].favorite = !recruitDetails[id].favorite;
+        recruitDetails[id].updatedAt = new Date().toISOString();
+      });
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkDeleteBtn').addEventListener('click', () => {
+      const ids = selectedIds();
+      if (!ids.length) return;
+      if (!window.confirm(`Delete ${ids.length} selected recruits?`)) return;
+      ids.forEach(id => delete recruitDetails[id]);
+      selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkPrioritySelect').addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (!value) return;
+      selectedIds().forEach(id => {
+        recruitDetails[id].priority = value;
+        recruitDetails[id].status = value;
+        recruitDetails[id].updatedAt = new Date().toISOString();
+      });
+      e.target.value = '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    document.getElementById('bulkJune15CallSelect').addEventListener('change', (e) => {
+      const value = e.target.value;
+      if (!value) return;
+      selectedIds().forEach(id => {
+        recruitDetails[id].june15Call = value;
+        recruitDetails[id].updatedAt = new Date().toISOString();
+      });
+      e.target.value = '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+    });
+
+    function exportFiltered() {
+      const rows = filteredIds.map(id => recruitDetails[id]);
+      const headers = [
+        'fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','offerStatus','wroteToUs',
+        'q1','q2','q3','q4','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email'
+      ];
+      const csv = [
+        headers.join(','),
+        ...rows.map(r => headers.map(h => {
+          const map = {
+            fullName: r.name,
+            classYear: r.classYear,
+            group: r.group,
+            position: r.position,
+            city: r.city,
+            state: r.state,
+            club: r.club,
+            priority: r.priority,
+            status: r.status,
+            june15Call: r.june15Call,
+            rating: r.rating,
+            offerStatus: r.offerStatus,
+            wroteToUs: r.wroteToUs,
+            q1: r.q1,
+            q2: r.q2,
+            q3: r.q3,
+            q4: r.q4,
+            lastContactDate: r.lastContactDate,
+            nextActionDue: r.nextActionDue,
+            visitStatus: r.visitStatus,
+            campAttended: r.campAttended,
+            filmLink: r.filmLink,
+            profileLink: r.profileLink,
+            phone: r.phone,
+            email: r.email
+          };
+          const v = String(map[h] ?? '').replace(/"/g, '""');
+          return `"${v}"`;
+        }).join(','))
+      ].join('\n');
+
+      const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'filtered_recruits.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    exportBtn.addEventListener('click', exportFiltered);
+    refreshLiveBtn.addEventListener('click', async () => {
+      await fetchLiveSheetData();
+    });
+
+    const modal = document.createElement('div');
+    modal.id = 'recruitModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(16,24,38,0.55);display:none;align-items:center;justify-content:center;padding:24px;z-index:9999;';
+    modal.innerHTML = `
+      <div style="background:#fff;border-radius:18px;max-width:980px;width:100%;max-height:90vh;overflow:auto;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+          <h3 id="modalTitle" style="margin:0;font-size:24px;">Add Recruit</h3>
+          <button id="closeRecruitModal" class="btn secondary" type="button">Close</button>
+        </div>
+        <form id="recruitForm" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;">
+          <input type="hidden" id="formRecruitId" />
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Full Name</label><input id="formName" class="modal-field" required /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Class Year</label><input id="formClassYear" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Group</label><input id="formGroup" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Position</label><input id="formPosition" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">City</label><input id="formCity" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">State</label><input id="formState" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Club</label><input id="formClub" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Priority / Status</label><input id="formPriority" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Phone</label><input id="formPhone" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Email</label><input id="formEmail" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Profile Link</label><input id="formProfileLink" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Film Link</label><input id="formFilmLink" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">June 15 Call</label><input id="formJune15Call" class="modal-field" placeholder="Leisa, Jerome, Orlando, Kelsey" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Rating</label><input id="formRating" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Offer / Commitment</label>
+            <select id="formOfferStatus" class="modal-field">
+              <option value="">None</option>
+              <option value="Offered">Offered</option>
+              <option value="Committed Here">Committed Here</option>
+              <option value="Committed Elsewhere">Committed Elsewhere</option>
+            </select>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Wrote To Us</label><input id="formWroteToUs" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Height</label><input id="formHeight" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Graduation Year</label><input id="formGraduationYear" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Last Contact Date</label><input id="formLastContactDate" type="date" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Next Action Due</label><input id="formNextActionDue" type="date" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Planned Call Date + Time</label><input id="formCallPlanLocal" type="datetime-local" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Call Timezone</label>
+            <select id="formCallPlanTimezone" class="modal-field">
+              <option value="">Select timezone</option>
+              <option value="America/Los_Angeles">Pacific</option>
+              <option value="America/Denver">Mountain</option>
+              <option value="America/Chicago">Central</option>
+              <option value="America/New_York">Eastern</option>
+              <option value="Pacific/Honolulu">Hawaii</option>
+            </select>
+          </div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">PST Conversion</label><input id="formCallPlanPST" class="modal-field" readonly /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q1</label><select id="formQ1" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q2</label><select id="formQ2" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q3</label><select id="formQ3" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q4</label><select id="formQ4" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Camp Attended</label><select id="formCampAttended" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Favorite</label><select id="formFavorite" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Pinned</label><select id="formPinned" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Headshot</label><input id="formHeadshot" type="file" accept="image/*" class="modal-field" /><div id="headshotCurrent" class="muted-small" style="margin-top:6px;"></div></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Tags</label><input id="formTags" class="modal-field" placeholder="comma separated" /></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Summary</label><textarea id="formSummary" rows="3" class="modal-field"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes</label><textarea id="formNotes" rows="3" class="modal-field" placeholder="separate with commas or semicolons"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Notes History</label><textarea id="formNotesHistory" rows="3" class="modal-field" placeholder="one note per line"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Evaluation</label><textarea id="formEvaluation" rows="3" class="modal-field" placeholder="separate with commas or semicolons"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Follow Up / Next Actions</label><textarea id="formFollowUp" rows="3" class="modal-field" placeholder="separate with commas or semicolons"></textarea></div>
+
+          ${[1,2,3,4].map(q => `
+            ${[1,2,3].map(i => `
+              <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q${q} Question ${i}</label><input id="formQ${q}Question${i}" class="modal-field" /></div>
+              <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Q${q} Answer ${i}</label><textarea id="formQ${q}Answer${i}" rows="2" class="modal-field"></textarea></div>
+            `).join('')}
+          `).join('')}
+
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Academics</label><textarea id="formAcademics" rows="2" class="modal-field"></textarea></div>
+          <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Visit Status</label><textarea id="formVisitStatus" rows="2" class="modal-field"></textarea></div>
+          <div style="grid-column:1 / -1;display:flex;justify-content:flex-end;gap:10px;margin-top:6px;">
+            <button type="button" id="deleteRecruitBtn" class="btn secondary" style="display:none;">Delete Recruit</button>
+            <button type="submit" class="btn">Save Recruit</button>
+          </div>
+        </form>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const modalTitle = document.getElementById('modalTitle');
+    const recruitForm = document.getElementById('recruitForm');
+    const closeRecruitModalBtn = document.getElementById('closeRecruitModal');
+    const deleteRecruitBtn = document.getElementById('deleteRecruitBtn');
+
+    const formEls = {
+      id: document.getElementById('formRecruitId'),
+      name: document.getElementById('formName'),
+      classYear: document.getElementById('formClassYear'),
+      group: document.getElementById('formGroup'),
+      position: document.getElementById('formPosition'),
+      city: document.getElementById('formCity'),
+      state: document.getElementById('formState'),
+      club: document.getElementById('formClub'),
+      priority: document.getElementById('formPriority'),
+      phone: document.getElementById('formPhone'),
+      email: document.getElementById('formEmail'),
+      profileLink: document.getElementById('formProfileLink'),
+      filmLink: document.getElementById('formFilmLink'),
+      june15Call: document.getElementById('formJune15Call'),
+      rating: document.getElementById('formRating'),
+      offerStatus: document.getElementById('formOfferStatus'),
+      wroteToUs: document.getElementById('formWroteToUs'),
+      height: document.getElementById('formHeight'),
+      graduationYear: document.getElementById('formGraduationYear'),
+      lastContactDate: document.getElementById('formLastContactDate'),
+      nextActionDue: document.getElementById('formNextActionDue'),
+      callPlanLocal: document.getElementById('formCallPlanLocal'),
+      callPlanTimezone: document.getElementById('formCallPlanTimezone'),
+      callPlanPST: document.getElementById('formCallPlanPST'),
+      q1: document.getElementById('formQ1'),
+      q2: document.getElementById('formQ2'),
+      q3: document.getElementById('formQ3'),
+      q4: document.getElementById('formQ4'),
+      campAttended: document.getElementById('formCampAttended'),
+      favorite: document.getElementById('formFavorite'),
+      pinned: document.getElementById('formPinned'),
+      headshot: document.getElementById('formHeadshot'),
+      tags: document.getElementById('formTags'),
+      summary: document.getElementById('formSummary'),
+      notes: document.getElementById('formNotes'),
+      notesHistory: document.getElementById('formNotesHistory'),
+      evaluation: document.getElementById('formEvaluation'),
+      followUp: document.getElementById('formFollowUp'),
+      academics: document.getElementById('formAcademics'),
+      visitStatus: document.getElementById('formVisitStatus')
+    };
+
+    for (let q = 1; q <= 4; q++) {
+      for (let i = 1; i <= 3; i++) {
+        formEls[`q${q}Question${i}`] = document.getElementById(`formQ${q}Question${i}`);
+        formEls[`q${q}Answer${i}`] = document.getElementById(`formQ${q}Answer${i}`);
+      }
+    }
+
+    function openRecruitModal(id = '') {
+      const recruit = id ? recruitDetails[id] : null;
+      modal.style.display = 'flex';
+      modalTitle.textContent = recruit ? 'Edit Recruit' : 'Add Recruit';
+      deleteRecruitBtn.style.display = recruit ? 'inline-flex' : 'none';
+
+      formEls.id.value = id || '';
+      formEls.name.value = recruit?.name || '';
+      formEls.classYear.value = recruit?.classYear || '';
+      formEls.group.value = recruit?.group || '';
+      formEls.position.value = recruit?.position || '';
+      formEls.city.value = recruit?.city || '';
+      formEls.state.value = recruit?.state || '';
+      formEls.club.value = recruit?.club || '';
+      formEls.priority.value = recruit?.priority || recruit?.status || '';
+      formEls.phone.value = recruit?.phone || '';
+      formEls.email.value = recruit?.email || '';
+      formEls.profileLink.value = recruit?.profileLink || '';
+      formEls.filmLink.value = recruit?.filmLink || '';
+      formEls.june15Call.value = recruit?.june15Call || '';
+      formEls.rating.value = recruit?.rating || '';
+      formEls.offerStatus.value = recruit?.offerStatus || '';
+      formEls.wroteToUs.value = recruit?.wroteToUs || '';
+      formEls.height.value = recruit?.height || '';
+      formEls.graduationYear.value = recruit?.graduationYear || recruit?.classYear || '';
+      formEls.lastContactDate.value = recruit?.lastContactDate || '';
+      formEls.nextActionDue.value = recruit?.nextActionDue || '';
+      formEls.callPlanLocal.value = recruit?.callPlanLocal || '';
+      formEls.callPlanTimezone.value = recruit?.callPlanTimezone || '';
+      formEls.callPlanPST.value = recruit?.callPlanPST ? recruit.callPlanPST + ' PST' : '';
+      refreshCallPlanPSTField();
+      formEls.q1.value = String(!!recruit?.q1);
+      formEls.q2.value = String(!!recruit?.q2);
+      formEls.q3.value = String(!!recruit?.q3);
+      formEls.q4.value = String(!!recruit?.q4);
+      formEls.campAttended.value = String(!!recruit?.campAttended);
+      formEls.favorite.value = String(!!recruit?.favorite);
+      formEls.pinned.value = String(!!recruit?.pinned);
+      formEls.tags.value = (recruit?.tags || []).join(', ');
+      formEls.summary.value = recruit?.summary || '';
+      formEls.notes.value = (recruit?.notes || []).join('; ');
+      formEls.notesHistory.value = (recruit?.notesHistory || []).map(item => item.text || '').join('\n');
+      formEls.evaluation.value = (recruit?.evaluation || []).join('; ');
+      formEls.followUp.value = recruit?.followUp || (recruit?.actions || []).join('; ');
+      formEls.academics.value = recruit?.academics || '';
+      formEls.visitStatus.value = recruit?.visitStatus || '';
+      formEls.headshot.value = '';
+      for (let q = 1; q <= 4; q++) {
+        for (let i = 1; i <= 3; i++) {
+          formEls[`q${q}Question${i}`].value = recruit?.[`q${q}Question${i}`] || '';
+          formEls[`q${q}Answer${i}`].value = recruit?.[`q${q}Answer${i}`] || '';
+        }
+      }
+      document.getElementById('headshotCurrent').textContent = recruit?.headshot ? 'Current headshot loaded.' : 'No headshot uploaded yet.';
+    }
+
+    function closeRecruitModal() { modal.style.display = 'none'; }
+
+    closeRecruitModalBtn.addEventListener('click', closeRecruitModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeRecruitModal(); });
+
+    addBtn.addEventListener('click', () => openRecruitModal());
+    importBtn.addEventListener('click', () => fileInput.click());
+
+    recruitForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const id = formEls.id.value || String(Date.now());
+      let existingHeadshot = recruitDetails[id]?.headshot || '';
+
+      if (formEls.headshot.files && formEls.headshot.files[0]) {
+        existingHeadshot = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (evt) => resolve(evt.target.result);
+          reader.readAsDataURL(formEls.headshot.files[0]);
+        });
+      }
+
+      const notesHistoryLines = String(formEls.notesHistory.value || '')
+        .split('\n')
+        .map(v => v.trim())
+        .filter(Boolean)
+        .map(text => ({ date: new Date().toISOString().slice(0,10), text }));
+
+      recruitDetails[id] = {
+        ...(recruitDetails[id] || {}),
+        name: formEls.name.value,
+        classYear: formEls.classYear.value,
+        group: formEls.group.value,
+        position: formEls.position.value,
+        city: formEls.city.value,
+        state: formEls.state.value,
+        club: formEls.club.value,
+        status: formEls.priority.value || 'Active',
+        priority: formEls.priority.value || 'Active',
+        june15Call: formEls.june15Call.value,
+        rating: formEls.rating.value,
+        offerStatus: formEls.offerStatus.value,
+        wroteToUs: formEls.wroteToUs.value,
+        q1: formEls.q1.value === 'true',
+        q2: formEls.q2.value === 'true',
+        q3: formEls.q3.value === 'true',
+        q4: formEls.q4.value === 'true',
+        tags: splitMulti(formEls.tags.value),
+        summary: formEls.summary.value,
+        notes: splitMulti(formEls.notes.value),
+        notesHistory: notesHistoryLines.length ? notesHistoryLines : (recruitDetails[id]?.notesHistory || []),
+        evaluation: splitMulti(formEls.evaluation.value),
+        actions: splitMulti(formEls.followUp.value),
+        academics: formEls.academics.value,
+        visitStatus: formEls.visitStatus.value,
+        followUp: formEls.followUp.value,
+        nextActionDue: formEls.nextActionDue.value,
+        lastContactDate: formEls.lastContactDate.value,
+        callPlanLocal: formEls.callPlanLocal.value,
+        callPlanTimezone: formEls.callPlanTimezone.value,
+        callPlanPST: formEls.callPlanLocal.value && formEls.callPlanTimezone.value ? formatInPSTFromLocal(formEls.callPlanLocal.value, formEls.callPlanTimezone.value) : '',
+        email: formEls.email.value,
+        phone: formEls.phone.value,
+        profileLink: formEls.profileLink.value,
+        filmLink: formEls.filmLink.value,
+        headshot: existingHeadshot,
+        height: formEls.height.value,
+        graduationYear: formEls.graduationYear.value,
+        favorite: formEls.favorite.value === 'true',
+        pinned: formEls.pinned.value === 'true',
+        campAttended: formEls.campAttended.value === 'true',
+        updatedAt: new Date().toISOString(),
+        selected: recruitDetails[id]?.selected || false
+      };
+
+      for (let q = 1; q <= 4; q++) {
+        for (let i = 1; i <= 3; i++) {
+          recruitDetails[id][`q${q}Question${i}`] = formEls[`q${q}Question${i}`].value;
+          recruitDetails[id][`q${q}Answer${i}`] = formEls[`q${q}Answer${i}`].value;
+        }
+      }
+
+      selectedRecruitId = id;
+      saveData();
+      rebuildRecruitList(id);
+      closeRecruitModal();
+    });
+
+    deleteRecruitBtn.addEventListener('click', () => {
+      const id = formEls.id.value;
+      if (!id) return;
+      if (!window.confirm('Delete this recruit?')) return;
+      delete recruitDetails[id];
+      selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+      saveData();
+      rebuildRecruitList(selectedRecruitId);
+      closeRecruitModal();
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const text = String(event.target.result || '').replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        const lines = text.split('\n').filter(line => line.trim() !== '');
+        if (lines.length < 2) {
+          alert('This file does not have enough rows to import.');
+          return;
+        }
+
+        const headers = parseCsvLine(lines[0]);
+        const importedIds = [];
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = parseCsvLine(lines[i]);
+          const row = {};
+          headers.forEach((header, index) => { row[header] = values[index] || ''; });
+          if (!row.fullName && !row.name && !row.recruitName) continue;
+          const id = String(Date.now() + i);
+          recruitDetails[id] = buildRecruitFromRow(row);
+          importedIds.push(id);
+        }
+
+        if (!importedIds.length) {
+          alert('No recruits were imported. Make sure your CSV has a fullName column.');
+          return;
+        }
+
+        selectedRecruitId = importedIds[0];
+        saveData();
+        rebuildRecruitList(selectedRecruitId);
+        alert(`Imported ${importedIds.length} recruits.`);
+      };
+
+      reader.readAsText(file);
+      fileInput.value = '';
+    });
+
+    
+function updateCountdown() {
+      const now = new Date();
+      let diff = TARGET_DATE.getTime() - now.getTime();
+      if (diff < 0) diff = 0;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      const totalWindow = TARGET_DATE.getTime() - YEAR_START.getTime();
+      const elapsed = Math.max(0, Math.min(totalWindow, now.getTime() - YEAR_START.getTime()));
+      const progress = totalWindow ? (elapsed / totalWindow) * 100 : 100;
+
+      const ringCircumference = 2 * Math.PI * 70;
+      const ringOffset = ringCircumference * (1 - progress / 100);
+
+      const dayEl = document.getElementById('daysLeftNumber');
+      const ringEl = document.getElementById('ringProgress');
+      const progressEl = document.getElementById('countdownProgress');
+      const statusEl = document.getElementById('countdownStatus');
+      const progressTextEl = document.getElementById('progressText');
+      const hmTextEl = document.getElementById('hoursMinutesText');
+
+      if (dayEl) dayEl.textContent = String(days);
+      if (ringEl) ringEl.style.strokeDashoffset = `${ringOffset}`;
+      if (progressEl) progressEl.style.width = `${progress.toFixed(2)}%`;
+      if (progressTextEl) progressTextEl.textContent = `${progress.toFixed(1)}% to June 15, 2026`;
+      if (hmTextEl) hmTextEl.textContent = `${String(hours).padStart(2, '0')}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+      if (statusEl) {
+        statusEl.textContent = diff === 0
+          ? 'Contact Day is here.'
+          : days <= 7
+            ? 'Final stretch to contact day.'
+            : 'Stay ready for contact day.';
+      }
+
+      const flipParts = [
+        ['flipDaysValue', 'flipDays', days],
+        ['flipHoursValue', 'flipHours', hours],
+        ['flipMinutesValue', 'flipMinutes', minutes],
+        ['flipSecondsValue', 'flipSeconds', seconds]
+      ];
+
+      flipParts.forEach(([valueId, cardId, value]) => {
+        const valueEl = document.getElementById(valueId);
+        const cardEl = document.getElementById(cardId);
+        if (!valueEl || !cardEl) return;
+        const next = String(value).padStart(2, '0');
+        if (valueEl.dataset.prev !== next) {
+          cardEl.classList.remove('bump');
+          void cardEl.offsetWidth;
+          cardEl.classList.add('bump');
+        }
+        valueEl.dataset.prev = next;
+        valueEl.textContent = next;
+      });
+
+      if (diff === 0 && !window.__june15ConfettiTriggered) {
+        window.__june15ConfettiTriggered = true;
+        launchConfetti();
+      }
+    }
+
+    function launchConfetti() {
+      const colors = ['#C41230', '#002D62', '#ffffff', '#d4af37'];
+      for (let i = 0; i < 120; i++) {
+        const piece = document.createElement('div');
+        piece.className = 'confetti-piece';
+        piece.style.left = `${Math.random() * 100}vw`;
+        piece.style.background = colors[i % colors.length];
+        piece.style.animationDuration = `${3 + Math.random() * 3}s`;
+        piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+        document.body.appendChild(piece);
+        setTimeout(() => piece.remove(), 7000);
+      }
+    }
+
+
+    function formatInPSTFromLocal(localValue, timeZone) {
+      if (!localValue || !timeZone) return '';
+      const [datePart, timePart] = localValue.split('T');
+      if (!datePart || !timePart) return '';
+      const [year, month, day] = datePart.split('-').map(Number);
+      const [hour, minute] = timePart.split(':').map(Number);
+
+      function zonedTimeToUtc(y, m, d, h, min, tz) {
+        const approxUtc = new Date(Date.UTC(y, m - 1, d, h, min));
+        const dtf = new Intl.DateTimeFormat('en-US', {
+          timeZone: tz,
+          year: 'numeric', month: '2-digit', day: '2-digit',
+          hour: '2-digit', minute: '2-digit', second: '2-digit',
+          hourCycle: 'h23'
+        });
+        const parts = Object.fromEntries(dtf.formatToParts(approxUtc).filter(p => p.type !== 'literal').map(p => [p.type, p.value]));
+        const asUTC = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour, +parts.minute, +parts.second);
+        const offset = asUTC - approxUtc.getTime();
+        return new Date(Date.UTC(y, m - 1, d, h, min) - offset);
+      }
+
+      const utcDate = zonedTimeToUtc(year, month, day, hour, minute, timeZone);
+      return new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/Los_Angeles',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true
+      }).format(utcDate).replace(',', '');
+    }
+
+    function refreshCallPlanPSTField() {
+      formEls.callPlanPST.value = formEls.callPlanLocal.value && formEls.callPlanTimezone.value
+        ? formatInPSTFromLocal(formEls.callPlanLocal.value, formEls.callPlanTimezone.value) + ' PST'
+        : '';
+    }
+
+    formEls.callPlanLocal.addEventListener('input', refreshCallPlanPSTField);
+    formEls.callPlanLocal.addEventListener('change', refreshCallPlanPSTField);
+    formEls.callPlanTimezone.addEventListener('input', refreshCallPlanPSTField);
+    formEls.callPlanTimezone.addEventListener('change', refreshCallPlanPSTField);
+
+    const countdownToggleBtn = document.getElementById('countdownToggleBtn');
+    const countdownSection = document.getElementById('countdownSection');
+    const countdownCollapseKey = 'recruit_dashboard_countdown_collapsed_v1';
+    if (localStorage.getItem(countdownCollapseKey) === 'true') {
+      countdownSection.classList.add('collapsed');
+      countdownToggleBtn.textContent = 'Expand Countdown';
+    }
+    countdownToggleBtn.addEventListener('click', () => {
+      countdownSection.classList.toggle('collapsed');
+      const collapsed = countdownSection.classList.contains('collapsed');
+      countdownToggleBtn.textContent = collapsed ? 'Expand Countdown' : 'Collapse Countdown';
+      localStorage.setItem(countdownCollapseKey, String(collapsed));
+    });
+
+    const sidebarBoxStateKey = "recruit_dashboard_sidebar_boxes_v1";
+    function loadSidebarBoxes() {
+      let saved = {};
+      try { saved = JSON.parse(localStorage.getItem(sidebarBoxStateKey) || "{}"); } catch (e) {}
+      document.querySelectorAll('.sidebar-box[data-box-key]').forEach(box => {
+        const key = box.dataset.boxKey;
+        const btn = box.querySelector('.sidebar-box-toggle');
+        const setState = (collapsed) => {
+          box.classList.toggle('collapsed', collapsed);
+          if (btn) btn.textContent = collapsed ? '+' : '−';
+          saved[key] = collapsed;
+          localStorage.setItem(sidebarBoxStateKey, JSON.stringify(saved));
+        };
+        setState(Boolean(saved[key]));
+        if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); setState(!box.classList.contains('collapsed')); });
+        const header = box.querySelector('.sidebar-box-header');
+        if (header) header.addEventListener('click', () => setState(!box.classList.contains('collapsed')));
+      });
+    }
+
+
+    const DASHBOARD_PASSWORD = 'bulldogs';
+    const PASSWORD_STORAGE_KEY = 'recruit_dashboard_unlocked_v1';
+
+    function unlockDashboard() {
+      const gate = document.getElementById('passwordGate');
+      const app = document.getElementById('appShell');
+      if (gate) gate.style.display = 'none';
+      if (app) app.classList.remove('locked');
+      sessionStorage.setItem(PASSWORD_STORAGE_KEY, 'true');
+    }
+
+    function initializePasswordGate() {
+      const gate = document.getElementById('passwordGate');
+      const app = document.getElementById('appShell');
+      const form = document.getElementById('passwordForm');
+      const input = document.getElementById('passwordInput');
+      const error = document.getElementById('passwordError');
+
+      if (sessionStorage.getItem(PASSWORD_STORAGE_KEY) === 'true') {
+        unlockDashboard();
+        return;
+      }
+
+      if (app) app.classList.add('locked');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const value = String(input.value || '');
+        if (value === DASHBOARD_PASSWORD) {
+          error.textContent = '';
+          unlockDashboard();
+        } else {
+          error.textContent = 'Incorrect password.';
+          input.value = '';
+          input.focus();
+        }
+      });
+
+      setTimeout(() => input.focus(), 50);
+    }
+
+
+    initializePasswordGate();
+
+    loadSidebarState();
+    initializeSnapshotFilters();
+    if (typeof loadSidebarBoxes === 'function') loadSidebarBoxes();
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    rebuildRecruitList(selectedRecruitId);
+  </script>
+</body>
+</html>
