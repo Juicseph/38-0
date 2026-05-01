@@ -771,6 +771,144 @@
       display: none;
     }
 
+    
+    
+    .compact-filter-bar.collapsed .compact-filter-groups {
+      display: none;
+    }
+
+    .compact-filter-toggle {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 8px 12px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    
+    .snapshot-filter-card {
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease, background .15s ease;
+      border: 1px solid transparent;
+    }
+
+    .snapshot-filter-card:hover {
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,0.16);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.10);
+    }
+
+    .snapshot-filter-card.active {
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.22);
+      box-shadow: 0 0 0 2px rgba(255,255,255,0.10) inset;
+    }
+
+    .class-snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .class-snapshot-grid .stat-card .value {
+      font-size: 20px;
+    }
+
+    .compact-filter-bar {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 16px;
+      display: grid;
+      gap: 10px;
+    }
+
+    .compact-filter-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .compact-filter-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    .compact-filter-groups {
+      display: grid;
+      gap: 10px;
+    }
+
+    .compact-filter-row {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px;
+      align-items: start;
+    }
+
+    .compact-filter-label {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding-top: 8px;
+    }
+
+    .compact-filter-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      border: 1px solid var(--line);
+      background: white;
+      color: var(--text);
+      border-radius: 999px;
+      padding: 7px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      line-height: 1;
+    }
+
+    .filter-chip.active {
+      background: var(--red-soft);
+      border-color: #f3bcc8;
+      color: var(--red);
+    }
+
+    .filter-chip-count {
+      display: inline-flex;
+      min-width: 20px;
+      height: 20px;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      background: #eef2f7;
+      color: #4b5e78;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 0 6px;
+    }
+
+    .filter-chip.active .filter-chip-count {
+      background: rgba(196,18,48,0.12);
+      color: var(--red);
+    }
+
     .bulk-bar {
       display: none;
       background: var(--panel);
@@ -962,6 +1100,42 @@
       padding: 6px 10px;
       font-size: 12px;
       font-weight: 600;
+    }
+
+    
+    .tag.club-tag {
+      background: #eaf2ff;
+      color: #18407c;
+      border: 1px solid #c9d8f5;
+    }
+
+    .offer-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 12px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .offer-badge.offered {
+      background: #eef4ff;
+      color: #18407c;
+      border: 1px solid #c9d8f5;
+    }
+
+    .offer-badge.committed-here {
+      background: #ebfff3;
+      color: #18794e;
+      border: 1px solid #b7e4c7;
+    }
+
+    .offer-badge.committed-elsewhere {
+      background: #fff2f2;
+      color: #b42318;
+      border: 1px solid #f2b8b5;
     }
 
     .detail {
@@ -1161,6 +1335,12 @@
         grid-template-columns: 1fr;
       }
       .content { grid-template-columns: 1fr; }
+      .compact-filter-row {
+        grid-template-columns: 1fr;
+      }
+      .compact-filter-label {
+        padding-top: 0;
+      }
       .contact-day-hero {
         grid-template-columns: 1fr;
       }
@@ -1287,19 +1467,24 @@
 
       <div class="sidebar-box" data-box-key="snapshot">
         <div class="sidebar-box-header"><h3>Class Snapshot</h3><button class="sidebar-box-toggle" type="button">−</button></div>
-        <div class="sidebar-box-body"><div class="summary-stat">
-          <div class="stat-card"><div class="label">Total Recruits</div><div class="value" id="totalRecruitsStat">0</div></div>
-          <div class="stat-card"><div class="label">Priority</div><div class="value" id="priorityStat">0</div></div>
-          <div class="stat-card"><div class="label">Q1 Complete</div><div class="value" id="q1Stat">0</div></div>
-          <div class="stat-card"><div class="label">Need Follow-Up</div><div class="value" id="followUpStat">0</div></div>
-        </div></div>
+        <div class="sidebar-box-body">
+          <div class="class-snapshot-grid">
+            <div class="stat-card snapshot-filter-card active" data-snapshot-filter=""><div class="label">Total</div><div class="value" id="totalRecruitsStat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2026"><div class="label">2026</div><div class="value" id="class2026Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2027"><div class="label">2027</div><div class="value" id="class2027Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2028"><div class="label">2028</div><div class="value" id="class2028Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2029"><div class="label">2029</div><div class="value" id="class2029Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2030"><div class="label">2030</div><div class="value" id="class2030Stat">0</div></div>
+            <div class="stat-card snapshot-filter-card" data-snapshot-filter="2031"><div class="label">2031</div><div class="value" id="class2031Stat">0</div></div>
+          </div>
+        </div>
       </div>
 
-      <div class="sidebar-box" data-box-key="quickViews"><div class="sidebar-box-header"><h3>Quick Views</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="quickViewsSection"></div></div></div>
-      <div class="sidebar-box" data-box-key="priority"><div class="sidebar-box-header"><h3>Priority</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="prioritySection"></div></div></div>
-      <div class="sidebar-box" data-box-key="june15Call"><div class="sidebar-box-header"><h3>June 15 Call</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="ownerSection"></div></div></div>
-      <div class="sidebar-box" data-box-key="classFilters"><div class="sidebar-box-header"><h3>Class Filters</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="classFilterSection"></div></div></div>
-      <div class="sidebar-box" data-box-key="statusShortcuts"><div class="sidebar-box-header"><h3>Status Shortcuts</h3><button class="sidebar-box-toggle" type="button">−</button></div><div class="sidebar-box-body"><div class="filter-section" id="statusShortcutSection"></div></div></div>
+      
+      
+      
+      
+      
     </aside>
 
     <main class="main">
@@ -1405,6 +1590,38 @@
         </div>
       </section>
 
+      <section class="compact-filter-bar" id="compactFilterBar">
+        <div class="compact-filter-top">
+          <div class="compact-filter-title">Quick Filters</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="compact-filter-toggle" id="toggleQuickFiltersBtn" type="button">Collapse Filters</button>
+            <button class="btn secondary" id="clearCompactFiltersBtn" type="button">Clear Quick Filters</button>
+          </div>
+        </div>
+        <div class="compact-filter-groups">
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Group</div>
+            <div class="compact-filter-chips" id="quickViewsSection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Priority</div>
+            <div class="compact-filter-chips" id="prioritySection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">June 15 Call</div>
+            <div class="compact-filter-chips" id="ownerSection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Class</div>
+            <div class="compact-filter-chips" id="classFilterSection"></div>
+          </div>
+          <div class="compact-filter-row">
+            <div class="compact-filter-label">Shortcuts</div>
+            <div class="compact-filter-chips" id="statusShortcutSection"></div>
+          </div>
+        </div>
+      </section>
+
       <section class="bulk-bar" id="bulkBar">
         <div><strong id="bulkCountText">0 selected</strong></div>
         <div class="bulk-actions">
@@ -1506,6 +1723,7 @@
         callPlanLocal: '',
         callPlanTimezone: '',
         callPlanPST: '',
+        offerStatus: '',
         selected: false
       },
       2: {
@@ -1559,6 +1777,7 @@
         callPlanLocal: '',
         callPlanTimezone: '',
         callPlanPST: '',
+        offerStatus: '',
         selected: false
       },
       3: {
@@ -1612,6 +1831,7 @@
         callPlanLocal: '',
         callPlanTimezone: '',
         callPlanPST: '',
+        offerStatus: '',
         selected: false
       }
     };
@@ -1669,6 +1889,15 @@
     function saveSidebarState() {
       localStorage.setItem(SIDEBAR_STATE_KEY, String(appShell.classList.contains('sidebar-collapsed')));
       localStorage.setItem(COMPACT_MODE_KEY, String(appShell.classList.contains('compact-mode')));
+    }
+
+
+    function offerBadgeClass(value) {
+      const v = String(value || '').toLowerCase();
+      if (v.includes('offered')) return 'offered';
+      if (v.includes('committed here')) return 'committed-here';
+      if (v.includes('committed elsewhere')) return 'committed-elsewhere';
+      return '';
     }
 
     function badgeClassFromStatus(status) {
@@ -1826,7 +2055,7 @@
           </div>
           <div class="tag-row">
             <span class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.status || 'Active'}</span>
-            <span class="tag">${recruit.club || 'No Club'}</span>
+            <span class="tag club-tag">${recruit.club || 'No Club'}</span>
             ${chipHtml}
           </div>
           ${recruit.callPlanPST ? `<div class="call-chip"><span class="call-label">Call</span><span class="call-time">${recruit.callPlanPST}</span><span class="call-zone">PST</span></div>` : ''}
@@ -1854,6 +2083,7 @@
             <li><strong>Group:</strong> ${recruit.group || '—'}</li>
             <li><strong>June 15 Call:</strong> ${recruit.june15Call || '—'}</li>
             <li><strong>Club:</strong> ${recruit.club || '—'}</li>
+            <li><strong>Offer / Commitment:</strong> ${recruit.offerStatus || '—'}</li>
             <li><strong>Rating:</strong> ${recruit.rating || '—'}</li>
             <li><strong>Wrote To Us:</strong> ${recruit.wroteToUs || '—'}</li>
             <li><strong>Academics:</strong> ${recruit.academics || '—'}</li>
@@ -1937,10 +2167,14 @@
     }
 
     function updateSummary(recruits) {
-      document.getElementById('totalRecruitsStat').textContent = recruits.length;
-      document.getElementById('priorityStat').textContent = recruits.filter(r => String(r.priority || '').toLowerCase().includes('priority')).length;
-      document.getElementById('q1Stat').textContent = recruits.filter(r => r.q1).length;
-      document.getElementById('followUpStat').textContent = recruits.filter(r => (r.followUp || '').trim() || (r.actions || []).length).length;
+      const totalEl = document.getElementById('totalRecruitsStat');
+      if (totalEl) totalEl.textContent = recruits.length;
+
+      ['2026','2027','2028','2029','2030','2031'].forEach(year => {
+        const count = recruits.filter(r => String(r.classYear || '') === year).length;
+        const el = document.getElementById(`class${year}Stat`);
+        if (el) el.textContent = count;
+      });
     }
 
     function populateFilterOptions(recruits) {
@@ -1977,14 +2211,15 @@
 
     function renderFilterButtons(containerId, items, type, activeValue) {
       const container = document.getElementById(containerId);
+      if (!container) return;
       container.innerHTML = items.map(item => `
-        <button class="filter-btn ${activeValue === item.value ? 'active' : ''}" data-filter-type="${type}" data-filter-value="${item.value}" type="button">
+        <button class="filter-chip ${activeValue === item.value ? 'active' : ''}" data-filter-type="${type}" data-filter-value="${item.value}" type="button">
           <span>${item.label}</span>
-          <span class="filter-count">${item.count}</span>
+          <span class="filter-chip-count">${item.count}</span>
         </button>
       `).join('');
 
-      container.querySelectorAll('.filter-btn').forEach(btn => {
+      container.querySelectorAll('.filter-chip').forEach(btn => {
         btn.addEventListener('click', () => {
           const filterType = btn.dataset.filterType;
           const value = btn.dataset.filterValue;
@@ -2056,6 +2291,7 @@
       const recruits = getAllRecruits();
       populateFilterOptions(recruits);
       updateSummary(recruits);
+      updateSnapshotFilterState();
       renderSidebarFilters(recruits);
       detectDuplicates(recruits);
 
@@ -2117,9 +2353,10 @@
             <div class="badge ${badgeClassFromStatus(recruit.status)}">${recruit.priority || recruit.status || 'Active'}</div>
           </div>
           <div class="tag-row">
-            <span class="tag">${recruit.club || 'No Club'}</span>
+            <span class="tag club-tag">${recruit.club || 'No Club'}</span>
             ${recruit.lastContactDate ? `<span class="tag">Last Contact: ${recruit.lastContactDate}</span>` : ''}
             ${recruit.nextActionDue ? `<span class="tag">Due: ${recruit.nextActionDue}</span>` : ''}
+            ${recruit.offerStatus ? `<span class="offer-badge ${offerBadgeClass(recruit.offerStatus)}">${recruit.offerStatus}</span>` : ''}
             ${(recruit.tags || []).slice(0, 2).map(tag => `<span class="tag">${tag}</span>`).join('')}
           </div>
         </div>
@@ -2205,6 +2442,27 @@
       });
     }
 
+
+    function initializeSnapshotFilters() {
+      document.querySelectorAll('.snapshot-filter-card').forEach(card => {
+        card.addEventListener('click', () => {
+          const year = card.dataset.snapshotFilter || '';
+          classSelect.value = year;
+          filterState.classYear = '';
+          rebuildRecruitList(selectedRecruitId);
+        });
+      });
+    }
+
+    function updateSnapshotFilterState() {
+      document.querySelectorAll('.snapshot-filter-card').forEach(card => {
+        const year = card.dataset.snapshotFilter || '';
+        const active = classSelect.value === year || (!classSelect.value && year === '');
+        card.classList.toggle('active', active);
+      });
+    }
+
+
     function resetAllFilters() {
       filterState.group = '';
       filterState.priority = '';
@@ -2221,6 +2479,21 @@
 
     showAllBtn.addEventListener('click', resetAllFilters);
     resetFiltersBtn.addEventListener('click', resetAllFilters);
+    document.getElementById('clearCompactFiltersBtn').addEventListener('click', resetAllFilters);
+
+    const compactFilterBar = document.getElementById('compactFilterBar');
+    const toggleQuickFiltersBtn = document.getElementById('toggleQuickFiltersBtn');
+    const QUICK_FILTERS_COLLAPSE_KEY = 'quick_filters_collapsed_v1';
+    if (localStorage.getItem(QUICK_FILTERS_COLLAPSE_KEY) === 'true') {
+      compactFilterBar.classList.add('collapsed');
+      toggleQuickFiltersBtn.textContent = 'Expand Filters';
+    }
+    toggleQuickFiltersBtn.addEventListener('click', () => {
+      compactFilterBar.classList.toggle('collapsed');
+      const collapsed = compactFilterBar.classList.contains('collapsed');
+      toggleQuickFiltersBtn.textContent = collapsed ? 'Expand Filters' : 'Collapse Filters';
+      localStorage.setItem(QUICK_FILTERS_COLLAPSE_KEY, String(collapsed));
+    });
 
     sidebarToggle.addEventListener('click', () => {
       appShell.classList.toggle('sidebar-collapsed');
@@ -2291,7 +2564,7 @@
     function exportFiltered() {
       const rows = filteredIds.map(id => recruitDetails[id]);
       const headers = [
-        'fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','wroteToUs',
+        'fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','offerStatus','wroteToUs',
         'q1','q2','q3','q4','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email'
       ];
       const csv = [
@@ -2309,6 +2582,7 @@
             status: r.status,
             june15Call: r.june15Call,
             rating: r.rating,
+            offerStatus: r.offerStatus,
             wroteToUs: r.wroteToUs,
             q1: r.q1,
             q2: r.q2,
@@ -2366,6 +2640,14 @@
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Film Link</label><input id="formFilmLink" class="modal-field" /></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">June 15 Call</label><input id="formJune15Call" class="modal-field" placeholder="Leisa, Jerome, Orlando, Kelsey" /></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Rating</label><input id="formRating" class="modal-field" /></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Offer / Commitment</label>
+            <select id="formOfferStatus" class="modal-field">
+              <option value="">None</option>
+              <option value="Offered">Offered</option>
+              <option value="Committed Here">Committed Here</option>
+              <option value="Committed Elsewhere">Committed Elsewhere</option>
+            </select>
+          </div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Wrote To Us</label><input id="formWroteToUs" class="modal-field" /></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Height</label><input id="formHeight" class="modal-field" /></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Graduation Year</label><input id="formGraduationYear" class="modal-field" /></div>
@@ -2437,6 +2719,7 @@
       filmLink: document.getElementById('formFilmLink'),
       june15Call: document.getElementById('formJune15Call'),
       rating: document.getElementById('formRating'),
+      offerStatus: document.getElementById('formOfferStatus'),
       wroteToUs: document.getElementById('formWroteToUs'),
       height: document.getElementById('formHeight'),
       graduationYear: document.getElementById('formGraduationYear'),
@@ -2491,6 +2774,7 @@
       formEls.filmLink.value = recruit?.filmLink || '';
       formEls.june15Call.value = recruit?.june15Call || '';
       formEls.rating.value = recruit?.rating || '';
+      formEls.offerStatus.value = recruit?.offerStatus || '';
       formEls.wroteToUs.value = recruit?.wroteToUs || '';
       formEls.height.value = recruit?.height || '';
       formEls.graduationYear.value = recruit?.graduationYear || recruit?.classYear || '';
@@ -2565,6 +2849,7 @@
         priority: formEls.priority.value || 'Active',
         june15Call: formEls.june15Call.value,
         rating: formEls.rating.value,
+        offerStatus: formEls.offerStatus.value,
         wroteToUs: formEls.wroteToUs.value,
         q1: formEls.q1.value === 'true',
         q2: formEls.q2.value === 'true',
@@ -2866,7 +3151,8 @@ function updateCountdown() {
     initializePasswordGate();
 
     loadSidebarState();
-    loadSidebarBoxes();
+    initializeSnapshotFilters();
+    if (typeof loadSidebarBoxes === 'function') loadSidebarBoxes();
     updateCountdown();
     setInterval(updateCountdown, 1000);
     rebuildRecruitList(selectedRecruitId);
