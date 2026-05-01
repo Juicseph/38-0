@@ -1373,24 +1373,271 @@
     }
   
 
-    .live-sync-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: #eef4ff;
-      border: 1px solid #c9d8f5;
-      color: #18407c;
-      font-size: 12px;
-      font-weight: 800;
-      line-height: 1;
+    .view-switch {
+      display:flex;
+      gap:8px;
+      align-items:center;
+      flex-wrap:wrap;
     }
 
-    .live-sync-status.error {
-      background: #fff2f2;
-      border-color: #f2b8b5;
-      color: #b42318;
+    .view-toggle-btn.active {
+      background: var(--red-soft);
+      color: var(--red);
+      border-color: #f3bcc8;
+    }
+
+    .daily-call-sheet {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .daily-sheet-header {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      cursor:pointer;
+      background: white;
+    }
+
+    .daily-sheet-header h3 {
+      margin:0;
+      font-size:16px;
+    }
+
+    .daily-sheet-body {
+      padding: 0 16px 16px;
+      display:grid;
+      gap:10px;
+    }
+
+    .daily-call-sheet.collapsed .daily-sheet-body {
+      display:none;
+    }
+
+    .daily-call-item {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+      align-items:center;
+      flex-wrap:wrap;
+      background:#fff;
+    }
+
+    .daily-call-left {
+      display:grid;
+      gap:4px;
+    }
+
+    .daily-call-name {
+      font-size:15px;
+      font-weight:800;
+    }
+
+    .daily-call-meta {
+      font-size:12px;
+      color: var(--muted);
+    }
+
+    .urgency-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:800;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+      white-space:nowrap;
+    }
+
+    .urgency-today {
+      background:#fff2f2;
+      color:#b42318;
+      border:1px solid #f2b8b5;
+    }
+
+    .urgency-week {
+      background:#fff7e8;
+      color:#9a6700;
+      border:1px solid #f5d08a;
+    }
+
+    .urgency-future {
+      background:#eef4ff;
+      color:#18407c;
+      border:1px solid #c9d8f5;
+    }
+
+    .urgency-stale {
+      background:#f3f4f6;
+      color:#475569;
+      border:1px solid #d7deea;
+    }
+
+    .tier-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:11px;
+      font-weight:800;
+      background:#fff7e8;
+      color:#9a6700;
+      border:1px solid #f5d08a;
+    }
+
+    .position-board {
+      display:none;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap:14px;
+      padding:18px;
+      max-height: calc(100vh - 410px);
+      overflow:auto;
+    }
+
+    .position-board.active {
+      display:grid;
+    }
+
+    .position-column {
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#f9fbff;
+      padding:12px;
+      display:grid;
+      gap:10px;
+      align-content:start;
+      min-height:200px;
+    }
+
+    .position-column h4 {
+      margin:0;
+      font-size:14px;
+    }
+
+    .position-count {
+      font-size:11px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .mini-recruit-card {
+      border:1px solid var(--line);
+      border-left:4px solid #d7deea;
+      background:white;
+      border-radius:14px;
+      padding:10px;
+      cursor:pointer;
+      display:grid;
+      gap:6px;
+    }
+
+    .mini-recruit-card:hover {
+      box-shadow:0 8px 18px rgba(16,33,58,.08);
+      transform:translateY(-1px);
+    }
+
+    .mini-recruit-name {
+      font-size:14px;
+      font-weight:800;
+    }
+
+    .mini-recruit-meta {
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
+    }
+
+    .call-mode-overlay {
+      position:fixed;
+      inset:0;
+      background:rgba(16,24,38,.7);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:11000;
+      padding:24px;
+    }
+
+    .call-mode-overlay.active {
+      display:flex;
+    }
+
+    .call-mode-card {
+      width:min(980px, 100%);
+      max-height:90vh;
+      overflow:auto;
+      background:white;
+      border-radius:24px;
+      box-shadow:0 24px 60px rgba(0,0,0,.24);
+      padding:22px;
+      display:grid;
+      gap:16px;
+    }
+
+    .call-mode-top {
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .call-mode-grid {
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:16px;
+    }
+
+    .call-mode-list {
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      background:white;
+    }
+
+    .call-mode-list h5 {
+      margin:0 0 10px;
+      font-size:14px;
+    }
+
+    .call-mode-list ul {
+      margin:0;
+      padding-left:18px;
+    }
+
+    .call-mode-nav {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    @media (max-width: 900px) {
+      .position-board {
+        grid-template-columns: 1fr 1fr;
+      }
+      .call-mode-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .position-board {
+        grid-template-columns: 1fr;
+      }
     }
 
     .password-gate {
@@ -1515,8 +1762,6 @@
           <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
         </div>
         <div class="actions">
-          <span class="live-sync-status" id="liveSyncStatus">Live Sheet: Not Connected</span>
-          <button class="btn secondary" id="refreshLiveBtn">Refresh Live</button>
           <button class="btn secondary" id="importBtn">Import Sheet</button>
           <button class="btn secondary" id="exportBtn">Export Filtered</button>
           <button class="btn secondary" id="compactBtn">Compact Mode</button>
@@ -1645,6 +1890,27 @@
         </div>
       </section>
 
+      <section class="panel" style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Board View</div>
+        <div class="view-switch">
+          <button class="btn secondary view-toggle-btn active" id="listViewBtn" type="button">List View</button>
+          <button class="btn secondary view-toggle-btn" id="boardViewBtn" type="button">Position Board</button>
+        </div>
+      </section>
+
+      <section class="daily-call-sheet" id="dailyCallSheet">
+        <div class="daily-sheet-header" id="dailyCallSheetToggle">
+          <div>
+            <h3>Today’s Calls</h3>
+            <div style="margin-top:4px;font-size:12px;color:var(--muted);" id="dailyCallSheetMeta">No calls scheduled today.</div>
+          </div>
+          <button class="btn secondary" type="button" id="dailyCallSheetButton">Collapse</button>
+        </div>
+        <div class="daily-sheet-body">
+          <div id="dailyCallList"></div>
+        </div>
+      </section>
+
       <section class="bulk-bar" id="bulkBar">
         <div><strong id="bulkCountText">0 selected</strong></div>
         <div class="bulk-actions">
@@ -1674,6 +1940,7 @@
             <p id="recruitListCount">Click a card to view the full profile.</p>
           </div>
           <div class="recruit-list" id="recruitList"></div>
+          <div class="position-board" id="positionBoard"></div>
         </div>
 
         <div class="panel detail">
@@ -1689,9 +1956,6 @@
 
   <script>
     const STORAGE_KEY = 'recruit_dashboard_data_v4';
-    const LIVE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvN9QdtIouvn6HlpwXaf9bv6r2063_dgJaPYcRvnPjWN8iniUp4kM8P5fHG1coan5Xng/exec';
-    const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
-    const LIVE_SYNC_AUTO_REFRESH_MS = 0;
     const SIDEBAR_STATE_KEY = 'recruit_dashboard_sidebar_collapsed_v4';
     const COMPACT_MODE_KEY = 'recruit_dashboard_compact_v4';
     const TARGET_DATE = new Date('2026-06-15T00:00:00');
@@ -1750,6 +2014,7 @@
         callPlanTimezone: '',
         callPlanPST: '',
         offerStatus: '',
+        pinTier: 0,
         selected: false
       },
       2: {
@@ -1804,6 +2069,7 @@
         callPlanTimezone: '',
         callPlanPST: '',
         offerStatus: '',
+        pinTier: 0,
         selected: false
       },
       3: {
@@ -1858,6 +2124,7 @@
         callPlanTimezone: '',
         callPlanPST: '',
         offerStatus: '',
+        pinTier: 0,
         selected: false
       }
     };
@@ -1878,8 +2145,6 @@
     const importBtn = document.getElementById('importBtn');
     const exportBtn = document.getElementById('exportBtn');
     const addBtn = document.getElementById('addBtn');
-    const refreshLiveBtn = document.getElementById('refreshLiveBtn');
-    const liveSyncStatus = document.getElementById('liveSyncStatus');
     const compactBtn = document.getElementById('compactBtn');
     const appShell = document.getElementById('appShell');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -1892,113 +2157,6 @@
     fileInput.accept = '.csv';
     fileInput.style.display = 'none';
     document.body.appendChild(fileInput);
-
-
-    function setLiveStatus(message, isError = false) {
-      if (!liveSyncStatus) return;
-      liveSyncStatus.textContent = message;
-      liveSyncStatus.classList.toggle('error', Boolean(isError));
-    }
-
-    function rowFromRecruit(recruit) {
-      return {
-        fullName: recruit.name || '',
-        classYear: recruit.classYear || '',
-        group: recruit.group || '',
-        position: recruit.position || '',
-        city: recruit.city || '',
-        state: recruit.state || '',
-        club: recruit.club || '',
-        priority: recruit.priority || '',
-        status: recruit.status || '',
-        june15Call: recruit.june15Call || '',
-        rating: recruit.rating || '',
-        offerStatus: recruit.offerStatus || '',
-        wroteToUs: recruit.wroteToUs || '',
-        q1: recruit.q1 || false,
-        q2: recruit.q2 || false,
-        q3: recruit.q3 || false,
-        q4: recruit.q4 || false,
-        lastContactDate: recruit.lastContactDate || '',
-        nextActionDue: recruit.nextActionDue || '',
-        visitStatus: recruit.visitStatus || '',
-        campAttended: recruit.campAttended || false,
-        filmLink: recruit.filmLink || '',
-        profileLink: recruit.profileLink || '',
-        phone: recruit.phone || '',
-        email: recruit.email || '',
-        callPlanLocal: recruit.callPlanLocal || '',
-        callPlanTimezone: recruit.callPlanTimezone || '',
-        callPlanPST: recruit.callPlanPST || '',
-        tags: Array.isArray(recruit.tags) ? recruit.tags.join(', ') : (recruit.tags || ''),
-        summary: recruit.summary || '',
-        notes: Array.isArray(recruit.notes) ? recruit.notes.join('; ') : (recruit.notes || ''),
-        evaluation: Array.isArray(recruit.evaluation) ? recruit.evaluation.join('; ') : (recruit.evaluation || ''),
-        followUp: recruit.followUp || (Array.isArray(recruit.actions) ? recruit.actions.join('; ') : ''),
-        academics: recruit.academics || '',
-        q1Question1: recruit.q1Question1 || '', q1Answer1: recruit.q1Answer1 || '',
-        q1Question2: recruit.q1Question2 || '', q1Answer2: recruit.q1Answer2 || '',
-        q1Question3: recruit.q1Question3 || '', q1Answer3: recruit.q1Answer3 || '',
-        q2Question1: recruit.q2Question1 || '', q2Answer1: recruit.q2Answer1 || '',
-        q2Question2: recruit.q2Question2 || '', q2Answer2: recruit.q2Answer2 || '',
-        q2Question3: recruit.q2Question3 || '', q2Answer3: recruit.q2Answer3 || '',
-        q3Question1: recruit.q3Question1 || '', q3Answer1: recruit.q3Answer1 || '',
-        q3Question2: recruit.q3Question2 || '', q3Answer2: recruit.q3Answer2 || '',
-        q3Question3: recruit.q3Question3 || '', q3Answer3: recruit.q3Answer3 || '',
-        q4Question1: recruit.q4Question1 || '', q4Answer1: recruit.q4Answer1 || '',
-        q4Question2: recruit.q4Question2 || '', q4Answer2: recruit.q4Answer2 || '',
-        q4Question3: recruit.q4Question3 || '', q4Answer3: recruit.q4Answer3 || '',
-        updatedAt: recruit.updatedAt || '',
-        favorite: recruit.favorite || false,
-        pinned: recruit.pinned || false,
-        headshot: recruit.headshot || ''
-      };
-    }
-
-    function normalizeLivePayload(data) {
-      if (Array.isArray(data)) return data;
-      if (data && Array.isArray(data.data)) return data.data;
-      if (data && Array.isArray(data.recruits)) return data.recruits;
-      if (data && Array.isArray(data.rows)) return data.rows;
-      return [];
-    }
-
-    async function fetchLiveSheetData() {
-      if (!LIVE_SYNC_ENABLED) {
-        setLiveStatus('Live Sheet: URL Needed', true);
-        return false;
-      }
-
-      try {
-        setLiveStatus('Live Sheet: Refreshing...');
-        const response = await fetch(LIVE_SHEET_WEBAPP_URL, { cache: 'no-store' });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        const rows = normalizeLivePayload(data);
-
-        if (!rows.length) {
-          setLiveStatus('Live Sheet: No Rows Found', true);
-          return false;
-        }
-
-        const nextDetails = {};
-        rows.forEach((row, index) => {
-          const id = String(row.id || row.recruitId || row.fullName || row.name || index + 1) + '_' + index;
-          nextDetails[id] = buildRecruitFromRow(row);
-        });
-
-        recruitDetails = nextDetails;
-        selectedRecruitId = Object.keys(recruitDetails)[0] || '';
-        saveData();
-        rebuildRecruitList(selectedRecruitId);
-        setLiveStatus(`Live Sheet: ${rows.length} Loaded`);
-        return true;
-      } catch (error) {
-        console.error(error);
-        setLiveStatus('Live Sheet: Refresh Failed', true);
-        return false;
-      }
-    }
 
     function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
 
@@ -2172,6 +2330,8 @@
       `).join('');
 
       const chipHtml = (recruit.tags || []).map(chip => `<span class="tag">${chip}</span>`).join('');
+      const urgency = urgencyForRecruit(recruit);
+      const tier = pinTierLabel(recruit);
       const notesHtml = ((recruit.notes && recruit.notes.length ? recruit.notes : ['No notes added yet.'])).map(item => `<li>${item}</li>`).join('');
       const evalHtml = ((recruit.evaluation && recruit.evaluation.length ? recruit.evaluation : ['No evaluation notes added yet.'])).map(item => `<li>${item}</li>`).join('');
       const actionsHtml = ((recruit.actions && recruit.actions.length ? recruit.actions : ['No next actions added yet.'])).map(item => `<li>${item}</li>`).join('');
@@ -2196,6 +2356,7 @@
           ${recruit.callPlanPST ? `<div class="call-chip"><span class="call-label">Call</span><span class="call-time">${recruit.callPlanPST}</span><span class="call-zone">PST</span></div>` : ''}
           <div class="detail-actions">
             <button class="btn secondary" id="editRecruitBtn" type="button">Edit Recruit</button>
+            <button class="btn secondary" id="callModeOpenBtn" type="button">Call Mode</button>
             <button class="btn secondary" id="favoriteRecruitBtn" type="button">${recruit.favorite ? 'Unfavorite' : 'Favorite'}</button>
             <button class="btn secondary" id="pinRecruitBtn" type="button">${recruit.pinned ? 'Unpin' : 'Pin'}</button>
             ${recruit.phone ? `<a class="btn secondary" href="tel:${recruit.phone}">Call</a>` : ''}
@@ -2287,6 +2448,7 @@
       `;
 
       document.getElementById('editRecruitBtn').onclick = () => openRecruitModal(recruitId);
+      document.getElementById('callModeOpenBtn').onclick = () => openCallMode(recruitId);
       document.getElementById('favoriteRecruitBtn').onclick = () => {
         recruitDetails[recruitId].favorite = !recruitDetails[recruitId].favorite;
         recruitDetails[recruitId].updatedAt = new Date().toISOString();
@@ -2403,7 +2565,7 @@
 
       list.sort((a, b) => {
         if (sortBy === 'pinned') {
-          return Number(Boolean(b.pinned)) - Number(Boolean(a.pinned))
+          return (derivePinTier(b) - derivePinTier(a))
             || Number(Boolean(b.favorite)) - Number(Boolean(a.favorite))
             || String(a.name).localeCompare(String(b.name));
         }
@@ -2418,7 +2580,7 @@
       });
 
       // Always surface pinned recruits first a little
-      list.sort((a,b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+      list.sort((a,b) => (derivePinTier(b) - derivePinTier(a)) || Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)));
       return list;
     }
 
@@ -2456,6 +2618,9 @@
       filtered = applySort(filtered);
       filteredIds = filtered.map(r => r.id);
 
+      renderDailyCallSheet(filtered);
+      renderPositionBoard(filtered, activeId);
+
       if (!filteredIds.includes(String(activeId))) activeId = filteredIds[0] || '';
       selectedRecruitId = activeId;
 
@@ -2463,7 +2628,10 @@
         ? `${filteredIds.length} recruit${filteredIds.length === 1 ? '' : 's'} showing`
         : 'No recruits match these filters yet.';
 
-      recruitList.innerHTML = filtered.map(recruit => `
+      recruitList.innerHTML = filtered.map(recruit => {
+        const urgency = urgencyForRecruit(recruit);
+        const tier = pinTierLabel(recruit);
+        return `
         <div class="recruit-card ${cardColorClass(recruit)} ${String(recruit.id) === String(activeId) ? 'active' : ''}" data-id="${recruit.id}">
           <div class="recruit-card-topline">
             <div class="card-left">
@@ -2489,13 +2657,15 @@
           </div>
           <div class="tag-row">
             <span class="tag club-tag">${recruit.club || 'No Club'}</span>
+            ${tier ? `<span class="tier-badge">${tier}</span>` : ''}
+            <span class="urgency-badge ${urgency.className}">${urgency.label}</span>
             ${recruit.lastContactDate ? `<span class="tag">Last Contact: ${recruit.lastContactDate}</span>` : ''}
             ${recruit.nextActionDue ? `<span class="tag">Due: ${recruit.nextActionDue}</span>` : ''}
             ${recruit.offerStatus ? `<span class="offer-badge ${offerBadgeClass(recruit.offerStatus)}">${recruit.offerStatus}</span>` : ''}
             ${(recruit.tags || []).slice(0, 2).map(tag => `<span class="tag">${tag}</span>`).join('')}
           </div>
         </div>
-      `).join('');
+      `;}).join('');
 
       document.querySelectorAll('.recruit-card').forEach(card => {
         card.addEventListener('click', (e) => {
@@ -2640,6 +2810,37 @@
       saveSidebarState();
     });
 
+    listViewBtn.addEventListener('click', () => setBoardView('list'));
+    boardViewBtn.addEventListener('click', () => setBoardView('board'));
+    callModeBtn.addEventListener('click', () => openCallMode(selectedRecruitId));
+    document.getElementById('callModeCloseBtn').addEventListener('click', closeCallMode);
+    document.getElementById('callModePrevBtn').addEventListener('click', () => {
+      const idx = filteredIds.indexOf(String(selectedRecruitId));
+      if (idx > 0) {
+        selectedRecruitId = filteredIds[idx - 1];
+        rebuildRecruitList(selectedRecruitId);
+        openCallMode(selectedRecruitId);
+      }
+    });
+    document.getElementById('callModeNextBtn').addEventListener('click', () => {
+      const idx = filteredIds.indexOf(String(selectedRecruitId));
+      if (idx >= 0 && idx < filteredIds.length - 1) {
+        selectedRecruitId = filteredIds[idx + 1];
+        rebuildRecruitList(selectedRecruitId);
+        openCallMode(selectedRecruitId);
+      }
+    });
+
+    dailyCallSheetToggle.addEventListener('click', (e) => {
+      if (e.target.closest('button') && e.target.id !== 'dailyCallSheetButton') return;
+      dailyCallSheet.classList.toggle('collapsed');
+      dailyCallSheetButton.textContent = dailyCallSheet.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+    });
+    dailyCallSheetButton.addEventListener('click', () => {
+      dailyCallSheet.classList.toggle('collapsed');
+      dailyCallSheetButton.textContent = dailyCallSheet.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+    });
+
     searchInput.addEventListener('input', () => rebuildRecruitList(selectedRecruitId));
     classSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
     positionSelect.addEventListener('change', () => rebuildRecruitList(selectedRecruitId));
@@ -2749,9 +2950,6 @@
     }
 
     exportBtn.addEventListener('click', exportFiltered);
-    refreshLiveBtn.addEventListener('click', async () => {
-      await fetchLiveSheetData();
-    });
 
     const modal = document.createElement('div');
     modal.id = 'recruitModal';
@@ -2810,6 +3008,7 @@
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Camp Attended</label><select id="formCampAttended" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Favorite</label><select id="formFavorite" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
           <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Pinned</label><select id="formPinned" class="modal-field"><option value="false">No</option><option value="true">Yes</option></select></div>
+          <div><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Pin Tier</label><select id="formPinTier" class="modal-field"><option value="0">None</option><option value="1">Tier 1</option><option value="2">Tier 2</option><option value="3">Tier 3</option></select></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Headshot</label><input id="formHeadshot" type="file" accept="image/*" class="modal-field" /><div id="headshotCurrent" class="muted-small" style="margin-top:6px;"></div></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Tags</label><input id="formTags" class="modal-field" placeholder="comma separated" /></div>
           <div style="grid-column:1 / -1;"><label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px;">Summary</label><textarea id="formSummary" rows="3" class="modal-field"></textarea></div>
@@ -2873,6 +3072,7 @@
       campAttended: document.getElementById('formCampAttended'),
       favorite: document.getElementById('formFavorite'),
       pinned: document.getElementById('formPinned'),
+      pinTier: document.getElementById('formPinTier'),
       headshot: document.getElementById('formHeadshot'),
       tags: document.getElementById('formTags'),
       summary: document.getElementById('formSummary'),
@@ -2929,6 +3129,7 @@
       formEls.campAttended.value = String(!!recruit?.campAttended);
       formEls.favorite.value = String(!!recruit?.favorite);
       formEls.pinned.value = String(!!recruit?.pinned);
+      formEls.pinTier.value = String(recruit?.pinTier || 0);
       formEls.tags.value = (recruit?.tags || []).join(', ');
       formEls.summary.value = recruit?.summary || '';
       formEls.notes.value = (recruit?.notes || []).join('; ');
@@ -3015,7 +3216,8 @@
         height: formEls.height.value,
         graduationYear: formEls.graduationYear.value,
         favorite: formEls.favorite.value === 'true',
-        pinned: formEls.pinned.value === 'true',
+        pinned: formEls.pinned.value === 'true' || Number(formEls.pinTier.value) > 0,
+        pinTier: Number(formEls.pinTier.value || 0),
         campAttended: formEls.campAttended.value === 'true',
         updatedAt: new Date().toISOString(),
         selected: recruitDetails[id]?.selected || false
@@ -3295,5 +3497,54 @@ function updateCountdown() {
     setInterval(updateCountdown, 1000);
     rebuildRecruitList(selectedRecruitId);
   </script>
+
+  <div class="call-mode-overlay" id="callModeOverlay">
+    <div class="call-mode-card">
+      <div class="call-mode-top">
+        <div>
+          <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef4ff;color:#18407c;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;">Call Mode</div>
+          <h3 id="callModeName" style="margin:0;font-size:30px;line-height:1.05;"></h3>
+          <div id="callModeMeta" style="margin-top:8px;color:var(--muted);font-size:14px;"></div>
+        </div>
+        <div class="call-mode-nav">
+          <button class="btn secondary" type="button" id="callModePrevBtn">Previous</button>
+          <button class="btn secondary" type="button" id="callModeNextBtn">Next</button>
+          <button class="btn" type="button" id="callModeCloseBtn">Close</button>
+        </div>
+      </div>
+
+      <div class="call-mode-grid">
+        <div style="display:grid;gap:16px;">
+          <div class="call-mode-list">
+            <h5>Quick Summary</h5>
+            <div id="callModeSummary" style="line-height:1.55;color:#334155;"></div>
+          </div>
+          <div class="call-mode-list">
+            <h5>Key Notes</h5>
+            <ul id="callModeNotes"></ul>
+          </div>
+          <div class="call-mode-list">
+            <h5>Suggested Questions</h5>
+            <ul id="callModeQuestions"></ul>
+          </div>
+        </div>
+        <div style="display:grid;gap:16px;">
+          <div class="call-mode-list">
+            <h5>Call Actions</h5>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;" id="callModeActions"></div>
+          </div>
+          <div class="call-mode-list">
+            <h5>Evaluation Focus</h5>
+            <ul id="callModeEvaluation"></ul>
+          </div>
+          <div class="call-mode-list">
+            <h5>Next Step</h5>
+            <div id="callModeNextAction" style="line-height:1.55;color:#334155;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
