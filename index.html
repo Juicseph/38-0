@@ -210,9 +210,12 @@
     .controls{
       padding:16px;
       display:grid;
-      grid-template-columns:2fr 1fr 1fr 1fr 1fr;
+      grid-template-columns:1.4fr 1fr 1fr;
       gap:12px;
+      align-items:end;
     }
+    .controls .control:first-child{grid-column:span 1}
+    .controls .control.search-wide{grid-column:span 1}
     .control{display:grid;gap:8px}
     .control label{
       font-size:12px;
@@ -233,6 +236,17 @@
       gap:10px;
     }
     .quick-filters.collapsed .quick-filter-body{display:none}
+    .quick-filter-body{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(280px,.9fr);gap:18px;align-items:start}
+    .quick-filter-main{display:grid;gap:10px}
+    .quick-filter-side{display:grid;gap:12px}
+    .filter-side-card{border:1px solid var(--line);border-radius:16px;background:#f9fbff;padding:14px;display:grid;gap:10px}
+    .filter-side-card h4{margin:0;font-size:14px}
+    .active-filter-list{display:flex;flex-wrap:wrap;gap:8px}
+    .active-filter-empty{font-size:12px;color:var(--muted)}
+    .filter-metric-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .filter-metric{border:1px solid var(--line);border-radius:14px;background:#fff;padding:10px}
+    .filter-metric .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;font-weight:800;margin-bottom:6px}
+    .filter-metric .value{font-size:18px;font-weight:900}
     .quick-filter-top,.daily-sheet-top{
       display:flex;
       justify-content:space-between;
@@ -384,6 +398,7 @@
       gap:12px;
       align-content:start;
     }
+    .pulse-card.wide{grid-column:span 2}
     .pulse-card h3{margin:0;font-size:16px}
     .pulse-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
     .pulse-card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
@@ -398,12 +413,18 @@
     .risk-medium{background:#fff7e8;color:#9a6700;border:1px solid #f5d08a}
     .heat-hot{background:#fff2f4;color:var(--red);border:1px solid #f3bcc8}
     .heat-warm{background:#eef4ff;color:#18407c;border:1px solid #c9d8f5}
-    .position-gap-grid{display:grid;gap:10px}
-    .position-gap-row{display:grid;grid-template-columns:72px 72px 1fr;gap:10px;align-items:center}
-    .position-gap-input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
-    .gap-bar{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden}
-    .gap-fill{height:100%;background:linear-gradient(90deg,#002D62,#C41230)}
-    .gap-label{font-size:12px;color:var(--muted);font-weight:700}
+    .roster-matrix-wrap{display:grid;gap:10px}
+    .roster-matrix-table{width:100%;border-collapse:separate;border-spacing:0 8px}
+    .roster-matrix-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;text-align:center;padding:0 6px 4px}
+    .roster-matrix-table th:first-child,.roster-matrix-table td:first-child{text-align:left}
+    .roster-matrix-table td{vertical-align:top;padding:0 6px}
+    .roster-matrix-row-label{font-size:12px;font-weight:800;padding-top:14px}
+    .matrix-cell{border:1px solid var(--line);border-radius:14px;background:#fff;padding:8px;display:grid;gap:6px;min-width:78px}
+    .matrix-current{font-size:11px;color:var(--muted);font-weight:700;text-align:center}
+    .matrix-input{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;text-align:center;font-weight:800}
+    .matrix-need{font-size:11px;font-weight:800;text-align:center}
+    .matrix-need.good{color:#18794e}
+    .matrix-need.warn{color:#b42318}
     .tiny-note{font-size:11px;color:var(--muted)}
     .content{
       display:grid;
@@ -564,13 +585,15 @@
     @media (max-width:1100px){
       .app,.content,.recruiting-pulse{grid-template-columns:1fr}
       .controls{grid-template-columns:1fr 1fr}
+      .quick-filter-body{grid-template-columns:1fr}
       .board-view{grid-template-columns:1fr 1fr}
       .sidebar{min-height:auto}
     }
     @media (max-width:700px){
       .main{padding:16px}
-      .controls,.detail-grid,.flip-grid,.modal-grid,.call-mode-grid,.class-snapshot-grid,.board-view,.countdown-body,.recruiting-pulse,.position-gap-row{grid-template-columns:1fr}
+      .controls,.detail-grid,.flip-grid,.modal-grid,.call-mode-grid,.class-snapshot-grid,.board-view,.countdown-body,.recruiting-pulse{grid-template-columns:1fr}
       .quick-filter-group{grid-template-columns:1fr}
+      .quick-filter-body,.filter-metric-grid{grid-template-columns:1fr}
       .hero-top{flex-wrap:wrap}
     }
   
@@ -597,6 +620,53 @@
     .compare-line{font-size:13px;color:#334155;line-height:1.5;margin-bottom:8px}
     .topbar-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     @media (max-width:900px){.compare-grid{grid-template-columns:1fr}}
+
+  
+    .sidebar-filters-host .controls,.sidebar-filters-host .quick-filters{box-shadow:none;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:#fff}
+    .sidebar-filters-host .controls{grid-template-columns:1fr; padding:14px}
+    .sidebar-filters-host .control label,.sidebar-filters-host .quick-filter-title,.sidebar-filters-host .quick-filter-label{color:#d2dced}
+    .sidebar-filters-host .control input,.sidebar-filters-host .control select{background:#fff;color:var(--text)}
+    .sidebar-filters-host .quick-filters{padding:14px}
+    .sidebar-filters-host .quick-filter-main,.sidebar-filters-host .quick-filter-body{display:grid;gap:10px}
+    .sidebar-filters-host .quick-filter-side{display:grid;gap:10px}
+    .sidebar-filters-host .quick-filter-group{grid-template-columns:1fr}
+    .sidebar-filters-host .filter-side-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px}
+    .sidebar-filters-host .filter-side-card h4{margin:0 0 8px;font-size:13px;color:#fff}
+    .sidebar-filters-host .filter-metric .label,.sidebar-filters-host .active-filter-list{color:#d2dced}
+    .sidebar-filters-host .filter-metric .value{color:#fff}
+    .sidebar-filters-host .filter-chip{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.12);color:#fff}
+    .sidebar-filters-host .filter-chip.active{background:#fff;color:var(--red);border-color:#fff}
+    .sidebar-filters-host .filter-count{background:rgba(255,255,255,.16);color:#fff}
+    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .event-tracker-wrap{display:none}
+    .pulse-collapse-btn{border:none;background:#fff;color:var(--text);width:36px;height:36px;border-radius:12px;cursor:pointer;font-weight:800}
+    .pulse-card.minimal{padding:14px}
+    .pulse-mini-stack{display:grid;gap:8px}
+    .mini-streak-bar{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--line);background:#fff;border-radius:14px;box-shadow:var(--shadow)}
+    .mini-streak-title{font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+    .sidebar-helper-note{font-size:12px;color:#c7d3e3;line-height:1.45}
+    .event-tracker-wrap{display:grid;gap:10px}
+    .event-group{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+    .event-group h4{margin:0 0 6px;font-size:15px}
+    .event-group-meta{font-size:11px;color:var(--muted);margin-bottom:6px}
+    .event-group{padding:10px}
+    .event-group .chip-row{gap:6px}
+    .event-group .filter-chip{padding:5px 8px;font-size:11px}
+    #eventTrackerCard .pulse-card-top p{font-size:12px}
+    #eventTrackerCard .status-pill{padding:6px 10px;font-size:11px}
+    #callStreakMiniCard{margin-top:12px}
+    #sidebarFiltersBody .controls{margin-top:0}
+    #sidebarFiltersBody .quick-filters{margin-top:12px}
+    .sidebar .mini-streak-bar{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);box-shadow:none;color:#fff}
+    .sidebar .mini-streak-title,.sidebar .tiny-note,#callStreakNote{color:#d2dced !important}
+    .sidebar .mini-streak-bar #callsTodayLabel{color:#d2dced !important}
+    .sidebar .mini-streak-bar #callsTodayKpi,.sidebar .mini-streak-bar #callStreakValue{color:#fff}
+    .sidebar-filters-host .btn.secondary{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.12)}
+    .sidebar-filters-host .btn.secondary.active{background:#fff;color:var(--red);border-color:#fff}
+    .tutorial-card{width:min(760px,100%)}
+    .tutorial-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .tutorial-step{border:1px solid var(--line);border-radius:14px;padding:14px;background:#fff}
+    .tutorial-step h4{margin:0 0 8px;font-size:15px}
+    @media (max-width:1100px){.tutorial-grid{grid-template-columns:1fr}}
 
   </style>
 </head>
@@ -644,6 +714,15 @@
           </div>
         </div>
       </div>
+
+      <div class="sidebar-box" id="sidebarFiltersBox">
+        <div class="sidebar-box-header">
+          <h3>Board Controls</h3>
+          <button class="sidebar-toggle-btn" id="sidebarFiltersToggleBtn" type="button">−</button>
+        </div>
+        <div id="sidebarFiltersBody" class="sidebar-filters-host"></div>
+      </div>
+      <div class="sidebar-helper-note">Use this area for search, filters, and quick resets so the main board stays cleaner.</div>
     </aside>
 
     <main class="main">
@@ -703,88 +782,56 @@
       </section>
 
       <section class="recruiting-pulse" id="recruitingPulse">
-        <div class="pulse-card">
+        <div class="pulse-card" id="pressureBoardCard">
           <div class="pulse-card-top">
             <div>
               <h3>Pressure Board</h3>
               <p>Top must-call recruits right now.</p>
             </div>
-            <span class="status-pill">Top 5</span>
+            <div style="display:flex;gap:8px;align-items:center;"><span class="status-pill">Top 5</span><button class="pulse-collapse-btn" data-collapse-target="pressureBoardCard" type="button">−</button></div>
           </div>
           <div class="pulse-list" id="pressureBoardList"></div>
         </div>
 
-        <div class="pulse-card">
-          <div class="pulse-card-top">
-            <div>
-              <h3>Call Streak Tracker</h3>
-              <p>Momentum from recent contact activity.</p>
-            </div>
-            <span class="status-pill">Daily Pace</span>
+        <div class="pulse-card minimal" id="callStreakMiniCard">
+          <div class="mini-streak-bar">
+            <div><div class="mini-streak-title">Call Streak</div><div id="callStreakValue" style="font-weight:800;">0 days</div></div>
+            <div style="text-align:right;"><div id="callsTodayKpi" style="font-size:18px;font-weight:900;">0</div><div id="callsTodayLabel" style="font-size:11px;color:var(--muted);">today</div></div>
           </div>
-          <div class="pulse-kpi" id="callsTodayKpi">0</div>
-          <div class="pulse-subkpi" id="callsTodayLabel">Calls logged today</div>
-          <div class="detail-grid">
-            <div class="mini"><div class="label">Current Streak</div><div class="value" id="callStreakValue">0 days</div></div>
-            <div class="mini"><div class="label">Last 7 Days</div><div class="value" id="callWeekValue">0</div></div>
-          </div>
-          <div class="tiny-note" id="callStreakNote">Streak counts days with 5+ logged contacts.</div>
+          <div class="tiny-note" id="callStreakNote" style="margin-top:8px;">5+ logged contacts starts a streak.</div>
         </div>
 
-        <div class="pulse-card">
+        <div class="pulse-card" id="commitWatchCard">
           <div class="pulse-card-top">
             <div>
               <h3>Commit Watch</h3>
               <p>Who feels warmest right now.</p>
             </div>
-            <span class="status-pill">Closers</span>
+            <div style="display:flex;gap:8px;align-items:center;"><span class="status-pill">Closers</span><button class="pulse-collapse-btn" data-collapse-target="commitWatchCard" type="button">−</button></div>
           </div>
           <div class="pulse-list" id="commitWatchList"></div>
         </div>
 
-        <div class="pulse-card">
+        <div class="pulse-card wide" id="rosterMatrixCard">
           <div class="pulse-card-top">
             <div>
-              <h3>Position Gap Tracker</h3>
-              <p>Edit your target needs anytime.</p>
+              <h3>Roster Matrix</h3>
+              <p>Edit needs by position and class year.</p>
             </div>
-            <button class="btn secondary" id="saveGapTargetsBtn" type="button">Save Targets</button>
+            <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="saveRosterMatrixBtn" type="button">Save Matrix</button><button class="pulse-collapse-btn" data-collapse-target="rosterMatrixCard" type="button">−</button></div>
           </div>
-          <div class="position-gap-grid">
-            <div class="position-gap-row">
-              <div class="badge">Pins</div>
-              <input class="position-gap-input" id="gapPinsTarget" type="number" min="0" step="1" />
-              <div>
-                <div class="gap-label" id="gapPinsLabel">0 of 0</div>
-                <div class="gap-bar"><div class="gap-fill" id="gapPinsFill" style="width:0%"></div></div>
-              </div>
+          <div class="roster-matrix-wrap" id="rosterMatrixGrid"></div>
+          <div class="tiny-note" id="rosterMatrixNote">Targets save on this browser/device. Each cell shows current tracked recruits and editable need.</div>
+        </div>
+              <div class="pulse-card wide" id="eventTrackerCard">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Tournament / Event Tracker</h3>
+              <p>Upcoming events.</p>
             </div>
-            <div class="position-gap-row">
-              <div class="badge">Middles</div>
-              <input class="position-gap-input" id="gapMiddlesTarget" type="number" min="0" step="1" />
-              <div>
-                <div class="gap-label" id="gapMiddlesLabel">0 of 0</div>
-                <div class="gap-bar"><div class="gap-fill" id="gapMiddlesFill" style="width:0%"></div></div>
-              </div>
-            </div>
-            <div class="position-gap-row">
-              <div class="badge">Setters</div>
-              <input class="position-gap-input" id="gapSettersTarget" type="number" min="0" step="1" />
-              <div>
-                <div class="gap-label" id="gapSettersLabel">0 of 0</div>
-                <div class="gap-bar"><div class="gap-fill" id="gapSettersFill" style="width:0%"></div></div>
-              </div>
-            </div>
-            <div class="position-gap-row">
-              <div class="badge">Liberos</div>
-              <input class="position-gap-input" id="gapLiberosTarget" type="number" min="0" step="1" />
-              <div>
-                <div class="gap-label" id="gapLiberosLabel">0 of 0</div>
-                <div class="gap-bar"><div class="gap-fill" id="gapLiberosFill" style="width:0%"></div></div>
-              </div>
-            </div>
+            <div style="display:flex;gap:8px;align-items:center;"><span class="status-pill">Events</span><button class="pulse-collapse-btn" data-collapse-target="eventTrackerCard" type="button">−</button></div>
           </div>
-          <div class="tiny-note" id="gapTrackerNote">Saved only on this browser/device.</div>
+          <div class="event-tracker-wrap" id="eventTrackerList"></div>
         </div>
       </section>
 
@@ -830,21 +877,45 @@
           </div>
         </div>
         <div class="quick-filter-body">
-          <div class="quick-filter-group">
-            <div class="quick-filter-label">Group</div>
-            <div class="chip-row" id="groupChips"></div>
+          <div class="quick-filter-main">
+            <div class="quick-filter-group">
+              <div class="quick-filter-label">Group</div>
+              <div class="chip-row" id="groupChips"></div>
+            </div>
+            <div class="quick-filter-group">
+              <div class="quick-filter-label">Priority</div>
+              <div class="chip-row" id="priorityChips"></div>
+            </div>
+            <div class="quick-filter-group">
+              <div class="quick-filter-label">June 15 Call</div>
+              <div class="chip-row" id="ownerChips"></div>
+            </div>
+            <div class="quick-filter-group">
+              <div class="quick-filter-label">Shortcuts</div>
+              <div class="chip-row" id="shortcutChips"></div>
+            </div>
           </div>
-          <div class="quick-filter-group">
-            <div class="quick-filter-label">Priority</div>
-            <div class="chip-row" id="priorityChips"></div>
-          </div>
-          <div class="quick-filter-group">
-            <div class="quick-filter-label">June 15 Call</div>
-            <div class="chip-row" id="ownerChips"></div>
-          </div>
-          <div class="quick-filter-group">
-            <div class="quick-filter-label">Shortcuts</div>
-            <div class="chip-row" id="shortcutChips"></div>
+          <div class="quick-filter-side">
+            <div class="filter-side-card">
+              <h4>Active Filters</h4>
+              <div class="active-filter-list" id="activeFilterList"></div>
+            </div>
+            <div class="filter-side-card">
+              <h4>Filtered Snapshot</h4>
+              <div class="filter-metric-grid">
+                <div class="filter-metric"><div class="label">Showing</div><div class="value" id="filterMetricShowing">0</div></div>
+                <div class="filter-metric"><div class="label">Priority</div><div class="value" id="filterMetricPriority">0</div></div>
+                <div class="filter-metric"><div class="label">Need Follow-Up</div><div class="value" id="filterMetricFollowUp">0</div></div>
+                <div class="filter-metric"><div class="label">Calls Today</div><div class="value" id="filterMetricCalls">0</div></div>
+              </div>
+            </div>
+            <div class="filter-side-card">
+              <h4>Quick Actions</h4>
+              <div class="actions">
+                <button class="btn secondary" id="filterResetSideBtn" type="button">Reset All</button>
+                <button class="btn secondary" id="manageTagsSideBtn" type="button">Manage Tags</button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -949,6 +1020,7 @@
         <div><label>Film Link</label><input id="fFilmLink" class="field" /></div>
         <div><label>June 15 Call</label><input id="fJune15Call" class="field" /></div>
         <div><label>Rating</label><input id="fRating" class="field" /></div>
+        <div><label>Engagement Score Override</label><input id="fEngagementScoreOverride" type="number" min="0" max="100" step="1" class="field" placeholder="Blank = auto score" /></div>
         <div><label>Offer / Commitment</label>
           <select id="fOfferStatus" class="field">
             <option value="">None</option>
@@ -999,6 +1071,10 @@
         <div class="span-2"><label>Q4 - Question 1</label><textarea id="fQ4Question1" rows="2" class="field" placeholder="Add Q4 question 1 and answer notes"></textarea></div>
         <div class="span-2"><label>Q4 - Question 2</label><textarea id="fQ4Question2" rows="2" class="field" placeholder="Add Q4 question 2 and answer notes"></textarea></div>
         <div class="span-2"><label>Q4 - Question 3</label><textarea id="fQ4Question3" rows="2" class="field" placeholder="Add Q4 question 3 and answer notes"></textarea></div>
+
+        <div><label>Primary Event Name</label><input id="fEventName" class="field" placeholder="SCVA Red Rock" /></div>
+        <div><label>Event Date</label><input id="fEventDate" type="date" class="field" /></div>
+        <div class="span-2"><label>Event Location</label><input id="fEventLocation" class="field" placeholder="Las Vegas, NV" /></div>
 
         <div class="span-2"><label>Headshot</label><input id="fHeadshot" type="file" accept="image/*" class="field" /><div id="headshotNote" style="font-size:12px;color:var(--muted);margin-top:6px;"></div></div>
         <div class="span-2"><label>Tags</label><input id="fTags" class="field" placeholder="comma separated" /><div class="tag-library" id="tagLibrary"></div></div>
@@ -1062,11 +1138,35 @@
     </div>
   </div>
 
+
+  <div class="modal-wrap" id="tutorialModal">
+    <div class="modal-card tutorial-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+        <div>
+          <div class="status-pill" style="margin-bottom:10px;">Quick Tutorial</div>
+          <h3 style="margin:0;font-size:24px;">Welcome to the Recruit Board</h3>
+        </div>
+        <button class="btn secondary" id="tutorialCloseBtn" type="button">Got It</button>
+      </div>
+      <div class="tutorial-grid">
+        <div class="tutorial-step"><h4>Sidebar = control center</h4><p>Search, class, position, status, sorting, and quick filters now live under Class Snapshot so the main board stays clean.</p></div>
+        <div class="tutorial-step"><h4>Pressure + Commit + Roster + Events</h4><p>These top cards can collapse. Open only the ones you want to focus on.</p></div>
+        <div class="tutorial-step"><h4>Roster Matrix</h4><p>Edit need numbers by position and class year, then save. The matrix keeps your roster targets visible.</p></div>
+        <div class="tutorial-step"><h4>Event Tracker</h4><p>Add an event name, date, and location in the recruit form to group recruits by tournament weekend.</p></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+        <button class="btn" id="tutorialDoneBtn" type="button">Start Using Board</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const DASHBOARD_PASSWORD = 'bulldogs';
     const PASSWORD_SESSION_KEY = 'recruit_board_unlocked_v1';
     const STORAGE_KEY = 'recruit_board_clean_build_v1';
-    const GAP_TARGETS_KEY = 'recruit_board_gap_targets_v1';
+    const TUTORIAL_SEEN_KEY = 'recruit_board_tutorial_seen_v1';
+    const PULSE_COLLAPSE_KEY = 'recruit_board_pulse_collapsed_v1';
+    const ROSTER_MATRIX_KEY = 'recruit_board_roster_matrix_v1';
     const CUSTOM_TAGS_KEY = 'recruit_board_custom_tags_v1';
     const LIVE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvN9QdtIouvn6HlpwXaf9bv6r2063_dgJaPYcRvnPjWN8iniUp4kM8P5fHG1coan5Xng/exec';
     const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
@@ -1137,9 +1237,9 @@
     let filteredIds = [];
     let currentBoardView = 'list';
     const filterState = { group:'', priority:'', june15Call:'', shortcut:'' };
-    let gapTargets = loadGapTargets();
     let compareIds = [];
     let customTags = loadCustomTags();
+    let rosterMatrixTargets = loadRosterMatrixTargets();
 
     const appShell = document.getElementById('appShell');
     const passwordGate = document.getElementById('passwordGate');
@@ -1176,21 +1276,41 @@
     function saveData(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
     }
-    function loadGapTargets(){
-      try{
-        const saved = JSON.parse(localStorage.getItem(GAP_TARGETS_KEY) || '{}');
-        return {
-          Pins:Number(saved.Pins ?? 2),
-          Middles:Number(saved.Middles ?? 1),
-          Setters:Number(saved.Setters ?? 1),
-          Liberos:Number(saved.Liberos ?? 1)
-        };
-      }catch(e){
-        return {Pins:2,Middles:1,Setters:1,Liberos:1};
-      }
+    function loadCollapsedSections(){
+      try{return JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}');}catch(e){return {}}
     }
-    function saveGapTargets(){
-      localStorage.setItem(GAP_TARGETS_KEY, JSON.stringify(gapTargets));
+    function saveCollapsedSections(state){
+      localStorage.setItem(PULSE_COLLAPSE_KEY, JSON.stringify(state));
+    }
+    function applyPulseCollapsedState(){
+      const state = loadCollapsedSections();
+      document.querySelectorAll('[data-collapse-target]').forEach(btn=>{
+        const card = document.getElementById(btn.dataset.collapseTarget);
+        const collapsed = !!state[btn.dataset.collapseTarget];
+        if(card) card.classList.toggle('collapsed', collapsed);
+        btn.textContent = collapsed ? '+' : '−';
+      });
+    }
+    function initTutorial(){
+      if(localStorage.getItem(TUTORIAL_SEEN_KEY)==='true') return;
+      document.getElementById('tutorialModal').classList.add('active');
+    }
+    function closeTutorial(){
+      localStorage.setItem(TUTORIAL_SEEN_KEY, 'true');
+      document.getElementById('tutorialModal').classList.remove('active');
+    }
+    function loadRosterMatrixTargets(){
+      const positions = ['Pins','Middles','Setters','Liberos'];
+      const years = ['2026','2027','2028','2029','2030','2031'];
+      const defaults = Object.fromEntries(positions.map(pos => [pos, Object.fromEntries(years.map(year => [year, 0]))]));
+      try{
+        const saved = JSON.parse(localStorage.getItem(ROSTER_MATRIX_KEY) || '{}');
+        positions.forEach(pos => years.forEach(year => { defaults[pos][year] = Number(saved?.[pos]?.[year] ?? defaults[pos][year]); }));
+      }catch(e){}
+      return defaults;
+    }
+    function saveRosterMatrixTargets(){
+      localStorage.setItem(ROSTER_MATRIX_KEY, JSON.stringify(rosterMatrixTargets));
     }
 
     function loadCustomTags(){
@@ -1208,6 +1328,10 @@
       return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
     function engagementScore(recruit){
+      const manual = recruit?.engagementScoreOverride;
+      if(manual !== '' && manual !== null && manual !== undefined && !Number.isNaN(Number(manual))){
+        return Math.max(0, Math.min(100, Number(manual)));
+      }
       let score = 0;
       score += Math.min(25, Number(recruit.wroteToUs || 0) * 2);
       score += Math.min(18, Number(recruit.rating || 0) * 3);
@@ -1287,7 +1411,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
           const score = engagementScore(r); const tier = engagementTier(score);
           return `<div class="compare-card">
             <h4>${escapeHtml(r.name)}</h4>
-            <div class="tag-row"><span class="score-badge ${tier.cls}">${score} Engagement • ${tier.label}</span>${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${escapeHtml(r.offerStatus)}</span>` : ''}</div>
+            <div class="tag-row"><span class="score-badge ${tier.cls}">${score} Engagement • ${tier.label}${r.engagementScoreOverride !== "" && r.engagementScoreOverride !== null && r.engagementScoreOverride !== undefined ? " Manual" : ""}</span>${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${escapeHtml(r.offerStatus)}</span>` : ''}</div>
             <div class="compare-line"><strong>Profile:</strong> ${escapeHtml(profileSubtitle(r) || '—')}</div>
             <div class="compare-line"><strong>Rating:</strong> ${escapeHtml(r.rating || '—')} • <strong>Owner:</strong> ${escapeHtml(r.june15Call || '—')}</div>
             <div class="compare-line"><strong>Academics:</strong> ${escapeHtml(r.academics || '—')}</div>
@@ -1483,6 +1607,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         status: row.status || row.priority || '',
         june15Call: row.june15Call || row.owner || '',
         rating: row.rating || '',
+        engagementScoreOverride: row.engagementScoreOverride || '',
         offerStatus: row.offerStatus || row.offer || row.commitmentStatus || '',
         wroteToUs: row.wroteToUs || '',
         q1: parseYesNo(row.q1), q2: parseYesNo(row.q2), q3: parseYesNo(row.q3), q4: parseYesNo(row.q4),
@@ -1527,6 +1652,9 @@ Let me know when you have time to connect. We're excited to stay in touch.
         callPlanLocal: row.callPlanLocal || '',
         callPlanTimezone: row.callPlanTimezone || '',
         callPlanPST: row.callPlanPST || '',
+        eventName: row.eventName || row.primaryEventName || '',
+        eventDate: row.eventDate || '',
+        eventLocation: row.eventLocation || '',
         tags: splitMulti(row.tags || ''),
         selected: false
       };
@@ -1646,6 +1774,49 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(filterState.shortcut === 'Visited Campus') return String(recruit.visitStatus||'').toLowerCase().includes('visit');
       if(filterState.shortcut === 'High Academic Fit') return String(recruit.academics||'').toLowerCase().includes('high academic');
       return true;
+    }
+
+    function renderFilterSidePanel(filtered){
+      const active = [];
+      if(searchInput.value.trim()) active.push(`Search: ${escapeHtml(searchInput.value.trim())}`);
+      if(classSelect.value) active.push(`Class: ${escapeHtml(classSelect.value)}`);
+      if(positionSelect.value) active.push(`Position: ${escapeHtml(positionSelect.value)}`);
+      if(statusSelect.value) active.push(`Status: ${escapeHtml(statusSelect.value)}`);
+      if(filterState.group) active.push(`Group: ${escapeHtml(filterState.group)}`);
+      if(filterState.priority) active.push(`Priority: ${escapeHtml(filterState.priority)}`);
+      if(filterState.june15Call) active.push(`Owner: ${escapeHtml(filterState.june15Call)}`);
+      if(filterState.shortcut) active.push(`Shortcut: ${escapeHtml(filterState.shortcut)}`);
+      const list = document.getElementById('activeFilterList');
+      if(list) list.innerHTML = active.length ? active.map(item => `<span class="filter-chip active">${item}</span>`).join('') : '<div class="active-filter-empty">No filters active.</div>';
+      const today = new Date().toISOString().slice(0,10);
+      document.getElementById('filterMetricShowing').textContent = String(filtered.length);
+      document.getElementById('filterMetricPriority').textContent = String(filtered.filter(r => String(r.priority||r.status||'').toLowerCase().includes('priority')).length);
+      document.getElementById('filterMetricFollowUp').textContent = String(filtered.filter(r => (r.followUp||'').trim() || (r.actions||[]).length).length);
+      document.getElementById('filterMetricCalls').textContent = String(filtered.filter(r => String(r.lastContactDate||'') === today).length);
+    }
+
+    function renderRosterMatrix(recruits){
+      const positions = ['Pins','Middles','Setters','Liberos'];
+      const years = ['2026','2027','2028','2029','2030','2031'];
+      const counts = Object.fromEntries(positions.map(pos => [pos, Object.fromEntries(years.map(year => [year, 0]))]));
+      recruits.forEach(r => {
+        const pos = boardGroupForRecruit(r);
+        const year = String(r.classYear || '');
+        if(counts[pos] && counts[pos][year] !== undefined && isOfferLive(r)) counts[pos][year]++;
+      });
+      const box = document.getElementById('rosterMatrixGrid');
+      if(!box) return;
+      const header = years.map(year => `<th>${year}</th>`).join('');
+      const rows = positions.map(pos => {
+        const cells = years.map(year => {
+          const current = counts[pos][year] || 0;
+          const target = Number(rosterMatrixTargets?.[pos]?.[year] || 0);
+          const need = Math.max(target - current, 0);
+          return `<td><div class="matrix-cell"><div class="matrix-current">${current} tracked</div><input class="matrix-input" data-matrix-position="${pos}" data-matrix-year="${year}" type="number" min="0" step="1" value="${target}" /><div class="matrix-need ${need ? 'warn' : 'good'}">${need ? `${need} needed` : 'Covered'}</div></div></td>`;
+        }).join('');
+        return `<tr><td class="roster-matrix-row-label">${pos}</td>${cells}</tr>`;
+      }).join('');
+      box.innerHTML = `<table class="roster-matrix-table"><thead><tr><th>Position</th>${header}</tr></thead><tbody>${rows}</tbody></table>`;
     }
 
     function applySort(recruits){
@@ -1837,8 +2008,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       document.getElementById('callsTodayKpi').textContent = String(callsToday);
       document.getElementById('callsTodayLabel').textContent = callsToday === 1 ? 'Call logged today' : 'Calls logged today';
       document.getElementById('callStreakValue').textContent = `${streak} day${streak===1?'':'s'}`;
-      document.getElementById('callWeekValue').textContent = String(weekCalls);
-      document.getElementById('callStreakNote').textContent = streak ? `You are on a ${streak}-day streak of 5+ contacts.` : 'Streak starts once you log 5 contacts in a day.';
+      document.getElementById('callStreakNote').textContent = streak ? `Last 7 days: ${weekCalls} total contacts.` : `Last 7 days: ${weekCalls} total contacts.`;
 
       const commitCandidates = recruits
         .filter(r => isOfferLive(r) && (r.offerStatus || r.favorite || Number(r.pinTier||0) > 0 || Number(r.rating||0) >= 4))
@@ -1860,21 +2030,28 @@ Let me know when you have time to connect. We're excited to stay in touch.
         </div>
       `).join('') : '<div class="tiny-note">No commit watch names yet.</div>';
 
-      const counts = {Pins:0, Middles:0, Setters:0, Liberos:0};
-      recruits.forEach(r => {
-        const key = boardGroupForRecruit(r);
-        if(counts[key] !== undefined && isOfferLive(r)) counts[key]++;
-      });
-      ['Pins','Middles','Setters','Liberos'].forEach(key => {
-        const target = Number(gapTargets[key] || 0);
-        const current = counts[key] || 0;
-        const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
-        document.getElementById(`gap${key}Label`).textContent = `${current} of ${target} tracked • ${Math.max(target - current, 0)} gap`;
-        document.getElementById(`gap${key}Fill`).style.width = `${pct}%`;
-        const input = document.getElementById(`gap${key}Target`);
-        if(document.activeElement !== input) input.value = String(target);
-      });
+      renderRosterMatrix(recruits);
+      renderEventTracker(recruits);
       document.querySelectorAll('[data-open-recruit]').forEach(item=>item.addEventListener('click', ()=>{ selectedRecruitId = item.dataset.openRecruit; rebuildRecruitList(selectedRecruitId); }));
+      applyPulseCollapsedState();
+    }
+
+    function renderEventTracker(recruits){
+      const events = {};
+      recruits.forEach(r=>{
+        if(!r.eventName) return;
+        const key = [r.eventName, r.eventDate || '', r.eventLocation || ''].join('||');
+        if(!events[key]) events[key] = {name:r.eventName, date:r.eventDate, location:r.eventLocation, recruits:[]};
+        events[key].recruits.push(r);
+      });
+      const ordered = Object.values(events).sort((a,b)=>String(a.date || '9999-12-31').localeCompare(String(b.date || '9999-12-31'))).slice(0,6);
+      document.getElementById('eventTrackerList').innerHTML = ordered.length ? ordered.map(event=>`
+        <div class="event-group">
+          <h4>${escapeHtml(event.name)}</h4>
+          <div class="event-group-meta">${[event.date || 'Date TBD', event.location || 'Location TBD', `${event.recruits.length} name${event.recruits.length===1?'':'s'}`].join(' • ')}</div>
+          <div class="chip-row">${event.recruits.map(r=>`<button class="filter-chip" type="button" data-open-recruit="${r.id}">${escapeHtml(r.name)}</button>`).join('')}</div>
+        </div>
+      `).join('') : '<div class="tiny-note">Add an event name/date/location in a recruit profile to populate this tracker.</div>';
     }
 
     function renderProfile(recruitId){
@@ -1913,7 +2090,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
                 ${tier ? `<span class="tier-badge">${tier}</span>` : ''}
                 <span class="urgency-badge ${urg.cls}">${urg.label}</span>
                 ${recruit.callPlanPST ? `<span class="call-chip">Call ${recruit.callPlanPST} PST</span>` : ''}
-                <span class="score-badge ${scoreTier.cls}">${score} Engagement • ${scoreTier.label}</span>
+                <span class="score-badge ${scoreTier.cls}">${score} Engagement • ${scoreTier.label}${recruit.engagementScoreOverride !== "" && recruit.engagementScoreOverride !== null && recruit.engagementScoreOverride !== undefined ? " Manual" : ""}</span>
                 ${chipHtml}
               </div>
             </div>
@@ -1948,6 +2125,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
             <li><strong>Wrote To Us:</strong> ${recruit.wroteToUs || '—'}</li>
             <li><strong>Academics:</strong> ${recruit.academics || '—'}</li>
             <li><strong>Visit Status:</strong> ${recruit.visitStatus || '—'}</li>
+            <li><strong>Primary Event:</strong> ${[recruit.eventName || '', recruit.eventDate || '', recruit.eventLocation || ''].filter(Boolean).join(' • ') || '—'}</li>
             <li><strong>Camp Attended:</strong> ${recruit.campAttended ? 'Yes' : 'No'}</li>
           </ul>
         </div>
@@ -2029,6 +2207,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       });
 
       filtered = applySort(filtered);
+      renderFilterSidePanel(filtered);
       filteredIds = filtered.map(r=>r.id);
       if(!filteredIds.includes(String(activeId))) activeId = filteredIds[0] || '';
       selectedRecruitId = activeId;
@@ -2063,7 +2242,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
               <span class="urgency-badge ${urg.cls}">${urg.label}</span>
               ${r.callPlanPST ? `<span class="call-chip">Call ${r.callPlanPST} PST</span>` : ''}
               ${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${r.offerStatus}</span>` : ''}
-              <span class="score-badge ${scoreTier.cls}">${score} • ${scoreTier.label}</span>
+              <span class="score-badge ${scoreTier.cls}">${score} • ${scoreTier.label}${r.engagementScoreOverride !== "" && r.engagementScoreOverride !== null && r.engagementScoreOverride !== undefined ? " Manual" : ""}</span>
               ${(r.tags || []).slice(0,2).map(tag=>`<span class="tag">${tag}</span>`).join('')}
             </div>
             <div class="quick-action-row">
@@ -2080,7 +2259,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
       recruitList.querySelectorAll('.recruit-card').forEach(card=>{
         card.addEventListener('click', (e)=>{
-          if(e.target.closest('[data-star],[data-pin],[data-check]')) return;
+          if(e.target.closest('[data-star],[data-pin],[data-check],[data-compare],[data-log],[data-followup],a.quick-action-btn,button.quick-action-btn')) return;
           selectedRecruitId = card.dataset.id;
           rebuildRecruitList(selectedRecruitId);
         });
@@ -2231,14 +2410,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Question2','q1Question3','q2Question1','q2Question2','q2Question3','q3Question1','q3Question2','q3Question3','q4Question1','q4Question2','q4Question3','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Question2','q1Question3','q2Question1','q2Question2','q2Question3','q3Question1','q3Question2','q3Question3','q4Question1','q4Question2','q4Question3','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
         ...rows.map(r => headers.map(h => {
           const map = {
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
-            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
+            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
             q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Question2:r.q1Question2,q1Question3:r.q1Question3,q2Question1:r.q2Question1,q2Question2:r.q2Question2,q2Question3:r.q2Question3,q3Question1:r.q3Question1,q3Question2:r.q3Question2,q3Question3:r.q3Question3,q4Question1:r.q4Question1,q4Question2:r.q4Question2,q4Question3:r.q4Question3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
             campAttended:r.campAttended,filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
@@ -2264,7 +2443,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       state:document.getElementById('fState'), club:document.getElementById('fClub'), priority:document.getElementById('fPriority'),
       phone:document.getElementById('fPhone'), email:document.getElementById('fEmail'), profileLink:document.getElementById('fProfileLink'),
       filmLink:document.getElementById('fFilmLink'), june15Call:document.getElementById('fJune15Call'),
-      rating:document.getElementById('fRating'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'),
+      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
       height:document.getElementById('fHeight'), gradYear:document.getElementById('fGradYear'),
       lastContact:document.getElementById('fLastContact'), nextActionDue:document.getElementById('fNextActionDue'),
       callPlanLocal:document.getElementById('fCallPlanLocal'), callPlanTimezone:document.getElementById('fCallPlanTimezone'), callPlanPST:document.getElementById('fCallPlanPST'),
@@ -2303,8 +2482,12 @@ Let me know when you have time to connect. We're excited to stay in touch.
       formEls.filmLink.value = r?.filmLink || '';
       formEls.june15Call.value = r?.june15Call || '';
       formEls.rating.value = r?.rating || '';
+      formEls.engagementScoreOverride.value = r?.engagementScoreOverride ?? '';
       formEls.offerStatus.value = r?.offerStatus || '';
       formEls.wroteToUs.value = r?.wroteToUs || '';
+      formEls.eventName.value = r?.eventName || '';
+      formEls.eventDate.value = r?.eventDate || '';
+      formEls.eventLocation.value = r?.eventLocation || '';
       formEls.height.value = r?.height || '';
       formEls.gradYear.value = r?.graduationYear || r?.classYear || '';
       formEls.lastContact.value = r?.lastContactDate || '';
@@ -2384,7 +2567,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         name:formEls.name.value, classYear:formEls.classYear.value, group:formEls.group.value, position:formEls.position.value,
         city:formEls.city.value, state:formEls.state.value, club:formEls.club.value, priority:formEls.priority.value || 'Active',
         status:formEls.priority.value || 'Active', june15Call:formEls.june15Call.value, rating:formEls.rating.value,
-        offerStatus:formEls.offerStatus.value, wroteToUs:formEls.wroteToUs.value, height:formEls.height.value,
+        engagementScoreOverride:formEls.engagementScoreOverride.value,
+        offerStatus:formEls.offerStatus.value, wroteToUs:formEls.wroteToUs.value, eventName:formEls.eventName.value, eventDate:formEls.eventDate.value, eventLocation:formEls.eventLocation.value, height:formEls.height.value,
         graduationYear:formEls.gradYear.value, lastContactDate:formEls.lastContact.value, nextActionDue:formEls.nextActionDue.value,
         callPlanLocal:formEls.callPlanLocal.value, callPlanTimezone:formEls.callPlanTimezone.value,
         callPlanPST:formEls.callPlanPST.value.replace(/ PST$/,''), campAttended:formEls.camp.value==='true',
@@ -2428,6 +2612,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.getElementById('showAllBtn').addEventListener('click', resetAllFilters);
     document.getElementById('resetFiltersBtn').addEventListener('click', resetAllFilters);
     document.getElementById('clearQuickFiltersBtn').addEventListener('click', resetAllFilters);
+    document.getElementById('filterResetSideBtn').addEventListener('click', resetAllFilters);
+    document.getElementById('manageTagsSideBtn').addEventListener('click', openTagManager);
     document.getElementById('compactBtn').addEventListener('click', ()=>appShell.classList.toggle('compact-mode'));
     document.getElementById('callModeBtn').addEventListener('click', ()=>openCallMode(selectedRecruitId));
     document.getElementById('callCloseBtn').addEventListener('click', closeCallMode);
@@ -2461,6 +2647,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
         document.getElementById('snapshotBody').classList.contains('hidden') ? '+' : '−';
     });
 
+    document.getElementById('sidebarFiltersToggleBtn').addEventListener('click', ()=>{
+      document.getElementById('sidebarFiltersBody').classList.toggle('hidden');
+      document.getElementById('sidebarFiltersToggleBtn').textContent =
+        document.getElementById('sidebarFiltersBody').classList.contains('hidden') ? '+' : '−';
+    });
+    document.getElementById('tutorialCloseBtn').addEventListener('click', closeTutorial);
+    document.getElementById('tutorialDoneBtn').addEventListener('click', closeTutorial);
+
     document.querySelectorAll('[data-snapshot]').forEach(card=>{
       card.addEventListener('click', ()=>{
         classSelect.value = card.dataset.snapshot || '';
@@ -2475,6 +2669,16 @@ Let me know when you have time to connect. We're excited to stay in touch.
       appShell.classList.remove('sidebar-collapsed');
     });
 
+    document.getElementById('saveRosterMatrixBtn').addEventListener('click', ()=>{
+      document.querySelectorAll('[data-matrix-position][data-matrix-year]').forEach(input=>{
+        const pos = input.dataset.matrixPosition;
+        const year = input.dataset.matrixYear;
+        rosterMatrixTargets[pos][year] = Math.max(0, Number(input.value || 0));
+      });
+      saveRosterMatrixTargets();
+      document.getElementById('rosterMatrixNote').textContent = 'Roster matrix saved on this browser/device.';
+      rebuildRecruitList(selectedRecruitId);
+    });
     document.getElementById('compareOpenBtn').addEventListener('click', openCompareModal);
     document.getElementById('compareCloseBtn').addEventListener('click', closeCompareModal);
     document.getElementById('compareModal').addEventListener('click', e=>{ if(e.target.id === 'compareModal') closeCompareModal(); });
@@ -2488,10 +2692,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const value = (input.value || '').trim();
       if(!value || customTags.includes(value)) return;
       customTags.push(value); saveCustomTags(); input.value=''; renderTagManager(); renderTagLibrary();
-    });
-    document.getElementById('saveGapTargetsBtn').addEventListener('click', ()=>{
-      ['Pins','Middles','Setters','Liberos'].forEach(key=>{ gapTargets[key] = Math.max(0, Number(document.getElementById(`gap${key}Target`).value || 0)); });
-      saveGapTargets(); rebuildRecruitList(selectedRecruitId); document.getElementById('gapTrackerNote').textContent = 'Targets saved on this browser/device.';
     });
     document.getElementById('listViewBtn').addEventListener('click', ()=>setBoardView('list'));
     document.getElementById('boardViewBtn').addEventListener('click', ()=>setBoardView('board'));
@@ -2535,6 +2735,28 @@ Let me know when you have time to connect. We're excited to stay in touch.
       reader.readAsText(file);
       fileInput.value = '';
     });
+
+    function moveSidebarTools(){
+      const sidebarHost = document.getElementById('sidebarFiltersBody');
+      const controls = document.querySelector('.controls');
+      const quickFilters = document.getElementById('quickFilters');
+      const callStreak = document.getElementById('callStreakMiniCard');
+      const snapshotBox = document.getElementById('snapshotBox');
+      if(sidebarHost && controls) sidebarHost.appendChild(controls);
+      if(sidebarHost && quickFilters) sidebarHost.appendChild(quickFilters);
+      if(snapshotBox && callStreak) snapshotBox.insertAdjacentElement('afterend', callStreak);
+    }
+
+    function initPulseCollapseButtons(){
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('[data-collapse-target]');
+        if(!btn) return;
+        const state = loadCollapsedSections();
+        state[btn.dataset.collapseTarget] = !state[btn.dataset.collapseTarget];
+        saveCollapsedSections(state);
+        applyPulseCollapsedState();
+      });
+    }
 
     function resetAllFilters(){
       searchInput.value = '';
