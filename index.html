@@ -369,6 +369,42 @@
     }
     .daily-name{font-size:15px;font-weight:800}
     .daily-meta{font-size:12px;color:var(--muted);margin-top:4px}
+    .recruiting-pulse{
+      display:grid;
+      grid-template-columns:repeat(4,minmax(220px,1fr));
+      gap:14px;
+    }
+    .pulse-card{
+      background:var(--panel);
+      border:1px solid var(--line);
+      border-radius:18px;
+      box-shadow:var(--shadow);
+      padding:16px;
+      display:grid;
+      gap:12px;
+      align-content:start;
+    }
+    .pulse-card h3{margin:0;font-size:16px}
+    .pulse-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.45}
+    .pulse-card-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+    .pulse-kpi{font-size:30px;font-weight:900;line-height:1}
+    .pulse-subkpi{font-size:12px;color:var(--muted);font-weight:700}
+    .pulse-list{display:grid;gap:10px}
+    .pulse-list-item{border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff}
+    .pulse-list-item strong{display:block;font-size:14px;margin-bottom:4px}
+    .pulse-list-item .meta-line{font-size:12px;color:var(--muted);line-height:1.45}
+    .risk-pill,.heat-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800}
+    .risk-high{background:#fff2f2;color:#b42318;border:1px solid #f2b8b5}
+    .risk-medium{background:#fff7e8;color:#9a6700;border:1px solid #f5d08a}
+    .heat-hot{background:#fff2f4;color:var(--red);border:1px solid #f3bcc8}
+    .heat-warm{background:#eef4ff;color:#18407c;border:1px solid #c9d8f5}
+    .position-gap-grid{display:grid;gap:10px}
+    .position-gap-row{display:grid;grid-template-columns:72px 72px 1fr;gap:10px;align-items:center}
+    .position-gap-input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .gap-bar{height:10px;background:#eef2f7;border-radius:999px;overflow:hidden}
+    .gap-fill{height:100%;background:linear-gradient(90deg,#002D62,#C41230)}
+    .gap-label{font-size:12px;color:var(--muted);font-weight:700}
+    .tiny-note{font-size:11px;color:var(--muted)}
     .content{
       display:grid;
       grid-template-columns:0.9fr 1.25fr;
@@ -526,14 +562,14 @@
     }
     .app.sidebar-collapsed + .sidebar-reopen-btn{display:block}
     @media (max-width:1100px){
-      .app,.content{grid-template-columns:1fr}
+      .app,.content,.recruiting-pulse{grid-template-columns:1fr}
       .controls{grid-template-columns:1fr 1fr}
       .board-view{grid-template-columns:1fr 1fr}
       .sidebar{min-height:auto}
     }
     @media (max-width:700px){
       .main{padding:16px}
-      .controls,.detail-grid,.flip-grid,.modal-grid,.call-mode-grid,.class-snapshot-grid,.board-view,.countdown-body{grid-template-columns:1fr}
+      .controls,.detail-grid,.flip-grid,.modal-grid,.call-mode-grid,.class-snapshot-grid,.board-view,.countdown-body,.recruiting-pulse,.position-gap-row{grid-template-columns:1fr}
       .quick-filter-group{grid-template-columns:1fr}
       .hero-top{flex-wrap:wrap}
     }
@@ -636,6 +672,92 @@
               <span id="countdownHMS">--</span>
             </div>
           </div>
+        </div>
+      </section>
+
+      <section class="recruiting-pulse" id="recruitingPulse">
+        <div class="pulse-card">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Pressure Board</h3>
+              <p>Top must-call recruits right now.</p>
+            </div>
+            <span class="status-pill">Top 5</span>
+          </div>
+          <div class="pulse-list" id="pressureBoardList"></div>
+        </div>
+
+        <div class="pulse-card">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Call Streak Tracker</h3>
+              <p>Momentum from recent contact activity.</p>
+            </div>
+            <span class="status-pill">Daily Pace</span>
+          </div>
+          <div class="pulse-kpi" id="callsTodayKpi">0</div>
+          <div class="pulse-subkpi" id="callsTodayLabel">Calls logged today</div>
+          <div class="detail-grid">
+            <div class="mini"><div class="label">Current Streak</div><div class="value" id="callStreakValue">0 days</div></div>
+            <div class="mini"><div class="label">Last 7 Days</div><div class="value" id="callWeekValue">0</div></div>
+          </div>
+          <div class="tiny-note" id="callStreakNote">Streak counts days with 5+ logged contacts.</div>
+        </div>
+
+        <div class="pulse-card">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Commit Watch</h3>
+              <p>Who feels warmest right now.</p>
+            </div>
+            <span class="status-pill">Closers</span>
+          </div>
+          <div class="pulse-list" id="commitWatchList"></div>
+        </div>
+
+        <div class="pulse-card">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Position Gap Tracker</h3>
+              <p>Edit your target needs anytime.</p>
+            </div>
+            <button class="btn secondary" id="saveGapTargetsBtn" type="button">Save Targets</button>
+          </div>
+          <div class="position-gap-grid">
+            <div class="position-gap-row">
+              <div class="badge">Pins</div>
+              <input class="position-gap-input" id="gapPinsTarget" type="number" min="0" step="1" />
+              <div>
+                <div class="gap-label" id="gapPinsLabel">0 of 0</div>
+                <div class="gap-bar"><div class="gap-fill" id="gapPinsFill" style="width:0%"></div></div>
+              </div>
+            </div>
+            <div class="position-gap-row">
+              <div class="badge">Middles</div>
+              <input class="position-gap-input" id="gapMiddlesTarget" type="number" min="0" step="1" />
+              <div>
+                <div class="gap-label" id="gapMiddlesLabel">0 of 0</div>
+                <div class="gap-bar"><div class="gap-fill" id="gapMiddlesFill" style="width:0%"></div></div>
+              </div>
+            </div>
+            <div class="position-gap-row">
+              <div class="badge">Setters</div>
+              <input class="position-gap-input" id="gapSettersTarget" type="number" min="0" step="1" />
+              <div>
+                <div class="gap-label" id="gapSettersLabel">0 of 0</div>
+                <div class="gap-bar"><div class="gap-fill" id="gapSettersFill" style="width:0%"></div></div>
+              </div>
+            </div>
+            <div class="position-gap-row">
+              <div class="badge">Liberos</div>
+              <input class="position-gap-input" id="gapLiberosTarget" type="number" min="0" step="1" />
+              <div>
+                <div class="gap-label" id="gapLiberosLabel">0 of 0</div>
+                <div class="gap-bar"><div class="gap-fill" id="gapLiberosFill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="tiny-note" id="gapTrackerNote">Saved only on this browser/device.</div>
         </div>
       </section>
 
@@ -865,6 +987,7 @@
     const DASHBOARD_PASSWORD = 'bulldogs';
     const PASSWORD_SESSION_KEY = 'recruit_board_unlocked_v1';
     const STORAGE_KEY = 'recruit_board_clean_build_v1';
+    const GAP_TARGETS_KEY = 'recruit_board_gap_targets_v1';
     const LIVE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvN9QdtIouvn6HlpwXaf9bv6r2063_dgJaPYcRvnPjWN8iniUp4kM8P5fHG1coan5Xng/exec';
     const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
     const TARGET_DATE = new Date('2026-06-15T00:00:00');
@@ -934,6 +1057,7 @@
     let filteredIds = [];
     let currentBoardView = 'list';
     const filterState = { group:'', priority:'', june15Call:'', shortcut:'' };
+    let gapTargets = loadGapTargets();
 
     const appShell = document.getElementById('appShell');
     const passwordGate = document.getElementById('passwordGate');
@@ -969,6 +1093,22 @@
     }
     function saveData(){
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
+    }
+    function loadGapTargets(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(GAP_TARGETS_KEY) || '{}');
+        return {
+          Pins:Number(saved.Pins ?? 2),
+          Middles:Number(saved.Middles ?? 1),
+          Setters:Number(saved.Setters ?? 1),
+          Liberos:Number(saved.Liberos ?? 1)
+        };
+      }catch(e){
+        return {Pins:2,Middles:1,Setters:1,Liberos:1};
+      }
+    }
+    function saveGapTargets(){
+      localStorage.setItem(GAP_TARGETS_KEY, JSON.stringify(gapTargets));
     }
 
     function unlockDashboard(){
@@ -1403,6 +1543,111 @@
       });
     }
 
+    function isOfferLive(recruit){
+      return String(recruit.offerStatus || '').toLowerCase() !== 'committed elsewhere';
+    }
+
+    function daysSince(dateValue){
+      const d = parseDateSafe(dateValue);
+      if(!d) return 999;
+      return Math.floor((Date.now() - d.getTime())/(1000*60*60*24));
+    }
+
+    function renderRecruitingPulse(recruits){
+      const pressureCandidates = recruits
+        .filter(r => isOfferLive(r))
+        .map(r => {
+          const urgency = urgencyForRecruit(r);
+          const due = parseDateSafe(r.callPlanLocal) || parseDateSafe(r.nextActionDue);
+          const daysAway = due ? Math.ceil((due.getTime() - Date.now())/(1000*60*60*24)) : 30;
+          const noContactDays = daysSince(r.lastContactDate);
+          const priorityBoost = String(r.priority || r.status || '').toLowerCase().includes('priority') ? 30 : String(r.priority || r.status || '').toLowerCase().includes('warm') ? 16 : 8;
+          const tierBoost = Number(r.pinTier || 0) * 12 + Number(r.rating || 0) * 6 + (r.favorite ? 8 : 0);
+          const urgencyBoost = urgency.order === 0 ? 36 : urgency.order === 1 ? 20 : 8;
+          const overdueBoost = noContactDays >= 14 ? 25 : noContactDays >= 7 ? 12 : 0;
+          const dateBoost = daysAway <= 0 ? 24 : daysAway <= 2 ? 18 : daysAway <= 7 ? 10 : 0;
+          return { recruit:r, score: priorityBoost + tierBoost + urgencyBoost + overdueBoost + dateBoost, noContactDays };
+        })
+        .sort((a,b)=>b.score-a.score)
+        .slice(0,5);
+
+      document.getElementById('pressureBoardList').innerHTML = pressureCandidates.length ? pressureCandidates.map(({recruit,noContactDays})=>{
+        const riskClass = noContactDays >= 14 ? 'risk-high' : 'risk-medium';
+        const riskText = noContactDays >= 14 ? 'AT RISK' : 'Pressing';
+        return `
+          <div class="pulse-list-item">
+            <strong>${recruit.name}</strong>
+            <div class="meta-line">${[recruit.position || 'No Position', recruit.club || 'No Club', recruit.june15Call || 'No owner'].join(' • ')}</div>
+            <div class="tag-row">
+              <span class="risk-pill ${riskClass}">${riskText}</span>
+              <span class="urgency-badge ${urgencyForRecruit(recruit).cls}">${urgencyForRecruit(recruit).label}</span>
+              <span class="badge">${noContactDays >= 999 ? 'No contact logged' : `${noContactDays}d since contact`}</span>
+            </div>
+          </div>
+        `;
+      }).join('') : '<div class="tiny-note">No pressure items yet.</div>';
+
+      const today = new Date();
+      const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const todayStr = start.toISOString().slice(0,10);
+      const callsToday = recruits.filter(r => String(r.lastContactDate || '') === todayStr).length;
+      let weekCalls = 0;
+      for(let i=0;i<7;i++){
+        const d = new Date(start);
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0,10);
+        weekCalls += recruits.filter(r => String(r.lastContactDate || '') === key).length;
+      }
+      let streak = 0;
+      for(let i=0;i<30;i++){
+        const d = new Date(start);
+        d.setDate(d.getDate() - i);
+        const key = d.toISOString().slice(0,10);
+        const count = recruits.filter(r => String(r.lastContactDate || '') === key).length;
+        if(count >= 5) streak++; else break;
+      }
+      document.getElementById('callsTodayKpi').textContent = String(callsToday);
+      document.getElementById('callsTodayLabel').textContent = callsToday === 1 ? 'Call logged today' : 'Calls logged today';
+      document.getElementById('callStreakValue').textContent = `${streak} day${streak===1?'':'s'}`;
+      document.getElementById('callWeekValue').textContent = String(weekCalls);
+      document.getElementById('callStreakNote').textContent = streak ? `You are on a ${streak}-day streak of 5+ contacts.` : 'Streak starts once you log 5 contacts in a day.';
+
+      const commitCandidates = recruits
+        .filter(r => isOfferLive(r) && (r.offerStatus || r.favorite || Number(r.pinTier||0) > 0 || Number(r.rating||0) >= 4))
+        .map(r => {
+          const heat = (String(r.offerStatus||'').toLowerCase().includes('offered') ? 28 : 0) + (r.favorite ? 10 : 0) + Number(r.pinTier || 0)*10 + Number(r.rating || 0)*5 + (daysSince(r.lastContactDate) <= 7 ? 12 : 0) + (String(r.visitStatus || '').toLowerCase().includes('visit') ? 10 : 0);
+          return {recruit:r, heat};
+        })
+        .sort((a,b)=>b.heat-a.heat)
+        .slice(0,5);
+      document.getElementById('commitWatchList').innerHTML = commitCandidates.length ? commitCandidates.map(({recruit,heat})=>`
+        <div class="pulse-list-item">
+          <strong>${recruit.name}</strong>
+          <div class="meta-line">${[recruit.classYear || '', recruit.position || '', recruit.club || 'No Club'].filter(Boolean).join(' • ')}</div>
+          <div class="tag-row">
+            <span class="heat-pill ${heat >= 55 ? 'heat-hot' : 'heat-warm'}">${heat >= 55 ? 'Heating Up' : 'On Radar'}</span>
+            ${recruit.offerStatus ? `<span class="offer-badge ${offerBadgeClass(recruit.offerStatus)}">${recruit.offerStatus}</span>` : ''}
+            ${recruit.visitStatus ? `<span class="tag">${recruit.visitStatus}</span>` : ''}
+          </div>
+        </div>
+      `).join('') : '<div class="tiny-note">No commit watch names yet.</div>';
+
+      const counts = {Pins:0, Middles:0, Setters:0, Liberos:0};
+      recruits.forEach(r => {
+        const key = boardGroupForRecruit(r);
+        if(counts[key] !== undefined && isOfferLive(r)) counts[key]++;
+      });
+      ['Pins','Middles','Setters','Liberos'].forEach(key => {
+        const target = Number(gapTargets[key] || 0);
+        const current = counts[key] || 0;
+        const pct = target > 0 ? Math.min(100, (current / target) * 100) : 0;
+        document.getElementById(`gap${key}Label`).textContent = `${current} of ${target} tracked • ${Math.max(target - current, 0)} gap`;
+        document.getElementById(`gap${key}Fill`).style.width = `${pct}%`;
+        const input = document.getElementById(`gap${key}Target`);
+        if(document.activeElement !== input) input.value = String(target);
+      });
+    }
+
     function renderProfile(recruitId){
       const recruit = recruitDetails[recruitId];
       if(!recruit){
@@ -1526,6 +1771,7 @@
       updateSnapshot(recruits);
       renderQuickFilterChips(recruits);
       renderDailySheet(recruits);
+      renderRecruitingPulse(recruits);
 
       const searchTerm = (searchInput.value || '').toLowerCase().trim();
       let filtered = recruits.filter(r=>{
