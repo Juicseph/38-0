@@ -507,6 +507,24 @@
     .app.sidebar-collapsed .sidebar-box,
     .app.sidebar-collapsed .sidebar-action{display:none}
     .app.sidebar-collapsed .sidebar h1{font-size:20px}
+    .sidebar-reopen-btn{
+      position:fixed;
+      top:16px;
+      left:16px;
+      z-index:12050;
+      width:48px;
+      height:48px;
+      border:none;
+      border-radius:16px;
+      background:var(--navy);
+      color:#fff;
+      font-size:22px;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 12px 28px rgba(17,36,63,.18);
+      display:none;
+    }
+    .app.sidebar-collapsed + .sidebar-reopen-btn{display:block}
     @media (max-width:1100px){
       .app,.content{grid-template-columns:1fr}
       .controls{grid-template-columns:1fr 1fr}
@@ -721,6 +739,7 @@
       </section>
     </main>
   </div>
+  <button class="sidebar-reopen-btn" id="sidebarReopenBtn" type="button" aria-label="Reopen sidebar">☰</button>
 
   <div class="call-mode" id="callMode">
     <div class="call-mode-card">
@@ -808,6 +827,22 @@
         <div><label>Q3</label><select id="fQ3" class="field"><option value="false">No</option><option value="true">Yes</option></select></div>
         <div><label>Q4</label><select id="fQ4" class="field"><option value="false">No</option><option value="true">Yes</option></select></div>
 
+        <div class="span-2"><label>Q1 - Question 1</label><textarea id="fQ1Question1" rows="2" class="field" placeholder="Add Q1 question 1 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q1 - Question 2</label><textarea id="fQ1Question2" rows="2" class="field" placeholder="Add Q1 question 2 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q1 - Question 3</label><textarea id="fQ1Question3" rows="2" class="field" placeholder="Add Q1 question 3 and answer notes"></textarea></div>
+
+        <div class="span-2"><label>Q2 - Question 1</label><textarea id="fQ2Question1" rows="2" class="field" placeholder="Add Q2 question 1 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q2 - Question 2</label><textarea id="fQ2Question2" rows="2" class="field" placeholder="Add Q2 question 2 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q2 - Question 3</label><textarea id="fQ2Question3" rows="2" class="field" placeholder="Add Q2 question 3 and answer notes"></textarea></div>
+
+        <div class="span-2"><label>Q3 - Question 1</label><textarea id="fQ3Question1" rows="2" class="field" placeholder="Add Q3 question 1 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q3 - Question 2</label><textarea id="fQ3Question2" rows="2" class="field" placeholder="Add Q3 question 2 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q3 - Question 3</label><textarea id="fQ3Question3" rows="2" class="field" placeholder="Add Q3 question 3 and answer notes"></textarea></div>
+
+        <div class="span-2"><label>Q4 - Question 1</label><textarea id="fQ4Question1" rows="2" class="field" placeholder="Add Q4 question 1 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q4 - Question 2</label><textarea id="fQ4Question2" rows="2" class="field" placeholder="Add Q4 question 2 and answer notes"></textarea></div>
+        <div class="span-2"><label>Q4 - Question 3</label><textarea id="fQ4Question3" rows="2" class="field" placeholder="Add Q4 question 3 and answer notes"></textarea></div>
+
         <div class="span-2"><label>Headshot</label><input id="fHeadshot" type="file" accept="image/*" class="field" /><div id="headshotNote" style="font-size:12px;color:var(--muted);margin-top:6px;"></div></div>
         <div class="span-2"><label>Tags</label><input id="fTags" class="field" placeholder="comma separated" /></div>
         <div class="span-2"><label>Summary</label><textarea id="fSummary" rows="3" class="field"></textarea></div>
@@ -839,7 +874,7 @@
       "1": {
         name: 'Shannon Kirchhardt', classYear:'2027', position:'Outside Hitter', city:'San Diego', state:'CA',
         club:'Coast Volleyball Club', group:'Pins', priority:'Priority', status:'Priority', june15Call:'Orlando',
-        rating:'5', offerStatus:'Offered', wroteToUs:'10', q1:true,q2:true,q3:false,q4:false,
+        rating:'5', offerStatus:'Offered', wroteToUs:'10', q1:true,q2:true,q3:false,q4:false, q1Question1:'Why Fresno State? Strong interest in culture and relationships.', q2Question1:'Academic goals: wants a strong balance with volleyball.', q3Question1:'Family support: family values connection and communication.',
         summary:'High-upside outside hitter with strong academics, confident communication, and clear family support.',
         notes:['Really values team culture and strong player relationships.','Wants a balance of competitive volleyball and a strong academic environment.'],
         notesHistory:[{date:'2026-04-25',text:'Follow-up after next tournament weekend.'}],
@@ -870,7 +905,7 @@
       "3": {
         name:'Brooklyn Rummler', classYear:'2027', position:'Libero', city:'Boise', state:'ID',
         club:'Idaho One', group:'Liberos', priority:'Watch List', status:'Watch List', june15Call:'Jerome',
-        rating:'5', offerStatus:'Committed Elsewhere', wroteToUs:'2', q1:true,q2:false,q3:false,q4:false,
+        rating:'5', offerStatus:'Committed Elsewhere', wroteToUs:'2', q1:true,q2:false,q3:false,q4:false, q1Question1:'Need more film before a deeper question set.', q2Question1:'Wants clear recruiting communication.', q3Question1:'Still learning overall school priorities.',
         summary:'Instinctive libero with good range and a strong motor.',
         notes:['Would benefit from more full-match film for evaluation.'],
         notesHistory:[{date:'2026-04-21',text:'Need full-match film and measurables.'}],
@@ -884,7 +919,17 @@
       }
     };
 
-    let recruitDetails = loadData();
+    function migrateRecruitQuestionFields(data){
+      Object.values(data || {}).forEach(recruit=>{
+        if(!recruit || typeof recruit !== 'object') return;
+        if(recruit.question1 && !recruit.q1Question1) recruit.q1Question1 = recruit.question1;
+        if(recruit.question2 && !recruit.q2Question1) recruit.q2Question1 = recruit.question2;
+        if(recruit.question3 && !recruit.q3Question1) recruit.q3Question1 = recruit.question3;
+      });
+      return data;
+    }
+
+    let recruitDetails = migrateRecruitQuestionFields(loadData());
     let selectedRecruitId = Object.keys(recruitDetails)[0] || '';
     let filteredIds = [];
     let currentBoardView = 'list';
@@ -983,6 +1028,21 @@
       const d = new Date(value);
       return isNaN(d.getTime()) ? null : d;
     }
+
+    function getQuarterQuestions(recruit, quarter){
+      return [1,2,3].map(i => recruit[`${quarter}Question${i}`] || '');
+    }
+    function renderQuarterQuestionSection(recruit, quarter){
+      const complete = recruit[quarter] ? 'Complete' : 'Not Complete';
+      const items = getQuarterQuestions(recruit, quarter).filter(Boolean);
+      return `
+        <div class="section">
+          <h5>${quarter.toUpperCase()} Questions + Answers</h5>
+          <p style="margin:0 0 10px;color:var(--muted);font-size:13px;"><strong>Status:</strong> ${complete}</p>
+          <ul>${items.length ? items.map((item, idx)=>`<li><strong>Question ${idx+1}:</strong> ${item}</li>`).join('') : '<li>No question responses added yet.</li>'}</ul>
+        </div>
+      `;
+    }
     function profileSubtitle(recruit){
       return [recruit.classYear,recruit.position,[recruit.city,recruit.state].filter(Boolean).join(', '),recruit.club].filter(Boolean).join(' • ');
     }
@@ -1062,6 +1122,18 @@
         offerStatus: row.offerStatus || row.offer || row.commitmentStatus || '',
         wroteToUs: row.wroteToUs || '',
         q1: parseYesNo(row.q1), q2: parseYesNo(row.q2), q3: parseYesNo(row.q3), q4: parseYesNo(row.q4),
+        q1Question1: row.q1Question1 || row.question1 || row.q1Question || '',
+        q1Question2: row.q1Question2 || '',
+        q1Question3: row.q1Question3 || '',
+        q2Question1: row.q2Question1 || row.question2 || row.q2Question || '',
+        q2Question2: row.q2Question2 || '',
+        q2Question3: row.q2Question3 || '',
+        q3Question1: row.q3Question1 || row.question3 || row.q3Question || '',
+        q3Question2: row.q3Question2 || '',
+        q3Question3: row.q3Question3 || '',
+        q4Question1: row.q4Question1 || row.q4Question || '',
+        q4Question2: row.q4Question2 || '',
+        q4Question3: row.q4Question3 || '',
         summary: row.summary || '',
         notes: splitMulti(row.notes || ''),
         notesHistory: splitMulti(row.notesHistory || '').map(text => ({date:new Date().toISOString().slice(0,10), text})),
@@ -1410,6 +1482,11 @@
           </ul>
         </div>
 
+        ${renderQuarterQuestionSection(recruit, 'q1')}
+        ${renderQuarterQuestionSection(recruit, 'q2')}
+        ${renderQuarterQuestionSection(recruit, 'q3')}
+        ${renderQuarterQuestionSection(recruit, 'q4')}
+
         <div class="section">
           <h5>Recruit Status Timeline</h5>
           <div class="timeline">
@@ -1556,6 +1633,10 @@
 
     function buildCallQuestions(recruit){
       const questions = [];
+      ['q1','q2','q3','q4'].forEach(quarter=>{
+        getQuarterQuestions(recruit, quarter).filter(Boolean).forEach(item=>questions.push(item));
+      });
+      if(questions.length) return questions.slice(0,5);
       if(recruit.academics) questions.push(`How are you thinking about academics and fit right now?`);
       if(recruit.visitStatus) questions.push(`What stood out most from your visit experience so far?`);
       questions.push('What matters most to you in your college decision?');
@@ -1652,7 +1733,7 @@
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','offerStatus','wroteToUs','q1','q2','q3','q4','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Question2','q1Question3','q2Question1','q2Question2','q2Question3','q3Question1','q3Question2','q3Question3','q4Question1','q4Question2','q4Question3','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
@@ -1660,7 +1741,7 @@
           const map = {
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
             priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
-            q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
+            q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Question2:r.q1Question2,q1Question3:r.q1Question3,q2Question1:r.q2Question1,q2Question2:r.q2Question2,q2Question3:r.q2Question3,q3Question1:r.q3Question1,q3Question2:r.q3Question2,q3Question3:r.q3Question3,q4Question1:r.q4Question1,q4Question2:r.q4Question2,q4Question3:r.q4Question3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
             campAttended:r.campAttended,filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
             tags:(r.tags||[]).join(', '),summary:r.summary,notes:(r.notes||[]).join('; '),evaluation:(r.evaluation||[]).join('; '),
@@ -1691,6 +1772,10 @@
       callPlanLocal:document.getElementById('fCallPlanLocal'), callPlanTimezone:document.getElementById('fCallPlanTimezone'), callPlanPST:document.getElementById('fCallPlanPST'),
       camp:document.getElementById('fCamp'), favorite:document.getElementById('fFavorite'), pinned:document.getElementById('fPinned'), pinTier:document.getElementById('fPinTier'),
       q1:document.getElementById('fQ1'), q2:document.getElementById('fQ2'), q3:document.getElementById('fQ3'), q4:document.getElementById('fQ4'),
+      q1Question1:document.getElementById('fQ1Question1'), q1Question2:document.getElementById('fQ1Question2'), q1Question3:document.getElementById('fQ1Question3'),
+      q2Question1:document.getElementById('fQ2Question1'), q2Question2:document.getElementById('fQ2Question2'), q2Question3:document.getElementById('fQ2Question3'),
+      q3Question1:document.getElementById('fQ3Question1'), q3Question2:document.getElementById('fQ3Question2'), q3Question3:document.getElementById('fQ3Question3'),
+      q4Question1:document.getElementById('fQ4Question1'), q4Question2:document.getElementById('fQ4Question2'), q4Question3:document.getElementById('fQ4Question3'),
       headshot:document.getElementById('fHeadshot'), tags:document.getElementById('fTags'), summary:document.getElementById('fSummary'),
       notes:document.getElementById('fNotes'), notesHistory:document.getElementById('fNotesHistory'), evaluation:document.getElementById('fEvaluation'),
       followUp:document.getElementById('fFollowUp'), academics:document.getElementById('fAcademics'), visitStatus:document.getElementById('fVisitStatus')
@@ -1733,6 +1818,18 @@
       formEls.q2.value = String(!!r?.q2);
       formEls.q3.value = String(!!r?.q3);
       formEls.q4.value = String(!!r?.q4);
+      formEls.q1Question1.value = r?.q1Question1 || '';
+      formEls.q1Question2.value = r?.q1Question2 || '';
+      formEls.q1Question3.value = r?.q1Question3 || '';
+      formEls.q2Question1.value = r?.q2Question1 || '';
+      formEls.q2Question2.value = r?.q2Question2 || '';
+      formEls.q2Question3.value = r?.q2Question3 || '';
+      formEls.q3Question1.value = r?.q3Question1 || '';
+      formEls.q3Question2.value = r?.q3Question2 || '';
+      formEls.q3Question3.value = r?.q3Question3 || '';
+      formEls.q4Question1.value = r?.q4Question1 || '';
+      formEls.q4Question2.value = r?.q4Question2 || '';
+      formEls.q4Question3.value = r?.q4Question3 || '';
       formEls.tags.value = (r?.tags || []).join(', ');
       formEls.summary.value = r?.summary || '';
       formEls.notes.value = (r?.notes || []).join('; ');
@@ -1778,7 +1875,11 @@
         callPlanPST:formEls.callPlanPST.value.replace(/ PST$/,''), campAttended:formEls.camp.value==='true',
         favorite:formEls.favorite.value==='true', pinned:formEls.pinned.value==='true' || Number(formEls.pinTier.value)>0,
         pinTier:Number(formEls.pinTier.value || 0), q1:formEls.q1.value==='true', q2:formEls.q2.value==='true',
-        q3:formEls.q3.value==='true', q4:formEls.q4.value==='true', tags:splitMulti(formEls.tags.value), summary:formEls.summary.value,
+        q3:formEls.q3.value==='true', q4:formEls.q4.value==='true',
+        q1Question1:formEls.q1Question1.value, q1Question2:formEls.q1Question2.value, q1Question3:formEls.q1Question3.value,
+        q2Question1:formEls.q2Question1.value, q2Question2:formEls.q2Question2.value, q2Question3:formEls.q2Question3.value,
+        q3Question1:formEls.q3Question1.value, q3Question2:formEls.q3Question2.value, q3Question3:formEls.q3Question3.value,
+        q4Question1:formEls.q4Question1.value, q4Question2:formEls.q4Question2.value, q4Question3:formEls.q4Question3.value, tags:splitMulti(formEls.tags.value), summary:formEls.summary.value,
         notes:splitMulti(formEls.notes.value), notesHistory:notesHistoryLines.length ? notesHistoryLines : (recruitDetails[id]?.notesHistory || []),
         evaluation:splitMulti(formEls.evaluation.value), actions:splitMulti(formEls.followUp.value), followUp:formEls.followUp.value,
         academics:formEls.academics.value, visitStatus:formEls.visitStatus.value, phone:formEls.phone.value, email:formEls.email.value,
@@ -1854,6 +1955,9 @@
 
     document.getElementById('sidebarCollapseBtn').addEventListener('click', ()=>{
       appShell.classList.toggle('sidebar-collapsed');
+    });
+    document.getElementById('sidebarReopenBtn').addEventListener('click', ()=>{
+      appShell.classList.remove('sidebar-collapsed');
     });
 
     document.getElementById('listViewBtn').addEventListener('click', ()=>setBoardView('list'));
