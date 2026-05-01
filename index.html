@@ -161,6 +161,7 @@
       color:var(--text);
       border:1px solid var(--line);
     }
+    .btn.secondary.active{background:var(--red-soft);color:var(--red);border-color:#f3bcc8}
     .status-pill{
       display:inline-flex;
       align-items:center;
@@ -386,13 +387,15 @@
       overflow:auto;
     }
     .recruit-list{display:grid;gap:12px}
-    .board-view{display:none;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+    .board-view{display:none;grid-template-columns:repeat(4,minmax(260px,1fr));gap:14px;align-items:start}
     .board-view.active{display:grid}
     .position-column{
-      background:#f9fbff;border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:10px;align-content:start
+      background:#f9fbff;border:1px solid var(--line);border-radius:16px;padding:14px;display:grid;gap:12px;align-content:start;min-width:260px
     }
-    .position-column h4{margin:0;font-size:14px}
+    .position-column h4{margin:0;font-size:16px}
     .position-column .count{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+    .position-column-header{display:flex;justify-content:space-between;align-items:center;gap:10px;padding-bottom:8px;border-bottom:1px solid #e6edf6}
+    .position-column-list{display:grid;gap:10px}
     .recruit-card,.mini-card{
       border:1px solid var(--line);border-left:6px solid #d7deea;border-radius:16px;background:#fff;
       padding:12px;cursor:pointer;transition:.15s ease
@@ -493,6 +496,17 @@
     .field{width:100%;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fff}
     .span-2{grid-column:1/-1}
     .hidden{display:none!important}
+    .board-mini-meta{font-size:12px;color:var(--muted);line-height:1.4}
+    .board-mini-name{font-size:15px;font-weight:800;line-height:1.25}
+    @media (max-width:1450px){
+      .board-view{grid-template-columns:repeat(2,minmax(260px,1fr));}
+    }
+    .app.sidebar-collapsed{grid-template-columns:96px 1fr}
+    .app.sidebar-collapsed .sidebar{padding:18px 12px}
+    .app.sidebar-collapsed .sidebar p,
+    .app.sidebar-collapsed .sidebar-box,
+    .app.sidebar-collapsed .sidebar-action{display:none}
+    .app.sidebar-collapsed .sidebar h1{font-size:20px}
     @media (max-width:1100px){
       .app,.content{grid-template-columns:1fr}
       .controls{grid-template-columns:1fr 1fr}
@@ -648,7 +662,7 @@
             <button class="btn secondary" id="clearQuickFiltersBtn" type="button">Clear Quick Filters</button>
           </div>
         </div>
-        <div class="quick-filter-body" style="display:grid;gap:10px;">
+        <div class="quick-filter-body">
           <div class="quick-filter-group">
             <div class="quick-filter-label">Group</div>
             <div class="chip-row" id="groupChips"></div>
@@ -1264,27 +1278,48 @@
       });
     }
 
+    function boardGroupForRecruit(recruit){
+      const group = String(recruit.group || '').trim().toLowerCase();
+      const position = String(recruit.position || '').trim().toLowerCase();
+      if(['pins','outside hitter','opposite','right side','oh','rs'].includes(group) || ['outside hitter','opposite','right side','oh','rs'].includes(position)) return 'Pins';
+      if(['middles','middle','middle blocker','mb'].includes(group) || ['middle','middle blocker','mb'].includes(position)) return 'Middles';
+      if(['setters','setter','s'].includes(group) || ['setter','s'].includes(position)) return 'Setters';
+      if(['liberos','libero','ds','defensive specialist'].includes(group) || ['libero','ds','defensive specialist'].includes(position)) return 'Liberos';
+      return recruit.group || recruit.position || 'Other';
+    }
+
+    function isBoardEligible(recruit){
+      const hasTier = Number(recruit.pinTier || 0) > 0;
+      const hasRating = String(recruit.rating || '').trim() !== '';
+      return hasTier || hasRating;
+    }
+
     function renderBoardView(recruits){
       const groups = ['Pins','Middles','Setters','Liberos'];
       boardView.innerHTML = groups.map(group=>{
-        const list = recruits.filter(r => r.group === group || r.position === group);
+        const list = recruits.filter(r => boardGroupForRecruit(r) === group && isBoardEligible(r));
         return `
           <div class="position-column">
-            <div><h4>${group}</h4><div class="count">${list.length} recruit${list.length===1?'':'s'}</div></div>
+            <div class="position-column-header"><h4>${group}</h4><div class="count">${list.length} tiered/rated recruit${list.length===1?'':'s'}</div></div>
+            <div class="position-column-list">
             ${list.map(r=>{
               const urg = urgencyForRecruit(r);
               const tier = pinTierLabel(r);
               return `
                 <div class="mini-card ${cardColorClass(r)}" data-mini="${r.id}">
-                  <div style="font-size:14px;font-weight:800;">${r.name}</div>
-                  <div style="font-size:12px;color:var(--muted);">${r.classYear || ''} • ${r.club || 'No Club'}</div>
+                  <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+                    <div class="board-mini-name">${r.name}</div>
+                    ${r.rating ? `<span class="badge">⭐ ${r.rating}</span>` : ''}
+                  </div>
+                  <div class="board-mini-meta">${[r.classYear || '', r.position || '', r.club || 'No Club'].filter(Boolean).join(' • ')}</div>
                   <div class="tag-row">
                     ${tier ? `<span class="tier-badge">${tier}</span>` : ''}
                     <span class="urgency-badge ${urg.cls}">${urg.label}</span>
                   </div>
                 </div>
               `;
-            }).join('') || '<div style="font-size:13px;color:var(--muted);">No recruits here.</div>'}
+            }).join('') || '<div style="font-size:13px;color:var(--muted);">No tiered or rated recruits here.</div>'}
+            </div>
           </div>
         `;
       }).join('');
@@ -1815,6 +1850,10 @@
         classSelect.value = card.dataset.snapshot || '';
         rebuildRecruitList(selectedRecruitId);
       });
+    });
+
+    document.getElementById('sidebarCollapseBtn').addEventListener('click', ()=>{
+      appShell.classList.toggle('sidebar-collapsed');
     });
 
     document.getElementById('listViewBtn').addEventListener('click', ()=>setBoardView('list'));
