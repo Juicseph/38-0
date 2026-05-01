@@ -1372,6 +1372,27 @@
       }
     }
   
+
+    .live-sync-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #eef4ff;
+      border: 1px solid #c9d8f5;
+      color: #18407c;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .live-sync-status.error {
+      background: #fff2f2;
+      border-color: #f2b8b5;
+      color: #b42318;
+    }
+
     .password-gate {
       position: fixed;
       inset: 0;
@@ -1494,6 +1515,8 @@
           <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
         </div>
         <div class="actions">
+          <span class="live-sync-status" id="liveSyncStatus">Live Sheet: Not Connected</span>
+          <button class="btn secondary" id="refreshLiveBtn">Refresh Live</button>
           <button class="btn secondary" id="importBtn">Import Sheet</button>
           <button class="btn secondary" id="exportBtn">Export Filtered</button>
           <button class="btn secondary" id="compactBtn">Compact Mode</button>
@@ -1666,6 +1689,9 @@
 
   <script>
     const STORAGE_KEY = 'recruit_dashboard_data_v4';
+    const LIVE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvN9QdtIouvn6HlpwXaf9bv6r2063_dgJaPYcRvnPjWN8iniUp4kM8P5fHG1coan5Xng/exec';
+    const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
+    const LIVE_SYNC_AUTO_REFRESH_MS = 0;
     const SIDEBAR_STATE_KEY = 'recruit_dashboard_sidebar_collapsed_v4';
     const COMPACT_MODE_KEY = 'recruit_dashboard_compact_v4';
     const TARGET_DATE = new Date('2026-06-15T00:00:00');
@@ -1852,6 +1878,8 @@
     const importBtn = document.getElementById('importBtn');
     const exportBtn = document.getElementById('exportBtn');
     const addBtn = document.getElementById('addBtn');
+    const refreshLiveBtn = document.getElementById('refreshLiveBtn');
+    const liveSyncStatus = document.getElementById('liveSyncStatus');
     const compactBtn = document.getElementById('compactBtn');
     const appShell = document.getElementById('appShell');
     const sidebarToggle = document.getElementById('sidebarToggle');
@@ -1864,6 +1892,113 @@
     fileInput.accept = '.csv';
     fileInput.style.display = 'none';
     document.body.appendChild(fileInput);
+
+
+    function setLiveStatus(message, isError = false) {
+      if (!liveSyncStatus) return;
+      liveSyncStatus.textContent = message;
+      liveSyncStatus.classList.toggle('error', Boolean(isError));
+    }
+
+    function rowFromRecruit(recruit) {
+      return {
+        fullName: recruit.name || '',
+        classYear: recruit.classYear || '',
+        group: recruit.group || '',
+        position: recruit.position || '',
+        city: recruit.city || '',
+        state: recruit.state || '',
+        club: recruit.club || '',
+        priority: recruit.priority || '',
+        status: recruit.status || '',
+        june15Call: recruit.june15Call || '',
+        rating: recruit.rating || '',
+        offerStatus: recruit.offerStatus || '',
+        wroteToUs: recruit.wroteToUs || '',
+        q1: recruit.q1 || false,
+        q2: recruit.q2 || false,
+        q3: recruit.q3 || false,
+        q4: recruit.q4 || false,
+        lastContactDate: recruit.lastContactDate || '',
+        nextActionDue: recruit.nextActionDue || '',
+        visitStatus: recruit.visitStatus || '',
+        campAttended: recruit.campAttended || false,
+        filmLink: recruit.filmLink || '',
+        profileLink: recruit.profileLink || '',
+        phone: recruit.phone || '',
+        email: recruit.email || '',
+        callPlanLocal: recruit.callPlanLocal || '',
+        callPlanTimezone: recruit.callPlanTimezone || '',
+        callPlanPST: recruit.callPlanPST || '',
+        tags: Array.isArray(recruit.tags) ? recruit.tags.join(', ') : (recruit.tags || ''),
+        summary: recruit.summary || '',
+        notes: Array.isArray(recruit.notes) ? recruit.notes.join('; ') : (recruit.notes || ''),
+        evaluation: Array.isArray(recruit.evaluation) ? recruit.evaluation.join('; ') : (recruit.evaluation || ''),
+        followUp: recruit.followUp || (Array.isArray(recruit.actions) ? recruit.actions.join('; ') : ''),
+        academics: recruit.academics || '',
+        q1Question1: recruit.q1Question1 || '', q1Answer1: recruit.q1Answer1 || '',
+        q1Question2: recruit.q1Question2 || '', q1Answer2: recruit.q1Answer2 || '',
+        q1Question3: recruit.q1Question3 || '', q1Answer3: recruit.q1Answer3 || '',
+        q2Question1: recruit.q2Question1 || '', q2Answer1: recruit.q2Answer1 || '',
+        q2Question2: recruit.q2Question2 || '', q2Answer2: recruit.q2Answer2 || '',
+        q2Question3: recruit.q2Question3 || '', q2Answer3: recruit.q2Answer3 || '',
+        q3Question1: recruit.q3Question1 || '', q3Answer1: recruit.q3Answer1 || '',
+        q3Question2: recruit.q3Question2 || '', q3Answer2: recruit.q3Answer2 || '',
+        q3Question3: recruit.q3Question3 || '', q3Answer3: recruit.q3Answer3 || '',
+        q4Question1: recruit.q4Question1 || '', q4Answer1: recruit.q4Answer1 || '',
+        q4Question2: recruit.q4Question2 || '', q4Answer2: recruit.q4Answer2 || '',
+        q4Question3: recruit.q4Question3 || '', q4Answer3: recruit.q4Answer3 || '',
+        updatedAt: recruit.updatedAt || '',
+        favorite: recruit.favorite || false,
+        pinned: recruit.pinned || false,
+        headshot: recruit.headshot || ''
+      };
+    }
+
+    function normalizeLivePayload(data) {
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.data)) return data.data;
+      if (data && Array.isArray(data.recruits)) return data.recruits;
+      if (data && Array.isArray(data.rows)) return data.rows;
+      return [];
+    }
+
+    async function fetchLiveSheetData() {
+      if (!LIVE_SYNC_ENABLED) {
+        setLiveStatus('Live Sheet: URL Needed', true);
+        return false;
+      }
+
+      try {
+        setLiveStatus('Live Sheet: Refreshing...');
+        const response = await fetch(LIVE_SHEET_WEBAPP_URL, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        const rows = normalizeLivePayload(data);
+
+        if (!rows.length) {
+          setLiveStatus('Live Sheet: No Rows Found', true);
+          return false;
+        }
+
+        const nextDetails = {};
+        rows.forEach((row, index) => {
+          const id = String(row.id || row.recruitId || row.fullName || row.name || index + 1) + '_' + index;
+          nextDetails[id] = buildRecruitFromRow(row);
+        });
+
+        recruitDetails = nextDetails;
+        selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+        saveData();
+        rebuildRecruitList(selectedRecruitId);
+        setLiveStatus(`Live Sheet: ${rows.length} Loaded`);
+        return true;
+      } catch (error) {
+        console.error(error);
+        setLiveStatus('Live Sheet: Refresh Failed', true);
+        return false;
+      }
+    }
 
     function deepClone(v) { return JSON.parse(JSON.stringify(v)); }
 
@@ -2614,6 +2749,9 @@
     }
 
     exportBtn.addEventListener('click', exportFiltered);
+    refreshLiveBtn.addEventListener('click', async () => {
+      await fetchLiveSheetData();
+    });
 
     const modal = document.createElement('div');
     modal.id = 'recruitModal';
