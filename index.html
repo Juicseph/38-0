@@ -562,7 +562,8 @@
     .app.sidebar-collapsed .sidebar{padding:18px 12px}
     .app.sidebar-collapsed .sidebar p,
     .app.sidebar-collapsed .sidebar-box,
-    .app.sidebar-collapsed .sidebar-action{display:none}
+    .app.sidebar-collapsed .sidebar-action,
+    .app.sidebar-collapsed #callStreakSidebarBox{display:none}
     .app.sidebar-collapsed .sidebar h1{font-size:20px}
     .sidebar-reopen-btn{
       position:fixed;
@@ -668,6 +669,49 @@
     .tutorial-step h4{margin:0 0 8px;font-size:15px}
     @media (max-width:1100px){.tutorial-grid{grid-template-columns:1fr}}
 
+  
+    .recruiting-pulse{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+    .pulse-card{min-height:auto;padding:14px;border-radius:16px;box-shadow:none}
+    .pulse-card.wide{grid-column:span 2}
+    .pulse-card-top h3{font-size:16px}
+    .pulse-card-top p{font-size:12px;margin-top:4px}
+    .pulse-list,.roster-matrix-wrap,.event-tracker-wrap{max-height:260px;overflow:auto}
+    .pulse-list{display:grid;gap:8px}
+    .pulse-item{padding:10px 12px;border-radius:12px}
+    .pulse-item .name{font-size:14px}
+    .event-tracker-wrap{display:grid;gap:8px}
+    .event-item{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}
+    .event-item h4{margin:0 0 4px;font-size:14px}
+    .event-item p{margin:0;color:var(--muted);font-size:12px;line-height:1.4}
+    .call-streak-sidebar{margin-top:0}
+    #callStreakSidebarMount .call-streak-sidebar{display:block!important}
+    #callStreakSidebarMount .call-streak-sidebar.minimal{min-height:auto;border:1px solid rgba(255,255,255,.12);box-shadow:none;background:rgba(255,255,255,.06)}
+    #callStreakSidebarMount .mini-streak-title,#callStreakSidebarMount #callStreakValue,#callStreakSidebarMount #callsTodayKpi,#callStreakSidebarMount #callsTodayLabel,#callStreakSidebarMount #callStreakNote{color:#fff}
+    #callStreakSidebarMount #callsTodayLabel,#callStreakSidebarMount #callStreakNote{color:#c7d3e3!important}
+    .call-streak-sidebar .pulse-card{padding:12px}
+    #recruitingPulse > #callStreakMiniCard{display:none!important}
+    .sidebar .controls,.sidebar .quick-filters{box-shadow:none;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.12);color:#fff}
+    .sidebar .controls{grid-template-columns:1fr; padding:0; border:none; background:transparent}
+    .sidebar .control label,.sidebar .quick-filter-title,.sidebar .quick-filter-label{color:#d2dced}
+    .sidebar .control input,.sidebar .control select{background:rgba(255,255,255,.95)}
+    .sidebar .quick-filters{padding:0; border:none; background:transparent}
+    .sidebar .quick-filter-top{display:none}
+    .sidebar .quick-filter-body{display:grid !important;gap:12px}
+    .sidebar .quick-filter-main,.sidebar .quick-filter-side{display:grid;gap:12px}
+    .sidebar .quick-filter-group{grid-template-columns:1fr;gap:6px}
+    .sidebar .filter-side-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:12px}
+    .sidebar .filter-side-card h4{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:#d2dced}
+    .sidebar .filter-metric{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.12)}
+    .sidebar .filter-metric .label{color:#d2dced}
+    .sidebar .filter-metric .value,.sidebar .active-filter-list,.sidebar .sidebar-helper-note{color:#fff}
+    .sidebar .filter-chip{background:rgba(255,255,255,.96)}
+    .sidebar .btn.secondary{background:rgba(255,255,255,.95)}
+    .main > .controls,.main > .quick-filters{display:none !important}
+    .main > .content-panel[style*="padding:14px 16px"]{margin-top:-4px}
+    .daily-sheet{margin-top:0}
+    .content{margin-top:0}
+    @media (max-width:1100px){.recruiting-pulse{grid-template-columns:1fr}.pulse-card.wide{grid-column:auto}}
+
   </style>
 </head>
 <body>
@@ -713,6 +757,13 @@
             <div class="stat-card clickable" data-snapshot="2031"><div class="label">2031</div><div class="value" id="stat2031">0</div></div>
           </div>
         </div>
+      </div>
+
+      <div class="sidebar-box" id="callStreakSidebarBox">
+        <div class="sidebar-box-header">
+          <h3>Call Streak</h3>
+        </div>
+        <div id="callStreakSidebarMount"></div>
       </div>
 
       <div class="sidebar-box" id="sidebarFiltersBox">
@@ -793,7 +844,7 @@
           <div class="pulse-list" id="pressureBoardList"></div>
         </div>
 
-        <div class="pulse-card minimal" id="callStreakMiniCard">
+        <div class="pulse-card minimal call-streak-sidebar" id="callStreakMiniCard">
           <div class="mini-streak-bar">
             <div><div class="mini-streak-title">Call Streak</div><div id="callStreakValue" style="font-weight:800;">0 days</div></div>
             <div style="text-align:right;"><div id="callsTodayKpi" style="font-size:18px;font-weight:900;">0</div><div id="callsTodayLabel" style="font-size:11px;color:var(--muted);">today</div></div>
@@ -827,7 +878,7 @@
           <div class="pulse-card-top">
             <div>
               <h3>Tournament / Event Tracker</h3>
-              <p>Upcoming events.</p>
+              <p>Compact view of upcoming events and who is attached.</p>
             </div>
             <div style="display:flex;gap:8px;align-items:center;"><span class="status-pill">Events</span><button class="pulse-collapse-btn" data-collapse-target="eventTrackerCard" type="button">−</button></div>
           </div>
@@ -1277,7 +1328,8 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
     }
     function loadCollapsedSections(){
-      try{return JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}');}catch(e){return {}}
+      const defaults = {commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true};
+      try{ return {...defaults, ...JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}')}; }catch(e){ return defaults; }
     }
     function saveCollapsedSections(state){
       localStorage.setItem(PULSE_COLLAPSE_KEY, JSON.stringify(state));
@@ -1348,7 +1400,7 @@
       if(score >= 55) return {label:'Warm', cls:'score-warm'};
       return {label:'Cold', cls:''};
     }
-    function toggleCompareRecruit(id){
+    function toggleCompareRecruit(id, autoOpen=true){
       const idx = compareIds.indexOf(String(id));
       if(idx >= 0) compareIds.splice(idx,1);
       else {
@@ -1357,6 +1409,16 @@
       }
       renderComparePicks();
       rebuildRecruitList(selectedRecruitId);
+      if(autoOpen && compareIds.length >= 2){
+        setTimeout(openCompareModal, 0);
+      }
+    }
+    function moveCallStreakIntoSidebar(){
+      const mount = document.getElementById('callStreakSidebarMount');
+      const card = document.getElementById('callStreakMiniCard');
+      if(mount && card && card.parentElement !== mount){
+        mount.appendChild(card);
+      }
     }
     function renderComparePicks(){
       const box = document.getElementById('comparePicks');
@@ -1405,7 +1467,11 @@ Let me know when you have time to connect. We're excited to stay in touch.
     function openCompareModal(){
       const picks = compareIds.map(id => ({id, ...recruitDetails[id]})).filter(r => r.id);
       const body = document.getElementById('compareModalBody');
-      if(picks.length < 2){ body.innerHTML = '<div class="section"><p>Select at least 2 recruits to compare.</p></div>'; }
+      if(picks.length < 2){
+        body.innerHTML = '<div class="section"><p>Select at least 2 recruits to compare.</p></div>';
+        document.getElementById('compareModal').classList.add('active');
+        return;
+      }
       else {
         body.innerHTML = `<div class="compare-grid">${picks.map(r => {
           const score = engagementScore(r); const tier = engagementTier(score);
@@ -2742,9 +2808,9 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const quickFilters = document.getElementById('quickFilters');
       const callStreak = document.getElementById('callStreakMiniCard');
       const snapshotBox = document.getElementById('snapshotBox');
-      if(sidebarHost && controls) sidebarHost.appendChild(controls);
-      if(sidebarHost && quickFilters) sidebarHost.appendChild(quickFilters);
-      if(snapshotBox && callStreak) snapshotBox.insertAdjacentElement('afterend', callStreak);
+      if(sidebarHost && controls && controls.parentElement !== sidebarHost) sidebarHost.appendChild(controls);
+      if(sidebarHost && quickFilters && quickFilters.parentElement !== sidebarHost) sidebarHost.appendChild(quickFilters);
+      if(snapshotBox && callStreak && callStreak.parentElement !== appShell.querySelector('.sidebar')) snapshotBox.insertAdjacentElement('afterend', callStreak);
     }
 
     function initPulseCollapseButtons(){
@@ -2773,6 +2839,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
     // boot
     initPassword();
+    moveCallStreakIntoSidebar();
+    moveSidebarTools();
+    initPulseCollapseButtons();
+    applyPulseCollapsedState();
     populateFilterOptions(Object.values(recruitDetails));
     updateCountdown();
     setInterval(updateCountdown, 1000);
