@@ -1191,10 +1191,86 @@
         font-size: 34px;
       }
     }
+  
+    .password-gate {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,0.10), transparent 24%),
+        linear-gradient(135deg, #001f46 0%, #002D62 45%, #143f7b 68%, #C41230 100%);
+    }
+
+    .password-card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(255,255,255,0.97);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.6);
+    }
+
+    .password-card h1 {
+      margin: 0 0 10px;
+      font-size: 30px;
+      line-height: 1.05;
+      color: #002D62;
+    }
+
+    .password-card p {
+      margin: 0 0 16px;
+      color: #4b5e78;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .password-row {
+      display: grid;
+      gap: 12px;
+    }
+
+    .password-input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid #d7deea;
+      font-size: 16px;
+    }
+
+    .password-error {
+      color: #b42318;
+      font-size: 13px;
+      min-height: 18px;
+      font-weight: 700;
+    }
+
+    .app.locked {
+      visibility: hidden;
+    }
+
   </style>
 </head>
 <body>
-  <div class="app" id="appShell">
+
+  <div class="password-gate" id="passwordGate">
+    <div class="password-card">
+      <div style="display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef4ff;color:#002D62;font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px;">Fresno State Recruit Board</div>
+      <h1>Protected Access</h1>
+      <p>Enter the password to view the recruiting dashboard.</p>
+      <form class="password-row" id="passwordForm">
+        <input class="password-input" id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password" />
+        <button class="btn" type="submit">Unlock Dashboard</button>
+        <div class="password-error" id="passwordError"></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="app locked" id="appShell">
     <aside class="sidebar">
       <div class="sidebar-top">
         <div class="brand">
@@ -2743,6 +2819,51 @@ function updateCountdown() {
         if (header) header.addEventListener('click', () => setState(!box.classList.contains('collapsed')));
       });
     }
+
+
+    const DASHBOARD_PASSWORD = 'bulldogs';
+    const PASSWORD_STORAGE_KEY = 'recruit_dashboard_unlocked_v1';
+
+    function unlockDashboard() {
+      const gate = document.getElementById('passwordGate');
+      const app = document.getElementById('appShell');
+      if (gate) gate.style.display = 'none';
+      if (app) app.classList.remove('locked');
+      sessionStorage.setItem(PASSWORD_STORAGE_KEY, 'true');
+    }
+
+    function initializePasswordGate() {
+      const gate = document.getElementById('passwordGate');
+      const app = document.getElementById('appShell');
+      const form = document.getElementById('passwordForm');
+      const input = document.getElementById('passwordInput');
+      const error = document.getElementById('passwordError');
+
+      if (sessionStorage.getItem(PASSWORD_STORAGE_KEY) === 'true') {
+        unlockDashboard();
+        return;
+      }
+
+      if (app) app.classList.add('locked');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const value = String(input.value || '');
+        if (value === DASHBOARD_PASSWORD) {
+          error.textContent = '';
+          unlockDashboard();
+        } else {
+          error.textContent = 'Incorrect password.';
+          input.value = '';
+          input.focus();
+        }
+      });
+
+      setTimeout(() => input.focus(), 50);
+    }
+
+
+    initializePasswordGate();
 
     loadSidebarState();
     loadSidebarBoxes();
