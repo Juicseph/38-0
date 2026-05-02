@@ -643,7 +643,7 @@
     .sidebar-filters-host .filter-chip{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.12);color:#fff}
     .sidebar-filters-host .filter-chip.active{background:#fff;color:var(--red);border-color:#fff}
     .sidebar-filters-host .filter-count{background:rgba(255,255,255,.16);color:#fff}
-    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .event-tracker-wrap{display:none}
+    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .event-tracker-wrap,.pulse-card.collapsed .coach-call-list,.pulse-card.collapsed .manual-event-list{display:none}
     .pulse-collapse-btn{border:none;background:#fff;color:var(--text);width:36px;height:36px;border-radius:12px;cursor:pointer;font-weight:800}
     .pulse-card.minimal{padding:14px}
     .pulse-mini-stack{display:grid;gap:8px}
@@ -766,6 +766,24 @@
     .sidebar .filter-side-card .actions{display:grid;grid-template-columns:1fr !important;gap:8px}
     .sidebar .filter-side-card .actions .btn{width:100%;padding:9px 10px;font-size:11px;line-height:1.2;white-space:normal}
 
+
+
+    .coach-call-list,.manual-event-list{display:grid;gap:10px}
+    .coach-call-item,.manual-event-item{border:1px solid var(--line);border-radius:14px;padding:12px;background:#fff}
+    .coach-call-top,.manual-event-top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+    .coach-call-name,.manual-event-name{font-size:15px;font-weight:800}
+    .coach-call-meta,.manual-event-meta{font-size:12px;color:var(--muted);margin-top:4px;line-height:1.4}
+    .coach-call-notes{margin-top:8px;font-size:13px;color:#334155;line-height:1.45}
+    .tiny-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .tiny-btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:10px;padding:7px 10px;font-size:12px;font-weight:700;cursor:pointer}
+    .assignment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;max-height:360px;overflow:auto;padding-top:4px}
+    .assignment-option{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff}
+    .assignment-option div{min-width:0}
+    .assignment-option strong{display:block;font-size:13px}
+    .assignment-option span{display:block;font-size:11px;color:var(--muted);margin-top:2px;line-height:1.3}
+    .inline-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .modal-card.narrow{width:min(760px,100%)}
+    @media (max-width:900px){.assignment-grid,.inline-form-grid{grid-template-columns:1fr}}
 
   </style>
 </head>
@@ -938,6 +956,28 @@
             <div style="display:flex;gap:8px;align-items:center;"><span class="status-pill">Events</span><button class="pulse-collapse-btn" data-collapse-target="eventTrackerCard" type="button">−</button></div>
           </div>
           <div class="event-tracker-wrap" id="eventTrackerList"></div>
+        </div>
+
+        <div class="pulse-card" id="clubCoachCard">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Club Coach Calls</h3>
+              <p>Track outreach and follow-up with club coaches.</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="addClubCoachCallBtn" type="button">Add Call</button><button class="pulse-collapse-btn" data-collapse-target="clubCoachCard" type="button">−</button></div>
+          </div>
+          <div class="coach-call-list" id="clubCoachCallList"></div>
+        </div>
+
+        <div class="pulse-card" id="manualTournamentsCard">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Manual Tournaments</h3>
+              <p>Add tournaments first, then assign athletes to them.</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="addTournamentBtn" type="button">Add Tournament</button><button class="pulse-collapse-btn" data-collapse-target="manualTournamentsCard" type="button">−</button></div>
+          </div>
+          <div class="manual-event-list" id="manualTournamentList"></div>
         </div>
       </section>
 
@@ -1266,6 +1306,70 @@
     </div>
   </div>
 
+
+  <div class="modal-wrap" id="clubCoachModal">
+    <div class="modal-card narrow">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+        <h3 id="clubCoachModalTitle" style="margin:0;font-size:24px;">Add Club Coach Call</h3>
+        <button class="btn secondary" id="clubCoachModalCloseBtn" type="button">Close</button>
+      </div>
+      <form id="clubCoachForm" class="modal-grid">
+        <input type="hidden" id="clubCoachId" />
+        <div><label>Coach Name</label><input id="clubCoachName" class="field" required /></div>
+        <div><label>Club</label><input id="clubCoachClub" class="field" /></div>
+        <div><label>Status</label><input id="clubCoachStatus" class="field" placeholder="Intro / Active / Follow-Up" /></div>
+        <div><label>Phone</label><input id="clubCoachPhone" class="field" /></div>
+        <div><label>Email</label><input id="clubCoachEmail" class="field" /></div>
+        <div><label>Last Call Date</label><input id="clubCoachLastCall" type="date" class="field" /></div>
+        <div><label>Next Follow-Up</label><input id="clubCoachNextFollowUp" type="date" class="field" /></div>
+        <div class="span-2"><label>Notes</label><textarea id="clubCoachNotes" rows="4" class="field"></textarea></div>
+        <div class="span-2" style="display:flex;justify-content:flex-end;gap:10px;">
+          <button class="btn secondary" type="button" id="clubCoachDeleteBtn">Delete</button>
+          <button class="btn" type="submit">Save Call</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-wrap" id="tournamentModal">
+    <div class="modal-card narrow">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+        <h3 id="tournamentModalTitle" style="margin:0;font-size:24px;">Add Tournament</h3>
+        <button class="btn secondary" id="tournamentModalCloseBtn" type="button">Close</button>
+      </div>
+      <form id="tournamentForm" class="modal-grid">
+        <input type="hidden" id="tournamentId" />
+        <div><label>Tournament Name</label><input id="tournamentName" class="field" required /></div>
+        <div><label>Date</label><input id="tournamentDate" type="date" class="field" /></div>
+        <div><label>Location</label><input id="tournamentLocation" class="field" /></div>
+        <div class="span-2"><label>Notes</label><textarea id="tournamentNotes" rows="3" class="field"></textarea></div>
+        <div class="span-2" style="display:flex;justify-content:flex-end;gap:10px;">
+          <button class="btn secondary" type="button" id="tournamentDeleteBtn">Delete</button>
+          <button class="btn" type="submit">Save Tournament</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-wrap" id="tournamentAssignModal">
+    <div class="modal-card narrow">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+        <h3 id="tournamentAssignTitle" style="margin:0;font-size:24px;">Assign Athletes</h3>
+        <button class="btn secondary" id="tournamentAssignCloseBtn" type="button">Close</button>
+      </div>
+      <div class="inline-form-grid">
+        <div class="mini"><div class="label">Tournament</div><div class="value" id="assignTournamentName">—</div></div>
+        <div class="mini"><div class="label">Date</div><div class="value" id="assignTournamentDate">—</div></div>
+        <div class="mini"><div class="label">Assigned</div><div class="value" id="assignTournamentCount">0 athletes</div></div>
+      </div>
+      <div class="assignment-grid" id="tournamentAssignmentGrid" style="margin-top:14px;"></div>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px;">
+        <button class="btn secondary" id="clearTournamentAssignmentsBtn" type="button">Clear Assignments</button>
+        <button class="btn" id="saveTournamentAssignmentsBtn" type="button">Save Assignments</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     const DASHBOARD_PASSWORD = 'bulldogs';
     const PASSWORD_SESSION_KEY = 'recruit_board_unlocked_v1';
@@ -1274,6 +1378,8 @@
     const PULSE_COLLAPSE_KEY = 'recruit_board_pulse_collapsed_v1';
     const ROSTER_MATRIX_KEY = 'recruit_board_roster_matrix_v1';
     const CUSTOM_TAGS_KEY = 'recruit_board_custom_tags_v1';
+    const CLUB_COACH_CALLS_KEY = 'recruit_board_club_coach_calls_v1';
+    const MANUAL_TOURNAMENTS_KEY = 'recruit_board_manual_tournaments_v1';
     const LIVE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvN9QdtIouvn6HlpwXaf9bv6r2063_dgJaPYcRvnPjWN8iniUp4kM8P5fHG1coan5Xng/exec';
     const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
     const TARGET_DATE = new Date('2026-06-15T00:00:00');
@@ -1346,6 +1452,9 @@
     let compareIds = [];
     let customTags = loadCustomTags();
     let rosterMatrixTargets = loadRosterMatrixTargets();
+    let clubCoachCalls = loadClubCoachCalls();
+    let manualTournaments = loadManualTournaments();
+    let activeTournamentAssignId = '';
 
     const appShell = document.getElementById('appShell');
     const passwordGate = document.getElementById('passwordGate');
@@ -1383,7 +1492,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
     }
     function loadCollapsedSections(){
-      const defaults = {commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true};
+      const defaults = {commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true, clubCoachCard:true, manualTournamentsCard:true};
       try{ return {...defaults, ...JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}')}; }catch(e){ return defaults; }
     }
     function saveCollapsedSections(state){
@@ -1431,9 +1540,48 @@
     function saveCustomTags(){
       localStorage.setItem(CUSTOM_TAGS_KEY, JSON.stringify(customTags));
     }
+    function loadClubCoachCalls(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(CLUB_COACH_CALLS_KEY) || '[]');
+        return Array.isArray(saved) ? saved : [];
+      }catch(e){ return []; }
+    }
+    function saveClubCoachCalls(){
+      localStorage.setItem(CLUB_COACH_CALLS_KEY, JSON.stringify(clubCoachCalls));
+    }
+    function loadManualTournaments(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(MANUAL_TOURNAMENTS_KEY) || '[]');
+        return Array.isArray(saved) ? saved : [];
+      }catch(e){ return []; }
+    }
+    function saveManualTournaments(){
+      localStorage.setItem(MANUAL_TOURNAMENTS_KEY, JSON.stringify(manualTournaments));
+    }
+
     function escapeHtml(value){
       return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
     }
+    function byDateValue(value, fallback='9999-12-31'){
+      return String(value || fallback);
+    }
+    function clubCoachUrgency(call){
+      const next = parseDateSafe(call.nextFollowUp);
+      const last = parseDateSafe(call.lastCallDate);
+      const now = new Date();
+      if(next){
+        const diff = Math.ceil((next.getTime() - now.getTime())/(1000*60*60*24));
+        if(diff <= 1) return {label:'Follow-Up Now', cls:'urgency-today'};
+        if(diff <= 7) return {label:'This Week', cls:'urgency-week'};
+      }
+      if(last && ((now.getTime() - last.getTime())/(1000*60*60*24) > 14)) return {label:'Needs Touch', cls:'urgency-stale'};
+      return {label:'On Track', cls:'urgency-future'};
+    }
+    function getRecruitLite(id){
+      const r = recruitDetails[id];
+      return r ? {id, ...r} : null;
+    }
+
     function engagementScore(recruit){
       const manual = recruit?.engagementScoreOverride;
       if(manual !== '' && manual !== null && manual !== undefined && !Number.isNaN(Number(manual))){
@@ -1789,6 +1937,75 @@ Let me know when you have time to connect. We're excited to stay in touch.
       return [];
     }
 
+    function recruitMatchKey(item){
+      return [item?.name || item?.fullName || '', item?.classYear || item?.graduationYear || '', item?.club || '']
+        .map(value => String(value || '').trim().toLowerCase())
+        .join('||');
+    }
+
+    function mergeRecruitRecord(localRecruit, liveRecruit){
+      const merged = { ...localRecruit, ...liveRecruit };
+      const arrayFields = ['notes','evaluation','actions','tags'];
+      arrayFields.forEach(field => {
+        if((!liveRecruit[field] || !liveRecruit[field].length) && localRecruit[field]?.length){
+          merged[field] = localRecruit[field];
+        }
+      });
+      if((!liveRecruit.notesHistory || !liveRecruit.notesHistory.length) && localRecruit.notesHistory?.length){
+        merged.notesHistory = localRecruit.notesHistory;
+      }
+      const preserveIfBlank = [
+        'summary','followUp','academics','visitStatus','headshot','profileLink','filmLink','phone','email','height','graduationYear',
+        'callPlanLocal','callPlanTimezone','callPlanPST','eventName','eventDate','eventLocation','offerStatus','wroteToUs',
+        'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status'
+      ];
+      preserveIfBlank.forEach(field => {
+        const liveValue = liveRecruit[field];
+        if((liveValue === '' || liveValue === null || typeof liveValue === 'undefined') && localRecruit[field]){
+          merged[field] = localRecruit[field];
+        }
+      });
+      ['favorite','pinned','campAttended','selected','q1','q2','q3','q4'].forEach(field => {
+        if(typeof localRecruit[field] !== 'undefined') merged[field] = localRecruit[field];
+      });
+      if(typeof localRecruit.pinTier !== 'undefined') merged.pinTier = localRecruit.pinTier;
+      if(typeof localRecruit.engagementScoreOverride !== 'undefined') merged.engagementScoreOverride = localRecruit.engagementScoreOverride;
+      if(localRecruit.updatedAt && (!liveRecruit.updatedAt || String(localRecruit.updatedAt) > String(liveRecruit.updatedAt))){
+        merged.updatedAt = localRecruit.updatedAt;
+      }
+      return merged;
+    }
+
+    function mergeLiveRowsIntoRecruitDetails(rows){
+      const localEntries = Object.entries(recruitDetails || {});
+      const localById = new Map(localEntries);
+      const localByMatch = new Map(localEntries.map(([id, recruit]) => [recruitMatchKey(recruit), [id, recruit]]));
+      const next = {};
+      const seenLocalIds = new Set();
+
+      rows.forEach((row, i) => {
+        const liveRecruit = buildRecruitFromRow(row);
+        const liveId = String(row.id || row.fullName || row.name || i + 1) + '_' + i;
+        const liveMatch = recruitMatchKey(liveRecruit);
+        const localPair = localById.get(liveId) || localByMatch.get(liveMatch);
+        if(localPair){
+          const [localId, localRecruit] = localPair;
+          next[liveId] = mergeRecruitRecord(localRecruit, liveRecruit);
+          seenLocalIds.add(localId);
+        } else {
+          next[liveId] = liveRecruit;
+        }
+      });
+
+      localEntries.forEach(([id, recruit]) => {
+        if(!seenLocalIds.has(id)){
+          next[id] = recruit;
+        }
+      });
+
+      return next;
+    }
+
     async function fetchLiveSheetData(){
       if(!LIVE_SYNC_ENABLED){
         setLiveStatus('Live Sheet: URL Needed', true);
@@ -1804,15 +2021,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
           setLiveStatus('Live Sheet: No Rows Found', true);
           return;
         }
-        const next = {};
-        rows.forEach((row, i)=>{
-          next[String(row.id || row.fullName || row.name || i+1) + '_' + i] = buildRecruitFromRow(row);
-        });
-        recruitDetails = next;
-        selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+        recruitDetails = mergeLiveRowsIntoRecruitDetails(rows);
+        if(!recruitDetails[selectedRecruitId]){
+          selectedRecruitId = Object.keys(recruitDetails)[0] || '';
+        }
         saveData();
         rebuildRecruitList(selectedRecruitId);
-        setLiveStatus(`Live Sheet: ${rows.length} Loaded`);
+        const localOnlyCount = Math.max(0, Object.keys(recruitDetails).length - rows.length);
+        setLiveStatus(`Live Sheet: ${rows.length} Synced${localOnlyCount ? ` + ${localOnlyCount} Local` : ''}`);
       }catch(err){
         console.error(err);
         setLiveStatus('Live Sheet: Refresh Failed', true);
@@ -2153,26 +2369,145 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
       renderRosterMatrix(recruits);
       renderEventTracker(recruits);
+      renderClubCoachCalls();
+      renderManualTournamentList();
       document.querySelectorAll('[data-open-recruit]').forEach(item=>item.addEventListener('click', ()=>{ selectedRecruitId = item.dataset.openRecruit; rebuildRecruitList(selectedRecruitId); }));
       applyPulseCollapsedState();
     }
 
+
+    function renderClubCoachCalls(){
+      const box = document.getElementById('clubCoachCallList');
+      if(!box) return;
+      const ordered = [...clubCoachCalls].sort((a,b)=>byDateValue(a.nextFollowUp).localeCompare(byDateValue(b.nextFollowUp)) || byDateValue(b.lastCallDate,'').localeCompare(byDateValue(a.lastCallDate,'')));
+      box.innerHTML = ordered.length ? ordered.map(call=>{
+        const urgency = clubCoachUrgency(call);
+        return `
+          <div class="coach-call-item">
+            <div class="coach-call-top">
+              <div>
+                <div class="coach-call-name">${escapeHtml(call.coachName || 'Unnamed Coach')}</div>
+                <div class="coach-call-meta">${[call.club || '', call.status || '', call.phone || call.email || ''].filter(Boolean).join(' • ') || 'No details yet'}</div>
+              </div>
+              <span class="urgency-badge ${urgency.cls}">${urgency.label}</span>
+            </div>
+            <div class="coach-call-meta">Last Call: ${escapeHtml(call.lastCallDate || '—')} • Next Follow-Up: ${escapeHtml(call.nextFollowUp || '—')}</div>
+            ${call.notes ? `<div class="coach-call-notes">${escapeHtml(call.notes)}</div>` : ''}
+            <div class="tiny-actions" style="margin-top:10px;">
+              <button class="tiny-btn" type="button" data-edit-club-call="${call.id}">Edit</button>
+              ${call.phone ? `<a class="tiny-btn" href="tel:${escapeHtml(call.phone)}">Call</a>` : ''}
+              ${call.email ? `<a class="tiny-btn" href="mailto:${escapeHtml(call.email)}">Email</a>` : ''}
+            </div>
+          </div>
+        `;
+      }).join('') : '<div class="tiny-note">No club coach calls tracked yet.</div>';
+      box.querySelectorAll('[data-edit-club-call]').forEach(btn=>btn.addEventListener('click', ()=>openClubCoachModal(btn.dataset.editClubCall)));
+    }
+
+    function renderManualTournamentList(){
+      const box = document.getElementById('manualTournamentList');
+      if(!box) return;
+      const ordered = [...manualTournaments].sort((a,b)=>byDateValue(a.date).localeCompare(byDateValue(b.date)) || String(a.name||'').localeCompare(String(b.name||'')));
+      box.innerHTML = ordered.length ? ordered.map(event=>{
+        const names = (event.recruitIds || []).map(id=>getRecruitLite(id)).filter(Boolean);
+        return `
+          <div class="manual-event-item">
+            <div class="manual-event-top">
+              <div>
+                <div class="manual-event-name">${escapeHtml(event.name || 'Unnamed Tournament')}</div>
+                <div class="manual-event-meta">${[event.date || '', event.location || ''].filter(Boolean).join(' • ') || 'No date/location yet'}</div>
+              </div>
+              <span class="status-pill">${names.length} athlete${names.length===1?'':'s'}</span>
+            </div>
+            ${event.notes ? `<div class="coach-call-notes">${escapeHtml(event.notes)}</div>` : ''}
+            <div class="tag-row" style="margin-top:10px;">${names.length ? names.slice(0,6).map(r=>`<button class="tag" type="button" data-open-recruit-from-event="${r.id}">${escapeHtml(r.name)}</button>`).join('') : '<span class="tiny-note">No athletes assigned yet.</span>'}</div>
+            <div class="tiny-actions" style="margin-top:10px;">
+              <button class="tiny-btn" type="button" data-edit-tournament="${event.id}">Edit Tournament</button>
+              <button class="tiny-btn" type="button" data-assign-tournament="${event.id}">Assign Athletes</button>
+            </div>
+          </div>
+        `;
+      }).join('') : '<div class="tiny-note">No manual tournaments added yet.</div>';
+      box.querySelectorAll('[data-edit-tournament]').forEach(btn=>btn.addEventListener('click', ()=>openTournamentModal(btn.dataset.editTournament)));
+      box.querySelectorAll('[data-assign-tournament]').forEach(btn=>btn.addEventListener('click', ()=>openTournamentAssignModal(btn.dataset.assignTournament)));
+      box.querySelectorAll('[data-open-recruit-from-event]').forEach(btn=>btn.addEventListener('click', ()=>{ selectedRecruitId = btn.dataset.openRecruitFromEvent; rebuildRecruitList(selectedRecruitId); }));
+    }
+
+    function openClubCoachModal(id=''){
+      const item = id ? clubCoachCalls.find(call=>String(call.id)===String(id)) : null;
+      document.getElementById('clubCoachModal').classList.add('active');
+      document.getElementById('clubCoachModalTitle').textContent = item ? 'Edit Club Coach Call' : 'Add Club Coach Call';
+      document.getElementById('clubCoachDeleteBtn').style.display = item ? 'inline-flex' : 'none';
+      document.getElementById('clubCoachId').value = item?.id || '';
+      document.getElementById('clubCoachName').value = item?.coachName || '';
+      document.getElementById('clubCoachClub').value = item?.club || '';
+      document.getElementById('clubCoachStatus').value = item?.status || '';
+      document.getElementById('clubCoachPhone').value = item?.phone || '';
+      document.getElementById('clubCoachEmail').value = item?.email || '';
+      document.getElementById('clubCoachLastCall').value = item?.lastCallDate || '';
+      document.getElementById('clubCoachNextFollowUp').value = item?.nextFollowUp || '';
+      document.getElementById('clubCoachNotes').value = item?.notes || '';
+    }
+    function closeClubCoachModal(){ document.getElementById('clubCoachModal').classList.remove('active'); }
+
+    function openTournamentModal(id=''){
+      const item = id ? manualTournaments.find(event=>String(event.id)===String(id)) : null;
+      document.getElementById('tournamentModal').classList.add('active');
+      document.getElementById('tournamentModalTitle').textContent = item ? 'Edit Tournament' : 'Add Tournament';
+      document.getElementById('tournamentDeleteBtn').style.display = item ? 'inline-flex' : 'none';
+      document.getElementById('tournamentId').value = item?.id || '';
+      document.getElementById('tournamentName').value = item?.name || '';
+      document.getElementById('tournamentDate').value = item?.date || '';
+      document.getElementById('tournamentLocation').value = item?.location || '';
+      document.getElementById('tournamentNotes').value = item?.notes || '';
+    }
+    function closeTournamentModal(){ document.getElementById('tournamentModal').classList.remove('active'); }
+
+    function openTournamentAssignModal(id){
+      const item = manualTournaments.find(event=>String(event.id)===String(id));
+      if(!item) return;
+      activeTournamentAssignId = String(id);
+      document.getElementById('tournamentAssignModal').classList.add('active');
+      document.getElementById('tournamentAssignTitle').textContent = `Assign Athletes • ${item.name || 'Tournament'}`;
+      document.getElementById('assignTournamentName').textContent = item.name || '—';
+      document.getElementById('assignTournamentDate').textContent = [item.date || '', item.location || ''].filter(Boolean).join(' • ') || '—';
+      const grid = document.getElementById('tournamentAssignmentGrid');
+      const recruits = Object.entries(recruitDetails).map(([id,recruit])=>({id,...recruit})).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+      grid.innerHTML = recruits.map(r=>`
+        <label class="assignment-option">
+          <input type="checkbox" data-assign-recruit="${r.id}" ${item.recruitIds?.includes(String(r.id)) ? 'checked' : ''} />
+          <div><strong>${escapeHtml(r.name)}</strong><span>${escapeHtml([r.classYear||'', r.position||'', r.club||''].filter(Boolean).join(' • ') || 'No details')}</span></div>
+        </label>
+      `).join('');
+      updateTournamentAssignCount();
+    }
+    function updateTournamentAssignCount(){
+      const count = document.querySelectorAll('#tournamentAssignmentGrid [data-assign-recruit]:checked').length;
+      const el = document.getElementById('assignTournamentCount');
+      if(el) el.textContent = `${count} athlete${count===1?'':'s'}`;
+    }
+    function closeTournamentAssignModal(){ document.getElementById('tournamentAssignModal').classList.remove('active'); activeTournamentAssignId = ''; }
+
     function renderEventTracker(recruits){
-      const events = {};
-      recruits.forEach(r=>{
-        if(!r.eventName) return;
-        const key = [r.eventName, r.eventDate || '', r.eventLocation || ''].join('||');
-        if(!events[key]) events[key] = {name:r.eventName, date:r.eventDate, location:r.eventLocation, recruits:[]};
-        events[key].recruits.push(r);
-      });
-      const ordered = Object.values(events).sort((a,b)=>String(a.date || '9999-12-31').localeCompare(String(b.date || '9999-12-31'))).slice(0,6);
-      document.getElementById('eventTrackerList').innerHTML = ordered.length ? ordered.map(event=>`
-        <div class="event-group">
-          <h4>${escapeHtml(event.name)}</h4>
-          <div class="event-group-meta">${[event.date || 'Date TBD', event.location || 'Location TBD', `${event.recruits.length} name${event.recruits.length===1?'':'s'}`].join(' • ')}</div>
-          <div class="chip-row">${event.recruits.map(r=>`<button class="filter-chip" type="button" data-open-recruit="${r.id}">${escapeHtml(r.name)}</button>`).join('')}</div>
-        </div>
-      `).join('') : '<div class="tiny-note">Add an event name/date/location in a recruit profile to populate this tracker.</div>';
+      const box = document.getElementById('eventTrackerList');
+      if(!box) return;
+      const ordered = [...manualTournaments].sort((a,b)=>byDateValue(a.date).localeCompare(byDateValue(b.date)) || String(a.name||'').localeCompare(String(b.name||''))).slice(0,6);
+      box.innerHTML = ordered.length ? ordered.map(event=>{
+        const attached = (event.recruitIds || []).map(id=>getRecruitLite(id)).filter(Boolean);
+        return `
+          <div class="event-card compact">
+            <div class="event-title-row">
+              <div>
+                <div class="event-name">${escapeHtml(event.name || 'Tournament')}</div>
+                <div class="event-meta">${[event.date || '', event.location || ''].filter(Boolean).join(' • ') || 'No date/location yet'}</div>
+              </div>
+              <span class="badge">${attached.length}</span>
+            </div>
+            <div class="tag-row" style="margin-top:8px;">${attached.length ? attached.slice(0,4).map(r=>`<button class="tag" type="button" data-open-recruit-from-event-summary="${r.id}">${escapeHtml(r.name)}</button>`).join('') : '<span class="tiny-note">No athletes assigned.</span>'}</div>
+          </div>
+        `;
+      }).join('') : '<div class="tiny-note">Add tournaments manually, then assign athletes to see them here.</div>';
+      box.querySelectorAll('[data-open-recruit-from-event-summary]').forEach(btn=>btn.addEventListener('click', ()=>{ selectedRecruitId = btn.dataset.openRecruitFromEventSummary; rebuildRecruitList(selectedRecruitId); }));
     }
 
     function renderProfile(recruitId){
@@ -2892,6 +3227,87 @@ Let me know when you have time to connect. We're excited to stay in touch.
       filterState.shortcut = '';
       rebuildRecruitList(selectedRecruitId);
     }
+
+    document.getElementById('addClubCoachCallBtn').addEventListener('click', ()=>openClubCoachModal());
+    document.getElementById('clubCoachModalCloseBtn').addEventListener('click', closeClubCoachModal);
+    document.getElementById('clubCoachModal').addEventListener('click', e=>{ if(e.target.id === 'clubCoachModal') closeClubCoachModal(); });
+    document.getElementById('clubCoachForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const id = document.getElementById('clubCoachId').value || String(Date.now());
+      const item = {
+        id,
+        coachName:document.getElementById('clubCoachName').value,
+        club:document.getElementById('clubCoachClub').value,
+        status:document.getElementById('clubCoachStatus').value,
+        phone:document.getElementById('clubCoachPhone').value,
+        email:document.getElementById('clubCoachEmail').value,
+        lastCallDate:document.getElementById('clubCoachLastCall').value,
+        nextFollowUp:document.getElementById('clubCoachNextFollowUp').value,
+        notes:document.getElementById('clubCoachNotes').value
+      };
+      const idx = clubCoachCalls.findIndex(call=>String(call.id)===String(id));
+      if(idx >= 0) clubCoachCalls[idx] = item; else clubCoachCalls.push(item);
+      saveClubCoachCalls();
+      renderClubCoachCalls();
+      closeClubCoachModal();
+    });
+    document.getElementById('clubCoachDeleteBtn').addEventListener('click', ()=>{
+      const id = document.getElementById('clubCoachId').value;
+      if(!id) return;
+      clubCoachCalls = clubCoachCalls.filter(call=>String(call.id)!==String(id));
+      saveClubCoachCalls();
+      renderClubCoachCalls();
+      closeClubCoachModal();
+    });
+
+    document.getElementById('addTournamentBtn').addEventListener('click', ()=>openTournamentModal());
+    document.getElementById('tournamentModalCloseBtn').addEventListener('click', closeTournamentModal);
+    document.getElementById('tournamentModal').addEventListener('click', e=>{ if(e.target.id === 'tournamentModal') closeTournamentModal(); });
+    document.getElementById('tournamentForm').addEventListener('submit', e=>{
+      e.preventDefault();
+      const id = document.getElementById('tournamentId').value || String(Date.now());
+      const current = manualTournaments.find(event=>String(event.id)===String(id));
+      const item = {
+        id,
+        name:document.getElementById('tournamentName').value,
+        date:document.getElementById('tournamentDate').value,
+        location:document.getElementById('tournamentLocation').value,
+        notes:document.getElementById('tournamentNotes').value,
+        recruitIds: current?.recruitIds || []
+      };
+      const idx = manualTournaments.findIndex(event=>String(event.id)===String(id));
+      if(idx >= 0) manualTournaments[idx] = item; else manualTournaments.push(item);
+      saveManualTournaments();
+      renderEventTracker(Object.values(recruitDetails));
+      renderManualTournamentList();
+      closeTournamentModal();
+    });
+    document.getElementById('tournamentDeleteBtn').addEventListener('click', ()=>{
+      const id = document.getElementById('tournamentId').value;
+      if(!id) return;
+      manualTournaments = manualTournaments.filter(event=>String(event.id)!==String(id));
+      saveManualTournaments();
+      renderEventTracker(Object.values(recruitDetails));
+      renderManualTournamentList();
+      closeTournamentModal();
+    });
+
+    document.getElementById('tournamentAssignCloseBtn').addEventListener('click', closeTournamentAssignModal);
+    document.getElementById('tournamentAssignModal').addEventListener('click', e=>{ if(e.target.id === 'tournamentAssignModal') closeTournamentAssignModal(); });
+    document.getElementById('tournamentAssignmentGrid').addEventListener('change', e=>{ if(e.target.matches('[data-assign-recruit]')) updateTournamentAssignCount(); });
+    document.getElementById('clearTournamentAssignmentsBtn').addEventListener('click', ()=>{
+      document.querySelectorAll('#tournamentAssignmentGrid [data-assign-recruit]').forEach(box=>box.checked = false);
+      updateTournamentAssignCount();
+    });
+    document.getElementById('saveTournamentAssignmentsBtn').addEventListener('click', ()=>{
+      const item = manualTournaments.find(event=>String(event.id)===String(activeTournamentAssignId));
+      if(!item) return;
+      item.recruitIds = [...document.querySelectorAll('#tournamentAssignmentGrid [data-assign-recruit]:checked')].map(box=>String(box.dataset.assignRecruit));
+      saveManualTournaments();
+      renderEventTracker(Object.values(recruitDetails));
+      renderManualTournamentList();
+      closeTournamentAssignModal();
+    });
 
     // boot
     initPassword();
