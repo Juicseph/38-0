@@ -1987,8 +1987,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
         const liveRecruit = buildRecruitFromRow(row);
         const liveId = String(row.id || row.fullName || row.name || i + 1) + '_' + i;
         const liveMatch = recruitMatchKey(liveRecruit);
-        const localPair = localById.get(liveId) || localByMatch.get(liveMatch);
-        if(localPair){
+        const localPair = localById.has(liveId)
+          ? [liveId, localById.get(liveId)]
+          : localByMatch.get(liveMatch);
+        if(localPair && Array.isArray(localPair)){
           const [localId, localRecruit] = localPair;
           next[liveId] = mergeRecruitRecord(localRecruit, liveRecruit);
           seenLocalIds.add(localId);
