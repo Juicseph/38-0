@@ -807,6 +807,51 @@
       .qa-field-pair{display:grid;gap:6px}
     .qa-answer-text{margin-top:4px;color:#334155}
     .qa-question-text{font-weight:800;color:#172033}
+
+    /* About / how-to modal */
+    .about-sidebar-btn{
+      width:100%;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.09);
+      color:#fff;
+      border-radius:16px;
+      padding:11px 12px;
+      text-align:left;
+      font-weight:800;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-top:12px;
+    }
+    .about-sidebar-btn span{font-size:12px;color:#d2dced;font-weight:700}
+    .about-modal-card{
+      width:min(920px,100%);
+      max-height:90vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:24px;
+      padding:22px;
+      box-shadow:0 24px 60px rgba(0,0,0,.24);
+    }
+    .about-hero{
+      background:linear-gradient(135deg,#fff7f8,#ffffff);
+      border:1px solid #f2d9dc;
+      border-radius:20px;
+      padding:18px;
+      margin-bottom:14px;
+    }
+    .about-hero h3{margin:0;font-size:26px;color:var(--navy)}
+    .about-hero p{margin:8px 0 0;color:var(--muted);line-height:1.5}
+    .about-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+    .about-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
+    .about-card h4{margin:0 0 8px;font-size:15px;color:var(--text)}
+    .about-card ul{margin:0;padding-left:18px}
+    .about-card li{font-size:13px;line-height:1.45;color:#334155;margin:4px 0}
+    .about-footer-note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:12px}
+    @media (max-width:800px){.about-grid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -829,6 +874,7 @@
         <div>
           <h1>Recruit Board</h1>
           <p>Organize, filter, and review athlete profiles in one place.</p>
+          <button class="about-sidebar-btn" id="aboutBoardBtn" type="button">About Board <span>How it works</span></button>
         </div>
         <button class="small-white-btn" id="sidebarCollapseBtn" type="button">☰</button>
       </div>
@@ -1390,6 +1436,89 @@
       </div>
     </div>
   </div>
+
+
+
+  <div class="modal-wrap" id="aboutBoardModal">
+    <div class="about-modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;">
+        <div class="status-pill">Recruit Board Guide</div>
+        <button class="btn secondary" id="aboutBoardCloseBtn" type="button">Close</button>
+      </div>
+      <div class="about-hero">
+        <h3>What this board can do</h3>
+        <p>This dashboard is built to keep recruiting organized from first evaluation through contact, calls, events, roster planning, and staff follow-up.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-card">
+          <h4>Recruit Profiles</h4>
+          <ul>
+            <li>Add, edit, search, filter, favorite, pin, and compare recruits.</li>
+            <li>Track contact info, film/profile links, notes, evaluation areas, academics, visit status, and follow-up.</li>
+            <li>Upload a PDF for each athlete and open it from the profile.</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Q1–Q4 Questionnaire Tracking</h4>
+          <ul>
+            <li>Mark Q1, Q2, Q3, and Q4 complete.</li>
+            <li>Each quarter has three question fields with the answer underneath.</li>
+            <li>Use this for repeat call questions, recruiting checkpoints, or staff prompts.</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Recruiting Priorities</h4>
+          <ul>
+            <li>Use Pressure Board to surface urgent recruits.</li>
+            <li>Use Commit Watch to track offered, hot, and decision-focused athletes.</li>
+            <li>Visual icons show Hot, Cold/Out, no recent contact, scheduled calls, and priority recruits.</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Calls + Communication</h4>
+          <ul>
+            <li>Plan calls with time zone conversion to Pacific time.</li>
+            <li>Use one-click call, text, email, and log contact actions.</li>
+            <li>Track club coach calls separately with last call, next follow-up, and notes.</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Tournaments + Events</h4>
+          <ul>
+            <li>Create tournaments manually.</li>
+            <li>Assign athletes to each tournament.</li>
+            <li>Use the event tracker to see who is attending and jump straight to their profile.</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Roster Planning</h4>
+          <ul>
+            <li>Edit roster needs by position and class year.</li>
+            <li>Compare current tracked recruits, commits, targets, and remaining needs.</li>
+            <li>Use it to keep recruiting aligned with future roster gaps.</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Live Sync + Local Work</h4>
+          <ul>
+            <li>Refresh Live pulls updates from the connected sheet.</li>
+            <li>Local additions like tournaments, coach calls, PDFs, notes, tags, and custom fields are preserved.</li>
+            <li>Use Export Filtered to save the current view as a CSV.</li>
+          </ul>
+        </div>
+        <div class="about-card">
+          <h4>Clean Navigation</h4>
+          <ul>
+            <li>Use the left rail for search, filters, snapshot, call streak, and board controls.</li>
+            <li>Collapse sections to keep the board calm on busy recruiting days.</li>
+            <li>Open this guide anytime from the About Board button under the title.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="about-footer-note">This guide appears automatically the first time this board is opened on a browser/device. After that, use the About Board button in the left sidebar.</div>
+    </div>
+  </div>
+
 
   <script>
     const DASHBOARD_PASSWORD = 'bulldogs';
@@ -3470,8 +3599,35 @@ Let me know when you have time to connect. We're excited to stay in touch.
       closeTournamentAssignModal();
     });
 
+
+
+    const ABOUT_BOARD_SEEN_KEY = 'recruit_board_about_seen_v1';
+    function openAboutBoard(){
+      const modal = document.getElementById('aboutBoardModal');
+      if(modal) modal.classList.add('active');
+    }
+    function closeAboutBoard(){
+      const modal = document.getElementById('aboutBoardModal');
+      if(modal) modal.classList.remove('active');
+      try{ localStorage.setItem(ABOUT_BOARD_SEEN_KEY, 'true'); }catch(e){}
+    }
+    function initAboutBoard(){
+      const openBtn = document.getElementById('aboutBoardBtn');
+      const closeBtn = document.getElementById('aboutBoardCloseBtn');
+      const modal = document.getElementById('aboutBoardModal');
+      if(openBtn) openBtn.addEventListener('click', openAboutBoard);
+      if(closeBtn) closeBtn.addEventListener('click', closeAboutBoard);
+      if(modal) modal.addEventListener('click', e=>{ if(e.target === modal) closeAboutBoard(); });
+      let seen = false;
+      try{ seen = localStorage.getItem(ABOUT_BOARD_SEEN_KEY) === 'true'; }catch(e){}
+      if(!seen){
+        setTimeout(openAboutBoard, 350);
+      }
+    }
+
     // boot
     initPassword();
+    initAboutBoard();
     moveCallStreakIntoSidebar();
     moveSidebarTools();
     initPulseCollapseButtons();
