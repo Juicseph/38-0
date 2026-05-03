@@ -2570,6 +2570,48 @@ Let me know when you have time to connect. We're excited to stay in touch.
       box.querySelectorAll('[data-open-recruit-from-event-summary]').forEach(btn=>btn.addEventListener('click', ()=>{ selectedRecruitId = btn.dataset.openRecruitFromEventSummary; rebuildRecruitList(selectedRecruitId); }));
     }
 
+    function dataUrlToBlob(dataUrl){
+      const parts = String(dataUrl || '').split(',');
+      if(parts.length < 2) return null;
+      const meta = parts[0] || '';
+      const mimeMatch = meta.match(/data:([^;]+)/);
+      const mime = mimeMatch ? mimeMatch[1] : 'application/pdf';
+      const binary = atob(parts[1]);
+      const len = binary.length;
+      const bytes = new Uint8Array(len);
+      for(let i=0;i<len;i++) bytes[i] = binary.charCodeAt(i);
+      return new Blob([bytes], {type:mime});
+    }
+
+    function openRecruitPdf(recruitId){
+      const recruit = recruitDetails[recruitId];
+      if(!recruit || !recruit.pdfFile){
+        alert('No PDF uploaded for this recruit yet.');
+        return;
+      }
+      try{
+        const blob = dataUrlToBlob(recruit.pdfFile);
+        if(!blob){
+          window.open(recruit.pdfFile, '_blank', 'noopener,noreferrer');
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const win = window.open(url, '_blank', 'noopener,noreferrer');
+        if(!win){
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = recruit.pdfName || `${recruit.name || 'recruit'}_profile.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+        }
+        setTimeout(()=>URL.revokeObjectURL(url), 60000);
+      }catch(err){
+        console.error(err);
+        alert('Could not open the PDF. Try re-uploading it for this recruit.');
+      }
+    }
+
     function renderProfile(recruitId){
       const recruit = recruitDetails[recruitId];
       if(!recruit){
@@ -2617,7 +2659,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
             <button class="btn secondary" id="pinRecruitBtn" type="button">${recruit.pinned ? 'Unpin' : 'Pin'}</button>
             <button class="btn secondary" id="logContactBtn" type="button">Log Contact</button>
             <button class="btn secondary" id="compareToggleProfileBtn" type="button">${compareIds.includes(String(recruitId)) ? 'Remove Compare' : 'Add to Compare'}</button>
-            ${recruit.pdfFile ? `<a class="btn secondary" href="${recruit.pdfFile}" target="_blank" rel="noopener noreferrer">View PDF</a>` : ''}
+            ${recruit.pdfFile ? `<button class="btn secondary" id="viewRecruitPdfBtn" type="button">View PDF</button>` : ''}
             ${recruit.phone ? `<a class="btn secondary" href="tel:${recruit.phone}">Call</a>` : ''}
             ${recruit.email ? `<a class="btn secondary" href="mailto:${recruit.email}">Email</a>` : ''}
             ${recruit.filmLink ? `<a class="btn secondary" href="${recruit.filmLink}" target="_blank" rel="noopener noreferrer">Film</a>` : ''}
@@ -2692,6 +2734,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         saveData();
         rebuildRecruitList(recruitId);
       };
+      const viewPdfBtn = document.getElementById('viewRecruitPdfBtn');
+      if(viewPdfBtn) viewPdfBtn.onclick = ()=>openRecruitPdf(recruitId);
       document.getElementById('logContactBtn').onclick = ()=>logRecruitContact(recruitId);
       document.getElementById('compareToggleProfileBtn').onclick = ()=>toggleCompareRecruit(recruitId);
     }
