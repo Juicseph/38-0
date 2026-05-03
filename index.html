@@ -1773,6 +1773,8 @@
     const WEEKEND_MODE_KEY = 'recruit_board_active_weekend_tournament_v1';
     const LIVE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvN9QdtIouvn6HlpwXaf9bv6r2063_dgJaPYcRvnPjWN8iniUp4kM8P5fHG1coan5Xng/exec';
     const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
+    const LIVE_PUSH_ENABLED = LIVE_SYNC_ENABLED;
+    const LIVE_PUSH_DEBOUNCE_MS = 1400;
     const TARGET_DATE = new Date('2026-06-15T00:00:00');
     const YEAR_START = new Date('2025-06-15T00:00:00');
 
@@ -1848,6 +1850,11 @@
     let activeTournamentAssignId = '';
     let activeWeekendTournamentId = localStorage.getItem(WEEKEND_MODE_KEY) || '';
     let activeCommunicationRecruitId = '';
+    let suppressLivePush = false;
+    let livePushTimer = null;
+    let livePushInFlight = false;
+    let pendingLivePush = false;
+    let lastRecruitDetailsJson = JSON.stringify(recruitDetails || {});
 
     const appShell = document.getElementById('appShell');
     const passwordGate = document.getElementById('passwordGate');
@@ -1882,7 +1889,12 @@
       return JSON.parse(JSON.stringify(defaultRecruits));
     }
     function saveData(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
+      const json = JSON.stringify(recruitDetails || {});
+      localStorage.setItem(STORAGE_KEY, json);
+      if(json !== lastRecruitDetailsJson){
+        lastRecruitDetailsJson = json;
+        if(!suppressLivePush) queueLivePush('local-change');
+      }
     }
     function loadCollapsedSections(){
       const defaults = {commitWatchCard:true, boardHealthCard:false, clubCoachCard:false, rosterMatrixCard:true, eventTrackerCard:true, manualTournamentsCard:true};
@@ -2525,13 +2537,105 @@ Let me know when you have time to connect. We're excited to stay in touch.
         if(!recruitDetails[selectedRecruitId]){
           selectedRecruitId = Object.keys(recruitDetails)[0] || '';
         }
+        suppressLivePush = true;
         saveData();
+        suppressLivePush = false;
         rebuildRecruitList(selectedRecruitId);
         const localOnlyCount = Math.max(0, Object.keys(recruitDetails).length - rows.length);
         setLiveStatus(`Live Sheet: ${rows.length} Synced${localOnlyCount ? ` + ${localOnlyCount} Local` : ''}`);
       }catch(err){
         console.error(err);
         setLiveStatus('Live Sheet: Refresh Failed', true);
+      }
+    }
+
+    function stringifySheetValue(value){
+      if(value === null || typeof value === 'undefined') return '';
+      if(Array.isArray(value)){
+        if(value.length && typeof value[0] === 'object'){
+          return value.map(item => item && typeof item === 'object' ? [item.date, item.type, item.result, item.note, item.text].filter(Boolean).join(' - ') : String(item || '')).filter(Boolean).join(' | ');
+        }
+        return value.join(', ');
+      }
+      if(typeof value === 'object') return JSON.stringify(value);
+      return String(value);
+    }
+
+    function recruitToSheetRow(id, recruit){
+      const r = recruit || {};
+      return {
+        id:String(id || ''),
+        fullName:r.name || '', name:r.name || '', classYear:r.classYear || '', group:r.group || '', position:r.position || '', city:r.city || '', state:r.state || '', club:r.club || '',
+        priority:r.priority || '', status:r.status || r.priority || '', june15Call:r.june15Call || '', rating:r.rating || '',
+        engagementStatus:r.engagementStatus || 'Auto', gutFeeling:r.gutFeeling || '', commitProbability:r.commitProbability || '', archetypeTags:stringifySheetValue(r.archetypeTags || []),
+        offerStatus:r.offerStatus || '', wroteToUs:r.wroteToUs || '',
+        q1:r.q1 ? 'true' : 'false', q2:r.q2 ? 'true' : 'false', q3:r.q3 ? 'true' : 'false', q4:r.q4 ? 'true' : 'false',
+        q1Question1:r.q1Question1 || '', q1Answer1:r.q1Answer1 || '', q1Question2:r.q1Question2 || '', q1Answer2:r.q1Answer2 || '', q1Question3:r.q1Question3 || '', q1Answer3:r.q1Answer3 || '',
+        q2Question1:r.q2Question1 || '', q2Answer1:r.q2Answer1 || '', q2Question2:r.q2Question2 || '', q2Answer2:r.q2Answer2 || '', q2Question3:r.q2Question3 || '', q2Answer3:r.q2Answer3 || '',
+        q3Question1:r.q3Question1 || '', q3Answer1:r.q3Answer1 || '', q3Question2:r.q3Question2 || '', q3Answer2:r.q3Answer2 || '', q3Question3:r.q3Question3 || '', q3Answer3:r.q3Answer3 || '',
+        q4Question1:r.q4Question1 || '', q4Answer1:r.q4Answer1 || '', q4Question2:r.q4Question2 || '', q4Answer2:r.q4Answer2 || '', q4Question3:r.q4Question3 || '', q4Answer3:r.q4Answer3 || '',
+        summary:r.summary || '', notes:stringifySheetValue(r.notes || []), notesHistory:stringifySheetValue(r.notesHistory || []), evaluation:stringifySheetValue(r.evaluation || []), followUp:r.followUp || stringifySheetValue(r.actions || []), academics:r.academics || '', visitStatus:r.visitStatus || '',
+        nextActionDue:r.nextActionDue || '', lastContactDate:r.lastContactDate || '', callPlanLocal:r.callPlanLocal || '', callPlanTimezone:r.callPlanTimezone || '', callPlanPST:r.callPlanPST || '',
+        phone:r.phone || '', email:r.email || '', profileLink:r.profileLink || '', filmLink:r.filmLink || '', height:r.height || '', graduationYear:r.graduationYear || r.classYear || '',
+        campAttended:r.campAttended ? 'true' : 'false', favorite:r.favorite ? 'true' : 'false', pinned:r.pinned ? 'true' : 'false', pinTier:String(r.pinTier || 0),
+        tags:stringifySheetValue(r.tags || []), eventName:r.eventName || '', eventDate:r.eventDate || '', eventLocation:r.eventLocation || '', pdfName:r.pdfName || '', headshot:r.headshot && String(r.headshot).startsWith('http') ? r.headshot : '', updatedAt:r.updatedAt || new Date().toISOString()
+      };
+    }
+
+    function queueLivePush(reason='local-change'){
+      if(!LIVE_PUSH_ENABLED) return;
+      clearTimeout(livePushTimer);
+      pendingLivePush = true;
+      livePushTimer = setTimeout(()=>pushAllRecruitDataToLiveSheet(reason), LIVE_PUSH_DEBOUNCE_MS);
+    }
+
+    async function postLivePayload(payload){
+      const body = JSON.stringify(payload);
+      try{
+        const res = await fetch(LIVE_SHEET_WEBAPP_URL, {
+          method:'POST',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body
+        });
+        return {ok:res.ok, status:res.status};
+      }catch(err){
+        console.warn('Standard live push failed; retrying no-cors.', err);
+        await fetch(LIVE_SHEET_WEBAPP_URL, {method:'POST', mode:'no-cors', body});
+        return {ok:true, status:'opaque'};
+      }
+    }
+
+    async function pushAllRecruitDataToLiveSheet(reason='local-change'){
+      if(!LIVE_PUSH_ENABLED || suppressLivePush) return;
+      if(livePushInFlight){ pendingLivePush = true; return; }
+      livePushInFlight = true;
+      pendingLivePush = false;
+      try{
+        setLiveStatus('Live Sheet: Saving...');
+        const records = Object.entries(recruitDetails || {}).map(([id, recruit]) => recruitToSheetRow(id, recruit));
+        await postLivePayload({action:'bulkUpsert', source:'recruit-board', reason, records});
+        setLiveStatus(`Live Sheet: Saved ${records.length}`);
+      }catch(err){
+        console.error(err);
+        setLiveStatus('Live Sheet: Save Failed', true);
+      }finally{
+        livePushInFlight = false;
+        if(pendingLivePush){
+          pendingLivePush = false;
+          queueLivePush('queued-change');
+        }
+      }
+    }
+
+    async function deleteRecruitFromLiveSheet(id, recruit){
+      if(!LIVE_PUSH_ENABLED) return;
+      try{
+        setLiveStatus('Live Sheet: Deleting...');
+        await postLivePayload({action:'delete', source:'recruit-board', id:String(id || ''), fullName:(recruit && recruit.name) || ''});
+        setLiveStatus('Live Sheet: Deleted');
+      }catch(err){
+        console.error(err);
+        setLiveStatus('Live Sheet: Delete Failed', true);
       }
     }
 
@@ -3760,9 +3864,11 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const id = formEls.id.value;
       if(!id) return;
       if(!window.confirm('Delete this recruit?')) return;
+      const deletedRecruit = recruitDetails[id];
       delete recruitDetails[id];
       selectedRecruitId = Object.keys(recruitDetails)[0] || '';
       saveData();
+      deleteRecruitFromLiveSheet(id, deletedRecruit);
       rebuildRecruitList(selectedRecruitId);
       closeRecruitModal();
     });
@@ -4094,7 +4200,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
     renderComparePicks();
     rebuildRecruitList(selectedRecruitId);
     if(LIVE_SYNC_ENABLED){
-      setLiveStatus('Live Sheet: Ready');
+      setLiveStatus('Live Sheet: Two-Way Ready');
+      setInterval(()=>{ if(!livePushInFlight) fetchLiveSheetData(); }, 60000);
     }else{
       setLiveStatus('Live Sheet: URL Needed', true);
     }
