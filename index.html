@@ -808,140 +808,90 @@
     .qa-answer-text{margin-top:4px;color:#334155}
     .qa-question-text{font-weight:800;color:#172033}
 
-    /* About / how-to modal */
-    .about-sidebar-btn{
-      width:100%;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.09);
-      color:#fff;
-      border-radius:16px;
-      padding:11px 12px;
-      text-align:left;
-      font-weight:800;
-      cursor:pointer;
-      display:flex;
+
+    /* Cleaner default layout: compact header countdown + list/profile before pulse cards */
+    .topbar{
+      display:grid;
+      grid-template-columns:minmax(260px, 1fr) minmax(360px, 520px) auto;
       align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-top:12px;
-    }
-    .about-sidebar-btn span{font-size:12px;color:#d2dced;font-weight:700}
-    .about-modal-card{
-      width:min(920px,100%);
-      max-height:90vh;
-      overflow:auto;
-      background:#fff;
-      border-radius:24px;
-      padding:22px;
-      box-shadow:0 24px 60px rgba(0,0,0,.24);
-    }
-    .about-hero{
-      background:linear-gradient(135deg,#fff7f8,#ffffff);
-      border:1px solid #f2d9dc;
-      border-radius:20px;
-      padding:18px;
-      margin-bottom:14px;
-    }
-    .about-hero h3{margin:0;font-size:26px;color:var(--navy)}
-    .about-hero p{margin:8px 0 0;color:var(--muted);line-height:1.5}
-    .about-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-    .about-card{border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}
-    .about-card h4{margin:0 0 8px;font-size:15px;color:var(--text)}
-    .about-card ul{margin:0;padding-left:18px}
-    .about-card li{font-size:13px;line-height:1.45;color:#334155;margin:4px 0}
-    .about-footer-note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:12px}
-    @media (max-width:800px){.about-grid{grid-template-columns:1fr}}
-
-
-
-    /* Compact countdown + moveable tile grid */
-    .tile-grid{
-      display:grid;
-      grid-template-columns:repeat(12,minmax(0,1fr));
       gap:14px;
-      align-items:start;
     }
-    .tile-grid .pulse-card{
-      grid-column:span 4;
-      position:relative;
-      min-height:0;
-    }
-    .tile-grid .pulse-card.wide{grid-column:span 8}
-    .tile-grid .compact-countdown-tile{grid-column:span 4}
-    .tile-drag-handle{
-      position:absolute;
-      top:10px;
-      right:10px;
-      width:30px;
-      height:30px;
-      border-radius:10px;
-      display:grid;
-      place-items:center;
-      color:rgba(100,116,139,.65);
-      background:rgba(241,245,249,.72);
-      cursor:grab;
-      font-weight:900;
-      letter-spacing:-4px;
-      z-index:2;
-      user-select:none;
-    }
-    .tile-drag-handle:active{cursor:grabbing}
-    .tile.dragging{opacity:.55;transform:scale(.985)}
-    .tile-drop-target{outline:2px dashed rgba(196,18,48,.35);outline-offset:4px}
-    .compact-countdown-tile{
-      background:
-        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 30%),
-        linear-gradient(135deg,#001f46 0%,#002D62 52%,#C41230 100%);
+    .topbar-title{min-width:0}
+    .topbar .actions{justify-content:flex-end}
+    .micro-countdown{
+      min-height:64px;
+      border-radius:18px;
+      padding:10px 14px;
       color:#fff;
-      border-color:rgba(255,255,255,.12);
-      box-shadow:0 14px 28px rgba(0,45,98,.18);
+      display:grid;
+      grid-template-columns:auto auto auto;
+      align-items:center;
+      gap:12px;
+      background:
+        radial-gradient(circle at 8% 20%, rgba(255,255,255,.2), transparent 28%),
+        linear-gradient(135deg,#002D62 0%,#143f7b 58%,#C41230 100%);
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 12px 26px rgba(0,45,98,.18);
       overflow:hidden;
-      padding:14px;
-      gap:10px;
+      position:relative;
     }
-    .compact-countdown-tile .tile-drag-handle{background:rgba(255,255,255,.14);color:#fff}
-    .compact-countdown-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-right:30px}
-    .compact-countdown-title{font-size:18px;font-weight:900;line-height:1.05;margin-top:8px}
-    .compact-countdown-sub{font-size:12px;opacity:.9;margin-top:4px}
-    .compact-countdown-body{display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:center;margin-top:4px}
-    .compact-ring-wrap{width:86px;height:86px;margin:0}
-    .compact-ring-svg{width:86px;height:86px}
-    .compact-ring-center{inset:12px;background:rgba(255,255,255,.11)}
-    .compact-ring-center .ring-days{font-size:24px}
-    .compact-ring-center .ring-days-label{font-size:9px;letter-spacing:.08em}
-    .ring-percent{font-size:10px;font-weight:900;color:#ffd7df;margin-top:2px}
-    .compact-time-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
-    .mini-time-card{
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.1);
+    .micro-countdown::after{
+      content:"";
+      position:absolute;
+      inset:auto -30px -38px auto;
+      width:110px;
+      height:110px;
+      border-radius:50%;
+      background:rgba(255,255,255,.12);
+      pointer-events:none;
+    }
+    .micro-countdown-left{display:flex;align-items:center;gap:9px;min-width:0}
+    .micro-flame{
+      width:34px;
+      height:34px;
       border-radius:12px;
-      min-height:46px;
+      background:rgba(255,255,255,.13);
       display:grid;
       place-items:center;
-      padding:6px 4px;
-      overflow:hidden;
+      animation:microPulse 1.7s ease-in-out infinite;
+      flex:0 0 34px;
     }
-    .mini-time-card span{font-size:19px;font-weight:900;line-height:1;transition:transform .18s ease}
-    .mini-time-card small{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;opacity:.86;margin-top:2px}
-    .mini-time-card.bump span{transform:translateY(-1px) scale(1.08)}
-    .compact-progress{height:7px;background:rgba(255,255,255,.2)}
-    .compact-countdown-meta{font-size:11px;margin-top:7px;gap:8px;color:rgba(255,255,255,.9)}
-    .compact-countdown-tile.collapsed .countdown-body{display:none}
-    .compact-countdown-tile.collapsed{padding-bottom:14px}
-    .compact-countdown-tile .pulse-collapse-btn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.12);width:32px;height:32px}
-    .compact-countdown-tile .pulse-banner{padding:6px 9px;font-size:11px}
-    .compact-countdown-tile .ring-progress{stroke:#fff;filter:drop-shadow(0 0 4px rgba(255,255,255,.35))}
-    .compact-countdown-tile .progress-fill{background:linear-gradient(90deg,#fff,#ffd7df 50%,#ff8ea2 100%)}
-    @media (max-width:1450px){
-      .tile-grid .pulse-card{grid-column:span 6}
-      .tile-grid .pulse-card.wide{grid-column:span 12}
-      .tile-grid .compact-countdown-tile{grid-column:span 6}
+    @keyframes microPulse{
+      0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.22)}
+      50%{transform:scale(1.06);box-shadow:0 0 0 8px rgba(255,255,255,0)}
     }
-    @media (max-width:900px){
-      .tile-grid{grid-template-columns:1fr}
-      .tile-grid .pulse-card,.tile-grid .pulse-card.wide,.tile-grid .compact-countdown-tile{grid-column:1/-1}
-      .compact-countdown-body{grid-template-columns:78px 1fr}
-      .compact-ring-wrap,.compact-ring-svg{width:76px;height:76px}
+    .micro-label{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+    .micro-status{font-size:12px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
+    .micro-countdown-main{display:flex;align-items:baseline;gap:6px;justify-content:center;white-space:nowrap}
+    .micro-days{font-size:34px;line-height:1;font-weight:950;letter-spacing:-.04em;transition:transform .18s ease}
+    .micro-days.bump{transform:translateY(-1px) scale(1.06)}
+    .micro-days-copy{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;opacity:.94}
+    .micro-time{font-size:12px;font-weight:900;opacity:.92;white-space:nowrap;text-align:right;z-index:1}
+    .countdown{display:none!important}
+    .content{grid-template-columns:minmax(360px,.95fr) minmax(380px,1.05fr);align-items:start;order:2}
+    #recruitListPanel{order:1}
+    #profilePanelWrap{order:2}
+    .recruiting-pulse{order:3}
+    .controls,.quick-filters{order:10}
+    .daily-sheet{order:4}
+    .main > .content-panel[style*="padding:14px 16px"], .compare-bar{order:5}
+    body .compact-mode .recruit-list,
+    body .compact-mode .profile-scroll,
+    body .compact-mode .pulse-card{font-size:inherit}
+    .app{--sidebar:300px}
+    .recruit-list,.profile-scroll{max-height:60vh}
+    @media (max-width:1350px){
+      .topbar{grid-template-columns:1fr;align-items:stretch}
+      .topbar .actions{justify-content:flex-start}
+      .micro-countdown{grid-template-columns:auto 1fr auto}
+    }
+    @media (max-width:1100px){
+      .content{grid-template-columns:1fr}
+    }
+    @media (max-width:700px){
+      .micro-countdown{grid-template-columns:1fr;gap:8px}
+      .micro-countdown-main{justify-content:flex-start}
+      .micro-time{text-align:left}
     }
 
   </style>
@@ -966,7 +916,6 @@
         <div>
           <h1>Recruit Board</h1>
           <p>Organize, filter, and review athlete profiles in one place.</p>
-          <button class="about-sidebar-btn" id="aboutBoardBtn" type="button">About Board <span>How it works</span></button>
         </div>
         <button class="small-white-btn" id="sidebarCollapseBtn" type="button">☰</button>
       </div>
@@ -1011,16 +960,29 @@
 
     <main class="main">
       <div class="topbar">
-        <div>
+        <div class="topbar-title">
           <h2>Fresno State Recruiting Dashboard</h2>
           <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
         </div>
+        <section class="micro-countdown" id="countdownSection" aria-label="June 15 countdown">
+          <div class="micro-countdown-left">
+            <span class="micro-flame">🔥</span>
+            <div>
+              <div class="micro-label">June 15 Contact Day</div>
+              <div class="micro-status" id="countdownStatus">Stay ready.</div>
+            </div>
+          </div>
+          <div class="micro-countdown-main">
+            <span class="micro-days" id="daysLeftNumber">--</span>
+            <span class="micro-days-copy">days left</span>
+          </div>
+          <div class="micro-time" id="countdownHMS">--</div>
+        </section>
         <div class="actions">
           <span class="status-pill" id="liveStatus">Live Sheet: URL Needed</span>
           <button class="btn secondary" id="refreshLiveBtn" type="button">Refresh Live</button>
           <button class="btn secondary" id="importBtn" type="button">Import Sheet</button>
           <button class="btn secondary" id="exportBtn" type="button">Export Filtered</button>
-          <button class="btn secondary" id="compactBtn" type="button">Compact Mode</button>
           <button class="btn secondary" id="callModeBtn" type="button">Call Mode</button>
           <button class="btn" id="addBtn" type="button">Add Recruit</button>
           <button class="btn secondary" id="compareOpenBtn" type="button">Compare Picks</button>
@@ -1028,45 +990,37 @@
         </div>
       </div>
 
-      <section class="recruiting-pulse tile-grid" id="recruitingPulse" aria-label="Moveable dashboard tiles">
-        <div class="pulse-card countdown compact-countdown-tile tile" id="countdownSection" draggable="true" data-tile-id="countdownSection">
-          <div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
-          <div class="compact-countdown-head">
-            <div>
-              <div class="pulse-banner">🔥 June 15</div>
-              <div class="compact-countdown-title">Contact Day Countdown</div>
-              <div class="compact-countdown-sub" id="countdownStatus">Stay ready for contact day.</div>
-            </div>
-            <button class="pulse-collapse-btn" id="countdownToggleBtn" type="button" data-collapse-target="countdownSection">−</button>
-          </div>
-          <div class="countdown-body compact-countdown-body" id="countdownBody">
-            <div class="ring-wrap compact-ring-wrap">
-              <svg class="ring-svg compact-ring-svg" viewBox="0 0 160 160" aria-hidden="true">
-                <circle class="ring-track" cx="80" cy="80" r="70"></circle>
-                <circle class="ring-progress" id="ringProgress" cx="80" cy="80" r="70"></circle>
-              </svg>
-              <div class="ring-center compact-ring-center">
-                <div class="ring-days" id="daysLeftNumber">--</div>
-                <div class="ring-days-label">days</div>
-                <div class="ring-percent" id="countdownRingPercent">--%</div>
+      <section class="content">
+        <div class="content-panel" id="recruitListPanel">
+          <div class="panel-header">
+            <div class="panel-header-row">
+              <div>
+                <h3>Recruit List</h3>
+                <p id="listMeta">Click a card to view the full profile.</p>
               </div>
-            </div>
-            <div class="compact-countdown-main">
-              <div class="compact-time-row">
-                <div class="mini-time-card bump" id="flipDays"><span id="flipDaysValue">--</span><small>days</small></div>
-                <div class="mini-time-card" id="flipHours"><span id="flipHoursValue">--</span><small>hrs</small></div>
-                <div class="mini-time-card" id="flipMinutes"><span id="flipMinutesValue">--</span><small>min</small></div>
-                <div class="mini-time-card" id="flipSeconds"><span id="flipSecondsValue">--</span><small>sec</small></div>
-              </div>
-              <div class="progress-bar compact-progress"><div class="progress-fill" id="progressFill"></div></div>
-              <div class="countdown-meta compact-countdown-meta">
-                <span id="countdownProgressText">Loading progress...</span>
-                <span id="countdownHMS">--</span>
-              </div>
+              <button class="panel-collapse-btn" id="recruitListCollapseBtn" type="button">Collapse</button>
             </div>
           </div>
+          <div class="recruit-list" id="recruitList"></div>
+          <div class="board-view" id="boardView"></div>
         </div>
-        <div class="pulse-card tile" id="pressureBoardCard" draggable="true" data-tile-id="pressureBoardCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
+
+        <div class="content-panel" id="profilePanelWrap">
+          <div class="panel-header">
+            <div class="panel-header-row">
+              <div>
+                <h3>Recruit Profile</h3>
+                <p>This panel can hold everything your staff needs at a glance.</p>
+              </div>
+              <button class="panel-collapse-btn" id="profileCollapseBtn" type="button">Collapse</button>
+            </div>
+          </div>
+          <div class="profile-scroll" id="profilePanel"></div>
+        </div>
+      </section>
+
+<section class="recruiting-pulse" id="recruitingPulse">
+        <div class="pulse-card" id="pressureBoardCard">
           <div class="pulse-card-top">
             <div>
               <h3>Pressure Board</h3>
@@ -1085,7 +1039,7 @@
           <div class="tiny-note" id="callStreakNote" style="margin-top:8px;">5+ logged contacts starts a streak.</div>
         </div>
 
-        <div class="pulse-card tile" id="commitWatchCard" draggable="true" data-tile-id="commitWatchCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
+        <div class="pulse-card" id="commitWatchCard">
           <div class="pulse-card-top">
             <div>
               <h3>Commit Watch</h3>
@@ -1096,7 +1050,7 @@
           <div class="pulse-list" id="commitWatchList"></div>
         </div>
 
-        <div class="pulse-card wide tile" id="rosterMatrixCard" draggable="true" data-tile-id="rosterMatrixCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
+        <div class="pulse-card wide" id="rosterMatrixCard">
           <div class="pulse-card-top">
             <div>
               <h3>Roster Planning Mode</h3>
@@ -1107,7 +1061,7 @@
           <div class="roster-matrix-wrap" id="rosterMatrixGrid"></div>
           <div class="tiny-note" id="rosterMatrixNote">Targets save on this browser/device. Each cell shows current tracked, committed, target, and remaining need.</div>
         </div>
-              <div class="pulse-card wide tile" id="eventTrackerCard" draggable="true" data-tile-id="eventTrackerCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
+              <div class="pulse-card wide" id="eventTrackerCard">
           <div class="pulse-card-top">
             <div>
               <h3>Tournament / Event Tracker</h3>
@@ -1118,7 +1072,7 @@
           <div class="event-tracker-wrap" id="eventTrackerList"></div>
         </div>
 
-        <div class="pulse-card tile" id="clubCoachCard" draggable="true" data-tile-id="clubCoachCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
+        <div class="pulse-card" id="clubCoachCard">
           <div class="pulse-card-top">
             <div>
               <h3>Club Coach Calls</h3>
@@ -1129,7 +1083,7 @@
           <div class="coach-call-list" id="clubCoachCallList"></div>
         </div>
 
-        <div class="pulse-card tile" id="manualTournamentsCard" draggable="true" data-tile-id="manualTournamentsCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
+        <div class="pulse-card" id="manualTournamentsCard">
           <div class="pulse-card-top">
             <div>
               <h3>Manual Tournaments</h3>
@@ -1253,34 +1207,7 @@
         <div class="compare-picks" id="comparePicks"></div>
       </section>
 
-<section class="content">
-        <div class="content-panel" id="recruitListPanel">
-          <div class="panel-header">
-            <div class="panel-header-row">
-              <div>
-                <h3>Recruit List</h3>
-                <p id="listMeta">Click a card to view the full profile.</p>
-              </div>
-              <button class="panel-collapse-btn" id="recruitListCollapseBtn" type="button">Collapse</button>
-            </div>
-          </div>
-          <div class="recruit-list" id="recruitList"></div>
-          <div class="board-view" id="boardView"></div>
-        </div>
 
-        <div class="content-panel" id="profilePanelWrap">
-          <div class="panel-header">
-            <div class="panel-header-row">
-              <div>
-                <h3>Recruit Profile</h3>
-                <p>This panel can hold everything your staff needs at a glance.</p>
-              </div>
-              <button class="panel-collapse-btn" id="profileCollapseBtn" type="button">Collapse</button>
-            </div>
-          </div>
-          <div class="profile-scroll" id="profilePanel"></div>
-        </div>
-      </section>
     </main>
   </div>
   <button class="sidebar-reopen-btn" id="sidebarReopenBtn" type="button" aria-label="Reopen sidebar">☰</button>
@@ -1529,89 +1456,6 @@
     </div>
   </div>
 
-
-
-  <div class="modal-wrap" id="aboutBoardModal">
-    <div class="about-modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:14px;">
-        <div class="status-pill">Recruit Board Guide</div>
-        <button class="btn secondary" id="aboutBoardCloseBtn" type="button">Close</button>
-      </div>
-      <div class="about-hero">
-        <h3>What this board can do</h3>
-        <p>This dashboard is built to keep recruiting organized from first evaluation through contact, calls, events, roster planning, and staff follow-up.</p>
-      </div>
-      <div class="about-grid">
-        <div class="about-card">
-          <h4>Recruit Profiles</h4>
-          <ul>
-            <li>Add, edit, search, filter, favorite, pin, and compare recruits.</li>
-            <li>Track contact info, film/profile links, notes, evaluation areas, academics, visit status, and follow-up.</li>
-            <li>Upload a PDF for each athlete and open it from the profile.</li>
-          </ul>
-        </div>
-        <div class="about-card">
-          <h4>Q1–Q4 Questionnaire Tracking</h4>
-          <ul>
-            <li>Mark Q1, Q2, Q3, and Q4 complete.</li>
-            <li>Each quarter has three question fields with the answer underneath.</li>
-            <li>Use this for repeat call questions, recruiting checkpoints, or staff prompts.</li>
-          </ul>
-        </div>
-        <div class="about-card">
-          <h4>Recruiting Priorities</h4>
-          <ul>
-            <li>Use Pressure Board to surface urgent recruits.</li>
-            <li>Use Commit Watch to track offered, hot, and decision-focused athletes.</li>
-            <li>Visual icons show Hot, Cold/Out, no recent contact, scheduled calls, and priority recruits.</li>
-          </ul>
-        </div>
-        <div class="about-card">
-          <h4>Calls + Communication</h4>
-          <ul>
-            <li>Plan calls with time zone conversion to Pacific time.</li>
-            <li>Use one-click call, text, email, and log contact actions.</li>
-            <li>Track club coach calls separately with last call, next follow-up, and notes.</li>
-          </ul>
-        </div>
-        <div class="about-card">
-          <h4>Tournaments + Events</h4>
-          <ul>
-            <li>Create tournaments manually.</li>
-            <li>Assign athletes to each tournament.</li>
-            <li>Use the event tracker to see who is attending and jump straight to their profile.</li>
-          </ul>
-        </div>
-        <div class="about-card">
-          <h4>Roster Planning</h4>
-          <ul>
-            <li>Edit roster needs by position and class year.</li>
-            <li>Compare current tracked recruits, commits, targets, and remaining needs.</li>
-            <li>Use it to keep recruiting aligned with future roster gaps.</li>
-          </ul>
-        </div>
-        <div class="about-card">
-          <h4>Live Sync + Local Work</h4>
-          <ul>
-            <li>Refresh Live pulls updates from the connected sheet.</li>
-            <li>Local additions like tournaments, coach calls, PDFs, notes, tags, and custom fields are preserved.</li>
-            <li>Use Export Filtered to save the current view as a CSV.</li>
-          </ul>
-        </div>
-        <div class="about-card">
-          <h4>Clean Navigation</h4>
-          <ul>
-            <li>Use the left rail for search, filters, snapshot, call streak, and board controls.</li>
-            <li>Collapse sections to keep the board calm on busy recruiting days.</li>
-            <li>Open this guide anytime from the About Board button under the title.</li>
-          </ul>
-        </div>
-      </div>
-      <div class="about-footer-note">This guide appears automatically the first time this board is opened on a browser/device. After that, use the About Board button in the left sidebar.</div>
-    </div>
-  </div>
-
-
   <script>
     const DASHBOARD_PASSWORD = 'bulldogs';
     const PASSWORD_SESSION_KEY = 'recruit_board_unlocked_v1';
@@ -1734,7 +1578,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
     }
     function loadCollapsedSections(){
-      const defaults = {countdownSection:false, commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true, clubCoachCard:true, manualTournamentsCard:true};
+      const defaults = {commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true, clubCoachCard:true, manualTournamentsCard:true};
       try{ return {...defaults, ...JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}')}; }catch(e){ return defaults; }
     }
     function saveCollapsedSections(state){
@@ -3137,14 +2981,30 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const progress = totalWindow ? (elapsed / totalWindow) * 100 : 100;
       const ringOffset = 439.82 * (1 - progress/100);
 
-      document.getElementById('daysLeftNumber').textContent = String(days);
-      document.getElementById('ringProgress').style.strokeDashoffset = String(ringOffset);
-      document.getElementById('progressFill').style.width = `${progress.toFixed(2)}%`;
-      const ringPercentEl = document.getElementById('countdownRingPercent');
-      if(ringPercentEl) ringPercentEl.textContent = `${progress.toFixed(0)}%`;
-      document.getElementById('countdownProgressText').textContent = `${progress.toFixed(1)}% to June 15, 2026`;
-      document.getElementById('countdownHMS').textContent = `${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m ${String(seconds).padStart(2,'0')}s`;
-      document.getElementById('countdownStatus').textContent = diff === 0 ? 'Contact Day is here.' : days <= 7 ? 'Final stretch to contact day.' : 'Stay ready for contact day.';
+      const daysEl = document.getElementById('daysLeftNumber');
+      const statusEl = document.getElementById('countdownStatus');
+      const hmsEl = document.getElementById('countdownHMS');
+      const nextDays = String(days);
+      if(daysEl){
+        if(daysEl.dataset.prev !== nextDays){
+          daysEl.classList.remove('bump'); void daysEl.offsetWidth; daysEl.classList.add('bump');
+        }
+        daysEl.dataset.prev = nextDays;
+        daysEl.textContent = nextDays;
+      }
+      if(statusEl){
+        statusEl.textContent = diff === 0 ? 'Contact Day is here.' : days <= 7 ? 'Final stretch.' : 'Stay ready.';
+      }
+      if(hmsEl){
+        hmsEl.textContent = `${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m ${String(seconds).padStart(2,'0')}s`;
+      }
+
+      const ringEl = document.getElementById('ringProgress');
+      if(ringEl) ringEl.style.strokeDashoffset = String(ringOffset);
+      const progressEl = document.getElementById('progressFill');
+      if(progressEl) progressEl.style.width = `${progress.toFixed(2)}%`;
+      const progressTextEl = document.getElementById('countdownProgressText');
+      if(progressTextEl) progressTextEl.textContent = `${progress.toFixed(1)}% to June 15, 2026`;
 
       [
         ['flipDaysValue','flipDays',days],
@@ -3154,8 +3014,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
       ].forEach(([valueId, cardId, value])=>{
         const valueEl = document.getElementById(valueId);
         const cardEl = document.getElementById(cardId);
-        const next = String(value).padStart(2,'0');
         if(!valueEl || !cardEl) return;
+        const next = String(value).padStart(2,'0');
         if(valueEl.dataset.prev !== next){
           cardEl.classList.remove('bump'); void cardEl.offsetWidth; cardEl.classList.add('bump');
         }
@@ -3440,7 +3300,9 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.getElementById('clearQuickFiltersBtn').addEventListener('click', resetAllFilters);
     document.getElementById('filterResetSideBtn').addEventListener('click', resetAllFilters);
     document.getElementById('manageTagsSideBtn').addEventListener('click', openTagManager);
-    document.getElementById('compactBtn').addEventListener('click', ()=>appShell.classList.toggle('compact-mode'));
+    const compactBtn = document.getElementById('compactBtn');
+    if(compactBtn) compactBtn.addEventListener('click', ()=>appShell.classList.toggle('compact-mode'));
+    appShell.classList.add('compact-mode');
     document.getElementById('callModeBtn').addEventListener('click', ()=>openCallMode(selectedRecruitId));
     document.getElementById('callCloseBtn').addEventListener('click', closeCallMode);
     document.getElementById('callPrevBtn').addEventListener('click', ()=>{
@@ -3452,6 +3314,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(idx >= 0 && idx < filteredIds.length - 1){ selectedRecruitId = filteredIds[idx+1]; rebuildRecruitList(selectedRecruitId); openCallMode(selectedRecruitId); }
     });
 
+    const countdownToggleBtn = document.getElementById('countdownToggleBtn');
+    if(countdownToggleBtn){
+      countdownToggleBtn.addEventListener('click', ()=>{
+        document.getElementById('countdownSection').classList.toggle('collapsed');
+        countdownToggleBtn.textContent =
+          document.getElementById('countdownSection').classList.contains('collapsed') ? 'Expand Countdown' : 'Collapse Countdown';
+      });
+    }
     document.getElementById('toggleQuickFiltersBtn').addEventListener('click', ()=>{
       document.getElementById('quickFilters').classList.toggle('collapsed');
       document.getElementById('toggleQuickFiltersBtn').textContent =
@@ -3554,71 +3424,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
       reader.readAsText(file);
       fileInput.value = '';
     });
-
-
-    const TILE_ORDER_KEY = 'recruit_board_tile_order_v1';
-    function loadTileOrder(){
-      try{return JSON.parse(localStorage.getItem(TILE_ORDER_KEY) || '[]');}catch(e){return [];}
-    }
-    function saveTileOrder(){
-      const grid = document.getElementById('recruitingPulse');
-      if(!grid) return;
-      const order = [...grid.querySelectorAll('[data-tile-id]')].map(tile=>tile.dataset.tileId);
-      localStorage.setItem(TILE_ORDER_KEY, JSON.stringify(order));
-    }
-    function applyTileOrder(){
-      const grid = document.getElementById('recruitingPulse');
-      if(!grid) return;
-      const order = loadTileOrder();
-      order.forEach(id=>{
-        const tile = grid.querySelector(`[data-tile-id="${id}"]`);
-        if(tile) grid.appendChild(tile);
-      });
-    }
-    function getDragAfterElement(container, x, y){
-      const draggableElements = [...container.querySelectorAll('.tile:not(.dragging)')];
-      return draggableElements.reduce((closest, child)=>{
-        const box = child.getBoundingClientRect();
-        const offsetY = y - box.top - box.height / 2;
-        const offsetX = x - box.left - box.width / 2;
-        const distance = Math.abs(offsetY) * 2 + Math.abs(offsetX);
-        if((offsetY < 0 || offsetX < 0) && distance < closest.distance){
-          return {distance, element: child};
-        }
-        return closest;
-      }, {distance: Number.POSITIVE_INFINITY, element: null}).element;
-    }
-    function initTileGrid(){
-      const grid = document.getElementById('recruitingPulse');
-      if(!grid) return;
-      applyTileOrder();
-      grid.querySelectorAll('.tile').forEach(tile=>{
-        tile.addEventListener('dragstart', (e)=>{
-          if(!e.target.closest('.tile-drag-handle') || e.target.closest('button,input,select,textarea,a')){ e.preventDefault(); return; }
-          tile.classList.add('dragging');
-          e.dataTransfer.effectAllowed = 'move';
-          e.dataTransfer.setData('text/plain', tile.dataset.tileId || tile.id || 'tile');
-        });
-        tile.addEventListener('dragend', ()=>{
-          tile.classList.remove('dragging');
-          grid.querySelectorAll('.tile-drop-target').forEach(el=>el.classList.remove('tile-drop-target'));
-          saveTileOrder();
-        });
-      });
-      grid.addEventListener('dragover', (e)=>{
-        e.preventDefault();
-        const dragging = grid.querySelector('.dragging');
-        if(!dragging) return;
-        const afterElement = getDragAfterElement(grid, e.clientX, e.clientY);
-        grid.querySelectorAll('.tile-drop-target').forEach(el=>el.classList.remove('tile-drop-target'));
-        if(afterElement){
-          afterElement.classList.add('tile-drop-target');
-          grid.insertBefore(dragging, afterElement);
-        }else{
-          grid.appendChild(dragging);
-        }
-      });
-    }
 
     function moveSidebarTools(){
       const sidebarHost = document.getElementById('sidebarFiltersBody');
@@ -3754,38 +3559,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
       closeTournamentAssignModal();
     });
 
-
-
-    const ABOUT_BOARD_SEEN_KEY = 'recruit_board_about_seen_v1';
-    function openAboutBoard(){
-      const modal = document.getElementById('aboutBoardModal');
-      if(modal) modal.classList.add('active');
-    }
-    function closeAboutBoard(){
-      const modal = document.getElementById('aboutBoardModal');
-      if(modal) modal.classList.remove('active');
-      try{ localStorage.setItem(ABOUT_BOARD_SEEN_KEY, 'true'); }catch(e){}
-    }
-    function initAboutBoard(){
-      const openBtn = document.getElementById('aboutBoardBtn');
-      const closeBtn = document.getElementById('aboutBoardCloseBtn');
-      const modal = document.getElementById('aboutBoardModal');
-      if(openBtn) openBtn.addEventListener('click', openAboutBoard);
-      if(closeBtn) closeBtn.addEventListener('click', closeAboutBoard);
-      if(modal) modal.addEventListener('click', e=>{ if(e.target === modal) closeAboutBoard(); });
-      let seen = false;
-      try{ seen = localStorage.getItem(ABOUT_BOARD_SEEN_KEY) === 'true'; }catch(e){}
-      if(!seen){
-        setTimeout(openAboutBoard, 350);
-      }
-    }
-
     // boot
     initPassword();
-    initAboutBoard();
     moveCallStreakIntoSidebar();
     moveSidebarTools();
-    initTileGrid();
     initPulseCollapseButtons();
     setupContentCollapse();
     applyPulseCollapsedState();
