@@ -809,65 +809,207 @@
     .qa-question-text{font-weight:800;color:#172033}
 
 
-    /* Cleaner default layout: compact header countdown + list/profile before pulse cards */
+    /* Clean command bar layout: compact title + 2-row final-push countdown + primary actions */
     .topbar{
-      display:grid;
-      grid-template-columns:minmax(260px, 1fr) minmax(360px, 520px) auto;
+      display:flex;
       align-items:center;
-      gap:14px;
-    }
-    .topbar-title{min-width:0}
-    .topbar .actions{justify-content:flex-end}
-    .micro-countdown{
-      min-height:64px;
+      justify-content:space-between;
+      gap:12px;
+      background:var(--panel);
+      border:1px solid var(--line);
       border-radius:18px;
-      padding:10px 14px;
+      box-shadow:var(--shadow);
+      padding:10px 12px;
+      position:sticky;
+      top:10px;
+      z-index:80;
+    }
+    .topbar-title{
+      min-width:230px;
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+    }
+    .topbar-title h2{
+      margin:0;
+      font-size:21px;
+      line-height:1.05;
+      white-space:nowrap;
+      letter-spacing:-.03em;
+    }
+    .topbar-title p{
+      margin:0;
+      font-size:11px;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:360px;
+    }
+    .micro-countdown{
+      min-height:48px;
+      min-width:330px;
+      max-width:500px;
+      flex:1 1 430px;
+      border-radius:999px;
+      padding:7px 13px 8px;
       color:#fff;
       display:grid;
-      grid-template-columns:auto auto auto;
-      align-items:center;
-      gap:12px;
-      background:
-        radial-gradient(circle at 8% 20%, rgba(255,255,255,.2), transparent 28%),
-        linear-gradient(135deg,#002D62 0%,#143f7b 58%,#C41230 100%);
+      grid-template-rows:auto auto;
+      gap:4px;
+      background:linear-gradient(115deg,#002D62 0%,#123f7e 48%,#8d285f 74%,#C41230 100%);
+      background-size:180% 100%;
+      animation:countdownShimmer 7s ease-in-out infinite;
       border:1px solid rgba(255,255,255,.16);
-      box-shadow:0 12px 26px rgba(0,45,98,.18);
+      box-shadow:0 10px 22px rgba(0,45,98,.14);
       overflow:hidden;
       position:relative;
     }
     .micro-countdown::after{
       content:"";
       position:absolute;
-      inset:auto -30px -38px auto;
-      width:110px;
-      height:110px;
+      inset:-28px -30px auto auto;
+      width:92px;
+      height:92px;
       border-radius:50%;
       background:rgba(255,255,255,.12);
       pointer-events:none;
     }
-    .micro-countdown-left{display:flex;align-items:center;gap:9px;min-width:0}
+    .micro-countdown.final-week{
+      background:linear-gradient(115deg,#002D62 0%,#7d1d4b 42%,#C41230 100%);
+      box-shadow:0 12px 26px rgba(196,18,48,.2);
+    }
+    .micro-countdown.final-day{
+      animation:countdownShimmer 4s ease-in-out infinite, countdownShake .72s ease-in-out infinite;
+    }
+    @keyframes countdownShimmer{
+      0%,100%{background-position:0% 50%}
+      50%{background-position:100% 50%}
+    }
+    @keyframes countdownShake{
+      0%,100%{transform:translateX(0)}
+      20%{transform:translateX(-1px)}
+      40%{transform:translateX(1px)}
+      60%{transform:translateX(-1px)}
+      80%{transform:translateX(1px)}
+    }
+    .micro-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      position:relative;
+      z-index:1;
+      min-width:0;
+    }
+    .micro-title-wrap{display:flex;align-items:center;gap:8px;min-width:0}
     .micro-flame{
-      width:34px;
-      height:34px;
-      border-radius:12px;
-      background:rgba(255,255,255,.13);
+      width:28px;
+      height:28px;
+      border-radius:999px;
+      background:rgba(255,255,255,.14);
       display:grid;
       place-items:center;
       animation:microPulse 1.7s ease-in-out infinite;
-      flex:0 0 34px;
+      flex:0 0 28px;
+      font-size:15px;
     }
     @keyframes microPulse{
       0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.22)}
-      50%{transform:scale(1.06);box-shadow:0 0 0 8px rgba(255,255,255,0)}
+      50%{transform:scale(1.07);box-shadow:0 0 0 8px rgba(255,255,255,0)}
     }
-    .micro-label{font-size:11px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
-    .micro-status{font-size:12px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px}
-    .micro-countdown-main{display:flex;align-items:baseline;gap:6px;justify-content:center;white-space:nowrap}
-    .micro-days{font-size:34px;line-height:1;font-weight:950;letter-spacing:-.04em;transition:transform .18s ease}
+    .micro-label{
+      font-size:11px;
+      font-weight:950;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .micro-final-week{
+      display:none;
+      font-size:9px;
+      font-weight:950;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      padding:3px 7px;
+      border-radius:999px;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.18);
+      white-space:nowrap;
+    }
+    .micro-countdown.final-week .micro-final-week{display:inline-flex}
+    .micro-mainline{display:flex;align-items:baseline;gap:6px;white-space:nowrap}
+    .micro-days{font-size:25px;line-height:1;font-weight:950;letter-spacing:-.04em;transition:transform .18s ease}
     .micro-days.bump{transform:translateY(-1px) scale(1.06)}
-    .micro-days-copy{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;opacity:.94}
-    .micro-time{font-size:12px;font-weight:900;opacity:.92;white-space:nowrap;text-align:right;z-index:1}
+    .micro-days-copy{font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.07em;opacity:.96}
+    .micro-time{font-size:12px;font-weight:950;opacity:.96;white-space:nowrap;text-align:right;min-width:82px}
+    .micro-progress-shell{
+      height:4px;
+      flex:1;
+      min-width:80px;
+      border-radius:999px;
+      background:rgba(255,255,255,.18);
+      overflow:hidden;
+    }
+    .micro-progress-fill{
+      height:100%;
+      width:0;
+      border-radius:999px;
+      background:linear-gradient(90deg,#fff,#ffd7df);
+      transition:width .8s ease;
+    }
+    .micro-progress-text{font-size:10px;font-weight:900;opacity:.92;white-space:nowrap}
+    .micro-status{display:none}
     .countdown{display:none!important}
+    .command-actions{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:8px;
+      flex:0 0 auto;
+      position:relative;
+    }
+    .command-actions .status-pill{
+      padding:7px 10px;
+      font-size:11px;
+      max-width:150px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .command-actions .btn{
+      padding:9px 12px;
+      border-radius:12px;
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .more-wrap{position:relative}
+    .more-menu{
+      position:absolute;
+      top:calc(100% + 8px);
+      right:0;
+      width:190px;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow:0 18px 40px rgba(17,36,63,.14);
+      padding:8px;
+      display:none;
+      z-index:200;
+    }
+    .more-menu.active{display:grid;gap:6px}
+    .more-menu .btn{
+      width:100%;
+      justify-content:flex-start;
+      text-align:left;
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--line);
+      padding:9px 10px;
+      font-size:12px;
+    }
     .content{grid-template-columns:minmax(360px,.95fr) minmax(380px,1.05fr);align-items:start;order:2}
     #recruitListPanel{order:1}
     #profilePanelWrap{order:2}
@@ -880,20 +1022,19 @@
     body .compact-mode .pulse-card{font-size:inherit}
     .app{--sidebar:300px}
     .recruit-list,.profile-scroll{max-height:60vh}
-    @media (max-width:1350px){
-      .topbar{grid-template-columns:1fr;align-items:stretch}
-      .topbar .actions{justify-content:flex-start}
-      .micro-countdown{grid-template-columns:auto 1fr auto}
-    }
-    @media (max-width:1100px){
-      .content{grid-template-columns:1fr}
+    @media (max-width:1200px){
+      .topbar{flex-wrap:wrap;align-items:flex-start}
+      .micro-countdown{order:3;flex-basis:100%;max-width:none}
+      .command-actions{margin-left:auto}
     }
     @media (max-width:700px){
-      .micro-countdown{grid-template-columns:1fr;gap:8px}
-      .micro-countdown-main{justify-content:flex-start}
-      .micro-time{text-align:left}
+      .topbar-title h2{font-size:18px;white-space:normal}
+      .topbar-title p{display:none}
+      .command-actions{width:100%;justify-content:flex-start;flex-wrap:wrap}
+      .micro-countdown{min-width:0;min-height:50px}
+      .micro-time{min-width:auto}
+      .content{grid-template-columns:1fr}
     }
-
   </style>
 </head>
 <body>
@@ -962,31 +1103,42 @@
       <div class="topbar">
         <div class="topbar-title">
           <h2>Fresno State Recruiting Dashboard</h2>
-          <p>A more readable home for class lists, notes, contact details, evaluations, and follow-ups.</p>
+          <p>Live board, profiles, calls, events, and roster planning.</p>
         </div>
         <section class="micro-countdown" id="countdownSection" aria-label="June 15 countdown">
-          <div class="micro-countdown-left">
-            <span class="micro-flame">🔥</span>
-            <div>
-              <div class="micro-label">June 15 Contact Day</div>
-              <div class="micro-status" id="countdownStatus">Stay ready.</div>
+          <div class="micro-row">
+            <div class="micro-title-wrap">
+              <span class="micro-flame">🔥</span>
+              <div>
+                <div class="micro-label" id="countdownStatus">Final Push to Contact Day</div>
+              </div>
+            </div>
+            <span class="micro-final-week" id="finalWeekBadge">Final Week</span>
+          </div>
+          <div class="micro-row">
+            <div class="micro-mainline">
+              <span class="micro-days" id="daysLeftNumber">--</span>
+              <span class="micro-days-copy">days left</span>
+            </div>
+            <div class="micro-progress-shell"><div class="micro-progress-fill" id="microProgressFill"></div></div>
+            <div class="micro-progress-text" id="microProgressText">--% there</div>
+            <div class="micro-time" id="countdownHMS">--</div>
+          </div>
+        </section>
+        <div class="command-actions actions">
+          <span class="status-pill" id="liveStatus">Live Sheet: URL Needed</span>
+          <button class="btn secondary" id="refreshLiveBtn" type="button">Refresh</button>
+          <button class="btn" id="addBtn" type="button">Add Recruit</button>
+          <div class="more-wrap">
+            <button class="btn secondary" id="moreMenuBtn" type="button">More ▾</button>
+            <div class="more-menu" id="moreMenu">
+              <button class="btn secondary" id="importBtn" type="button">Import Sheet</button>
+              <button class="btn secondary" id="exportBtn" type="button">Export Filtered</button>
+              <button class="btn secondary" id="callModeBtn" type="button">Call Mode</button>
+              <button class="btn secondary" id="compareOpenBtn" type="button">Compare Picks</button>
+              <button class="btn secondary" id="tagManagerBtn" type="button">Tag Manager</button>
             </div>
           </div>
-          <div class="micro-countdown-main">
-            <span class="micro-days" id="daysLeftNumber">--</span>
-            <span class="micro-days-copy">days left</span>
-          </div>
-          <div class="micro-time" id="countdownHMS">--</div>
-        </section>
-        <div class="actions">
-          <span class="status-pill" id="liveStatus">Live Sheet: URL Needed</span>
-          <button class="btn secondary" id="refreshLiveBtn" type="button">Refresh Live</button>
-          <button class="btn secondary" id="importBtn" type="button">Import Sheet</button>
-          <button class="btn secondary" id="exportBtn" type="button">Export Filtered</button>
-          <button class="btn secondary" id="callModeBtn" type="button">Call Mode</button>
-          <button class="btn" id="addBtn" type="button">Add Recruit</button>
-          <button class="btn secondary" id="compareOpenBtn" type="button">Compare Picks</button>
-          <button class="btn secondary" id="tagManagerBtn" type="button">Tag Manager</button>
         </div>
       </div>
 
@@ -2992,13 +3144,22 @@ Let me know when you have time to connect. We're excited to stay in touch.
         daysEl.dataset.prev = nextDays;
         daysEl.textContent = nextDays;
       }
+      const countdownSection = document.getElementById('countdownSection');
+      if(countdownSection){
+        countdownSection.classList.toggle('final-week', diff > 0 && days < 7);
+        countdownSection.classList.toggle('final-day', diff > 0 && diff <= 24*60*60*1000);
+      }
       if(statusEl){
-        statusEl.textContent = diff === 0 ? 'Contact Day is here.' : days <= 7 ? 'Final stretch.' : 'Stay ready.';
+        statusEl.textContent = diff === 0 ? 'Contact Day is Here' : days < 7 ? 'Final Week to Contact Day' : 'Final Push to Contact Day';
       }
       if(hmsEl){
-        hmsEl.textContent = `${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m ${String(seconds).padStart(2,'0')}s`;
+        hmsEl.textContent = `⏱ ${String(hours).padStart(2,'0')}:${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
       }
 
+      const microProgressEl = document.getElementById('microProgressFill');
+      if(microProgressEl) microProgressEl.style.width = `${progress.toFixed(2)}%`;
+      const microProgressTextEl = document.getElementById('microProgressText');
+      if(microProgressTextEl) microProgressTextEl.textContent = `${progress.toFixed(0)}% there`;
       const ringEl = document.getElementById('ringProgress');
       if(ringEl) ringEl.style.strokeDashoffset = String(ringOffset);
       const progressEl = document.getElementById('progressFill');
@@ -3558,6 +3719,19 @@ Let me know when you have time to connect. We're excited to stay in touch.
       renderManualTournamentList();
       closeTournamentAssignModal();
     });
+
+
+
+    const moreMenuBtn = document.getElementById('moreMenuBtn');
+    const moreMenu = document.getElementById('moreMenu');
+    if(moreMenuBtn && moreMenu){
+      moreMenuBtn.addEventListener('click', (e)=>{
+        e.stopPropagation();
+        moreMenu.classList.toggle('active');
+      });
+      moreMenu.addEventListener('click', (e)=>e.stopPropagation());
+      document.addEventListener('click', ()=>moreMenu.classList.remove('active'));
+    }
 
     // boot
     initPassword();
