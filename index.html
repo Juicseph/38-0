@@ -425,6 +425,25 @@
     .matrix-need{font-size:11px;font-weight:800;text-align:center}
     .matrix-need.good{color:#18794e}
     .matrix-need.warn{color:#b42318}
+
+    .matrix-cell.matrix-filled{border-color:#b7e4c7;background:#f3fff7}
+    .matrix-cell.matrix-close{border-color:#f5d08a;background:#fffaf0}
+    .matrix-cell.matrix-need{border-color:#f2b8b5;background:#fff7f7}
+    .matrix-label{font-size:10px;color:var(--muted);font-weight:800;text-align:center;text-transform:uppercase;letter-spacing:.04em}
+    .matrix-commit{font-size:10px;color:#18407c;font-weight:800;text-align:center}
+    .status-icons{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+    .status-icon{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 7px;font-size:11px;font-weight:900;color:#22324a}
+    .status-icon.hot{background:#fff2f4;border-color:#f3bcc8;color:#b42318}
+    .status-icon.cold{background:#eef2f7;color:#475569}
+    .status-icon.warn{background:#fff7e8;border-color:#f5d08a;color:#9a6700}
+    .status-icon.schedule{background:#eef4ff;border-color:#c9d8f5;color:#18407c}
+    .status-icon.priority{background:#fff7e8;border-color:#f5d08a;color:#9a6700}
+    .content-panel.collapsed .recruit-list,
+    .content-panel.collapsed .board-view,
+    .content-panel.collapsed .profile-scroll{display:none!important}
+    .content-panel.collapsed{min-height:auto}
+    .panel-header-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+    .panel-collapse-btn{border:1px solid var(--line);background:#fff;color:var(--text);border-radius:12px;padding:7px 10px;font-size:12px;font-weight:900;cursor:pointer}
     .tiny-note{font-size:11px;color:var(--muted)}
     .content{
       display:grid;
@@ -942,13 +961,13 @@
         <div class="pulse-card wide" id="rosterMatrixCard">
           <div class="pulse-card-top">
             <div>
-              <h3>Roster Matrix</h3>
-              <p>Edit needs by position and class year.</p>
+              <h3>Roster Planning Mode</h3>
+              <p>Edit roster targets by position and class year. Current, committed, and remaining needs update automatically.</p>
             </div>
             <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="saveRosterMatrixBtn" type="button">Save Matrix</button><button class="pulse-collapse-btn" data-collapse-target="rosterMatrixCard" type="button">−</button></div>
           </div>
           <div class="roster-matrix-wrap" id="rosterMatrixGrid"></div>
-          <div class="tiny-note" id="rosterMatrixNote">Targets save on this browser/device. Each cell shows current tracked recruits and editable need.</div>
+          <div class="tiny-note" id="rosterMatrixNote">Targets save on this browser/device. Each cell shows current tracked, committed, target, and remaining need.</div>
         </div>
               <div class="pulse-card wide" id="eventTrackerCard">
           <div class="pulse-card-top">
@@ -1097,19 +1116,29 @@
       </section>
 
 <section class="content">
-        <div class="content-panel">
+        <div class="content-panel" id="recruitListPanel">
           <div class="panel-header">
-            <h3>Recruit List</h3>
-            <p id="listMeta">Click a card to view the full profile.</p>
+            <div class="panel-header-row">
+              <div>
+                <h3>Recruit List</h3>
+                <p id="listMeta">Click a card to view the full profile.</p>
+              </div>
+              <button class="panel-collapse-btn" id="recruitListCollapseBtn" type="button">Collapse</button>
+            </div>
           </div>
           <div class="recruit-list" id="recruitList"></div>
           <div class="board-view" id="boardView"></div>
         </div>
 
-        <div class="content-panel">
+        <div class="content-panel" id="profilePanelWrap">
           <div class="panel-header">
-            <h3>Recruit Profile</h3>
-            <p>This panel can hold everything your staff needs at a glance.</p>
+            <div class="panel-header-row">
+              <div>
+                <h3>Recruit Profile</h3>
+                <p>This panel can hold everything your staff needs at a glance.</p>
+              </div>
+              <button class="panel-collapse-btn" id="profileCollapseBtn" type="button">Collapse</button>
+            </div>
           </div>
           <div class="profile-scroll" id="profilePanel"></div>
         </div>
@@ -1227,6 +1256,7 @@
         <div class="span-2"><label>Event Location</label><input id="fEventLocation" class="field" placeholder="Las Vegas, NV" /></div>
 
         <div class="span-2"><label>Headshot</label><input id="fHeadshot" type="file" accept="image/*" class="field" /><div id="headshotNote" style="font-size:12px;color:var(--muted);margin-top:6px;"></div></div>
+        <div class="span-2"><label>Recruit PDF</label><input id="fRecruitPdf" type="file" accept="application/pdf,.pdf" class="field" /><div id="pdfNote" style="font-size:12px;color:var(--muted);margin-top:6px;"></div><label style="display:flex;gap:8px;align-items:center;margin-top:8px;font-size:12px;color:var(--muted);"><input id="fRemovePdf" type="checkbox" /> Remove current PDF</label></div>
         <div class="span-2"><label>Tags</label><input id="fTags" class="field" placeholder="comma separated" /><div class="tag-library" id="tagLibrary"></div></div>
         <div class="span-2"><label>Summary</label><textarea id="fSummary" rows="3" class="field"></textarea></div>
         <div class="span-2"><label>Notes</label><textarea id="fNotes" rows="3" class="field"></textarea></div>
@@ -1252,19 +1282,6 @@
         <button class="btn secondary" id="compareCloseBtn" type="button">Close</button>
       </div>
       <div id="compareModalBody"></div>
-    </div>
-  </div>
-
-  <div class="modal-wrap" id="followUpModal">
-    <div class="modal-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
-        <h3 style="margin:0;font-size:24px;">Auto Follow-Up Generator</h3>
-        <button class="btn secondary" id="followUpCloseBtn" type="button">Close</button>
-      </div>
-      <div class="section">
-        <h5 id="followUpTitle">Generated Follow-Up</h5>
-        <div class="followup-output" id="followUpOutput"></div>
-      </div>
     </div>
   </div>
 
@@ -1301,7 +1318,7 @@
       <div class="tutorial-grid">
         <div class="tutorial-step"><h4>Sidebar = control center</h4><p>Search, class, position, status, sorting, and quick filters now live under Class Snapshot so the main board stays clean.</p></div>
         <div class="tutorial-step"><h4>Pressure + Commit + Roster + Events</h4><p>These top cards can collapse. Open only the ones you want to focus on.</p></div>
-        <div class="tutorial-step"><h4>Roster Matrix</h4><p>Edit need numbers by position and class year, then save. The matrix keeps your roster targets visible.</p></div>
+        <div class="tutorial-step"><h4>Roster Matrix</h4><p>Edit target numbers by position and class year, then save. The matrix shows current tracked recruits, commits, and remaining needs.</p></div>
         <div class="tutorial-step"><h4>Event Tracker</h4><p>Add an event name, date, and location in the recruit form to group recruits by tournament weekend.</p></div>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-top:16px;">
@@ -1584,6 +1601,18 @@
     function getRecruitLite(id){
       const r = recruitDetails[id];
       return r ? {id, ...r} : null;
+    }
+
+
+    function cardStatusIcons(recruit){
+      const e = engagementStatusMeta(recruit);
+      const icons = [];
+      if(e.label === 'Hot') icons.push({icon:'🔥', label:'Hot', cls:'hot'});
+      if(e.label === 'Cold' || e.label === 'Out') icons.push({icon:'🧊', label:e.label, cls:'cold'});
+      if(daysSince(recruit.lastContactDate) > 10) icons.push({icon:'⚠️', label:'No recent contact', cls:'warn'});
+      if(recruit.callPlanLocal || recruit.callPlanPST || recruit.nextActionDue) icons.push({icon:'📅', label:'Call scheduled', cls:'schedule'});
+      if(String(recruit.priority || recruit.status || '').toLowerCase().includes('priority') || Number(recruit.pinTier || 0) === 1) icons.push({icon:'🎯', label:'Priority', cls:'priority'});
+      return icons.map(item => `<span class="status-icon ${item.cls}" title="${escapeHtml(item.label)}"><span>${item.icon}</span><span>${escapeHtml(item.label)}</span></span>`).join('');
     }
 
     function engagementScore(recruit){
@@ -1930,6 +1959,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         profileLink: row.profileLink || '',
         filmLink: row.filmLink || '',
         headshot: row.headshot || row.headshotUrl || '',
+        pdfFile: row.pdfFile || row.recruitPdf || '',
+        pdfName: row.pdfName || '',
         height: row.height || '',
         graduationYear: row.graduationYear || row.classYear || '',
         favorite: parseYesNo(row.favorite),
@@ -1974,7 +2005,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         merged.notesHistory = localRecruit.notesHistory;
       }
       const preserveIfBlank = [
-        'summary','followUp','academics','visitStatus','headshot','profileLink','filmLink','phone','email','height','graduationYear',
+        'summary','followUp','academics','visitStatus','headshot','pdfFile','pdfName','profileLink','filmLink','phone','email','height','graduationYear',
         'callPlanLocal','callPlanTimezone','callPlanPST','eventName','eventDate','eventLocation','offerStatus','wroteToUs',
         'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status'
       ];
@@ -2157,26 +2188,33 @@ Let me know when you have time to connect. We're excited to stay in touch.
     function renderRosterMatrix(recruits){
       const positions = ['Pins','Middles','Setters','Liberos'];
       const years = ['2026','2027','2028','2029','2030','2031'];
-      const counts = Object.fromEntries(positions.map(pos => [pos, Object.fromEntries(years.map(year => [year, 0]))]));
+      const counts = Object.fromEntries(positions.map(pos => [pos, Object.fromEntries(years.map(year => [year, {current:0, committed:0}]))]));
       recruits.forEach(r => {
         const pos = boardGroupForRecruit(r);
         const year = String(r.classYear || '');
-        if(counts[pos] && counts[pos][year] !== undefined && isOfferLive(r)) counts[pos][year]++;
+        if(!counts[pos] || counts[pos][year] === undefined) return;
+        if(isOfferLive(r)) counts[pos][year].current++;
+        if(String(r.offerStatus || '').toLowerCase().includes('committed here')) counts[pos][year].committed++;
       });
       const box = document.getElementById('rosterMatrixGrid');
       if(!box) return;
       const header = years.map(year => `<th>${year}</th>`).join('');
       const rows = positions.map(pos => {
         const cells = years.map(year => {
-          const current = counts[pos][year] || 0;
+          const cellCounts = counts[pos][year] || {current:0, committed:0};
+          const current = cellCounts.current || 0;
+          const committed = cellCounts.committed || 0;
           const target = Number(rosterMatrixTargets?.[pos]?.[year] || 0);
           const need = Math.max(target - current, 0);
-          return `<td><div class="matrix-cell"><div class="matrix-current">${current} tracked</div><input class="matrix-input" data-matrix-position="${pos}" data-matrix-year="${year}" type="number" min="0" step="1" value="${target}" /><div class="matrix-need ${need ? 'warn' : 'good'}">${need ? `${need} needed` : 'Covered'}</div></div></td>`;
+          const status = target === 0 ? '' : current >= target ? 'matrix-filled' : current > 0 ? 'matrix-close' : 'matrix-need';
+          const needText = target === 0 ? 'No target' : need ? `${need} still needed` : 'Covered';
+          return `<td><div class="matrix-cell ${status}"><div class="matrix-current">Current ${current}</div><div class="matrix-commit">${committed} committed</div><div class="matrix-label">Target</div><input class="matrix-input" data-matrix-position="${pos}" data-matrix-year="${year}" type="number" min="0" step="1" value="${target}" /><div class="matrix-need ${need ? 'warn' : 'good'}">${needText}</div></div></td>`;
         }).join('');
         return `<tr><td class="roster-matrix-row-label">${pos}</td>${cells}</tr>`;
       }).join('');
       box.innerHTML = `<table class="roster-matrix-table"><thead><tr><th>Position</th>${header}</tr></thead><tbody>${rows}</tbody></table>`;
     }
+
 
     function applySort(recruits){
       const sortBy = sortSelect.value;
@@ -2578,8 +2616,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
             <button class="btn secondary" id="favoriteRecruitBtn" type="button">${recruit.favorite ? 'Unfavorite' : 'Favorite'}</button>
             <button class="btn secondary" id="pinRecruitBtn" type="button">${recruit.pinned ? 'Unpin' : 'Pin'}</button>
             <button class="btn secondary" id="logContactBtn" type="button">Log Contact</button>
-            <button class="btn secondary" id="generateFollowUpBtn" type="button">Generate Follow-Up</button>
             <button class="btn secondary" id="compareToggleProfileBtn" type="button">${compareIds.includes(String(recruitId)) ? 'Remove Compare' : 'Add to Compare'}</button>
+            ${recruit.pdfFile ? `<a class="btn secondary" href="${recruit.pdfFile}" target="_blank" rel="noopener noreferrer">View PDF</a>` : ''}
             ${recruit.phone ? `<a class="btn secondary" href="tel:${recruit.phone}">Call</a>` : ''}
             ${recruit.email ? `<a class="btn secondary" href="mailto:${recruit.email}">Email</a>` : ''}
             ${recruit.filmLink ? `<a class="btn secondary" href="${recruit.filmLink}" target="_blank" rel="noopener noreferrer">Film</a>` : ''}
@@ -2604,6 +2642,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
             <li><strong>Visit Status:</strong> ${recruit.visitStatus || '—'}</li>
             <li><strong>Primary Event:</strong> ${[recruit.eventName || '', recruit.eventDate || '', recruit.eventLocation || ''].filter(Boolean).join(' • ') || '—'}</li>
             <li><strong>Camp Attended:</strong> ${recruit.campAttended ? 'Yes' : 'No'}</li>
+            <li><strong>Recruit PDF:</strong> ${recruit.pdfName || (recruit.pdfFile ? 'Uploaded' : '—')}</li>
           </ul>
         </div>
 
@@ -2654,7 +2693,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
         rebuildRecruitList(recruitId);
       };
       document.getElementById('logContactBtn').onclick = ()=>logRecruitContact(recruitId);
-      document.getElementById('generateFollowUpBtn').onclick = ()=>openFollowUpModal(recruitId);
       document.getElementById('compareToggleProfileBtn').onclick = ()=>toggleCompareRecruit(recruitId);
     }
 
@@ -2708,6 +2746,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
                     <button class="pin-btn ${r.pinned ? 'pin-on' : ''}" data-pin="${r.id}" type="button">${r.pinned ? '📌' : '📍'}</button>
                   </div>
                   <div class="meta">${profileSubtitle(r)}</div>
+                  ${cardStatusIcons(r) ? `<div class="status-icons">${cardStatusIcons(r)}</div>` : ``}
                 </div>
               </div>
               <div class="badge">${r.priority || r.status || 'Active'}</div>
@@ -2719,12 +2758,12 @@ Let me know when you have time to connect. We're excited to stay in touch.
               ${r.callPlanPST ? `<span class="call-chip">Call ${r.callPlanPST} PST</span>` : ''}
               ${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${r.offerStatus}</span>` : ''}
               <span class="score-badge ${eMeta.cls}">${eMeta.score} • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>
+              ${r.pdfFile ? `<span class="tag">PDF</span>` : ''}
               ${(r.tags || []).slice(0,2).map(tag=>`<span class="tag">${tag}</span>`).join('')}
             </div>
             <div class="quick-action-row">
               <button class="quick-action-btn ${compareIds.includes(String(r.id)) ? 'active' : ''}" type="button" data-compare="${r.id}">${compareIds.includes(String(r.id)) ? 'Remove Compare' : 'Compare'}</button>
               <button class="quick-action-btn" type="button" data-log="${r.id}">Log Contact</button>
-              <button class="quick-action-btn" type="button" data-followup="${r.id}">Follow-Up</button>
               ${r.phone ? `<a class="quick-action-btn" href="tel:${r.phone}">Call</a>` : ''}
               ${r.phone ? `<a class="quick-action-btn" href="sms:${r.phone}">Text</a>` : ''}
               ${r.email ? `<a class="quick-action-btn" href="mailto:${r.email}">Email</a>` : ''}
@@ -2735,7 +2774,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
       recruitList.querySelectorAll('.recruit-card').forEach(card=>{
         card.addEventListener('click', (e)=>{
-          if(e.target.closest('[data-star],[data-pin],[data-check],[data-compare],[data-log],[data-followup],a.quick-action-btn,button.quick-action-btn')) return;
+          if(e.target.closest('[data-star],[data-pin],[data-check],[data-compare],[data-log],a.quick-action-btn,button.quick-action-btn')) return;
           selectedRecruitId = card.dataset.id;
           rebuildRecruitList(selectedRecruitId);
         });
@@ -2768,7 +2807,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
       });
       recruitList.querySelectorAll('[data-compare]').forEach(btn=>{ btn.addEventListener('click', e=>{ e.stopPropagation(); toggleCompareRecruit(btn.dataset.compare); }); });
       recruitList.querySelectorAll('[data-log]').forEach(btn=>{ btn.addEventListener('click', e=>{ e.stopPropagation(); logRecruitContact(btn.dataset.log); }); });
-      recruitList.querySelectorAll('[data-followup]').forEach(btn=>{ btn.addEventListener('click', e=>{ e.stopPropagation(); openFollowUpModal(btn.dataset.followup); }); });
 
       renderBoardView(filtered);
       renderProfile(selectedRecruitId);
@@ -2886,7 +2924,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
@@ -2895,7 +2933,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
             priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
             q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Answer1:r.q1Answer1,q1Question2:r.q1Question2,q1Answer2:r.q1Answer2,q1Question3:r.q1Question3,q1Answer3:r.q1Answer3,q2Question1:r.q2Question1,q2Answer1:r.q2Answer1,q2Question2:r.q2Question2,q2Answer2:r.q2Answer2,q2Question3:r.q2Question3,q2Answer3:r.q2Answer3,q3Question1:r.q3Question1,q3Answer1:r.q3Answer1,q3Question2:r.q3Question2,q3Answer2:r.q3Answer2,q3Question3:r.q3Question3,q3Answer3:r.q3Answer3,q4Question1:r.q4Question1,q4Answer1:r.q4Answer1,q4Question2:r.q4Question2,q4Answer2:r.q4Answer2,q4Question3:r.q4Question3,q4Answer3:r.q4Answer3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
-            campAttended:r.campAttended,filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
+            campAttended:r.campAttended,pdfName:r.pdfName || (r.pdfFile ? 'Uploaded' : ''),filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
             tags:(r.tags||[]).join(', '),summary:r.summary,notes:(r.notes||[]).join('; '),evaluation:(r.evaluation||[]).join('; '),
             followUp:r.followUp || (r.actions||[]).join('; '),academics:r.academics,pinTier:r.pinTier || 0
@@ -2933,7 +2971,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       q2Question1:document.getElementById('fQ2Question1'), q2Answer1:document.getElementById('fQ2Answer1'), q2Question2:document.getElementById('fQ2Question2'), q2Answer2:document.getElementById('fQ2Answer2'), q2Question3:document.getElementById('fQ2Question3'), q2Answer3:document.getElementById('fQ2Answer3'),
       q3Question1:document.getElementById('fQ3Question1'), q3Answer1:document.getElementById('fQ3Answer1'), q3Question2:document.getElementById('fQ3Question2'), q3Answer2:document.getElementById('fQ3Answer2'), q3Question3:document.getElementById('fQ3Question3'), q3Answer3:document.getElementById('fQ3Answer3'),
       q4Question1:document.getElementById('fQ4Question1'), q4Answer1:document.getElementById('fQ4Answer1'), q4Question2:document.getElementById('fQ4Question2'), q4Answer2:document.getElementById('fQ4Answer2'), q4Question3:document.getElementById('fQ4Question3'), q4Answer3:document.getElementById('fQ4Answer3'),
-      headshot:document.getElementById('fHeadshot'), tags:document.getElementById('fTags'), summary:document.getElementById('fSummary'),
+      headshot:document.getElementById('fHeadshot'), recruitPdf:document.getElementById('fRecruitPdf'), removePdf:document.getElementById('fRemovePdf'), tags:document.getElementById('fTags'), summary:document.getElementById('fSummary'),
       notes:document.getElementById('fNotes'), notesHistory:document.getElementById('fNotesHistory'), evaluation:document.getElementById('fEvaluation'),
       followUp:document.getElementById('fFollowUp'), academics:document.getElementById('fAcademics'), visitStatus:document.getElementById('fVisitStatus')
     };
@@ -3038,6 +3076,9 @@ Let me know when you have time to connect. We're excited to stay in touch.
       formEls.visitStatus.value = r?.visitStatus || '';
       formEls.headshot.value = '';
       document.getElementById('headshotNote').textContent = r?.headshot ? 'Current headshot loaded.' : 'No headshot uploaded yet.';
+      formEls.recruitPdf.value = '';
+      formEls.removePdf.checked = false;
+      document.getElementById('pdfNote').textContent = r?.pdfFile ? `Current PDF: ${r.pdfName || 'Uploaded recruit PDF'}` : 'No recruit PDF uploaded yet.';
       renderTagLibrary();
     }
     function closeRecruitModal(){ modal.classList.remove('active'); }
@@ -3062,6 +3103,21 @@ Let me know when you have time to connect. We're excited to stay in touch.
           reader.readAsDataURL(formEls.headshot.files[0]);
         });
       }
+      let pdfFile = recruitDetails[id]?.pdfFile || '';
+      let pdfName = recruitDetails[id]?.pdfName || '';
+      if(formEls.removePdf.checked){
+        pdfFile = '';
+        pdfName = '';
+      }
+      if(formEls.recruitPdf.files && formEls.recruitPdf.files[0]){
+        const file = formEls.recruitPdf.files[0];
+        pdfName = file.name || 'Recruit PDF';
+        pdfFile = await new Promise(resolve=>{
+          const reader = new FileReader();
+          reader.onload = evt => resolve(evt.target.result);
+          reader.readAsDataURL(file);
+        });
+      }
       const notesHistoryLines = String(formEls.notesHistory.value || '').split('\n').map(v=>v.trim()).filter(Boolean).map(text=>({date:new Date().toISOString().slice(0,10), text}));
       recruitDetails[id] = {
         ...(recruitDetails[id] || {}),
@@ -3084,7 +3140,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         notes:splitMulti(formEls.notes.value), notesHistory:notesHistoryLines.length ? notesHistoryLines : (recruitDetails[id]?.notesHistory || []),
         evaluation:splitMulti(formEls.evaluation.value), actions:splitMulti(formEls.followUp.value), followUp:formEls.followUp.value,
         academics:formEls.academics.value, visitStatus:formEls.visitStatus.value, phone:formEls.phone.value, email:formEls.email.value,
-        profileLink:formEls.profileLink.value, filmLink:formEls.filmLink.value, headshot, updatedAt:new Date().toISOString(),
+        profileLink:formEls.profileLink.value, filmLink:formEls.filmLink.value, headshot, pdfFile, pdfName, updatedAt:new Date().toISOString(),
         selected: recruitDetails[id]?.selected || false
       };
       selectedRecruitId = id;
@@ -3184,8 +3240,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.getElementById('compareOpenBtn').addEventListener('click', openCompareModal);
     document.getElementById('compareCloseBtn').addEventListener('click', closeCompareModal);
     document.getElementById('compareModal').addEventListener('click', e=>{ if(e.target.id === 'compareModal') closeCompareModal(); });
-    document.getElementById('followUpCloseBtn').addEventListener('click', closeFollowUpModal);
-    document.getElementById('followUpModal').addEventListener('click', e=>{ if(e.target.id === 'followUpModal') closeFollowUpModal(); });
     document.getElementById('tagManagerBtn').addEventListener('click', openTagManager);
     document.getElementById('tagManagerCloseBtn').addEventListener('click', closeTagManager);
     document.getElementById('tagManagerModal').addEventListener('click', e=>{ if(e.target.id === 'tagManagerModal') closeTagManager(); });
@@ -3258,6 +3312,23 @@ Let me know when you have time to connect. We're excited to stay in touch.
         state[btn.dataset.collapseTarget] = !state[btn.dataset.collapseTarget];
         saveCollapsedSections(state);
         applyPulseCollapsedState();
+      });
+    }
+
+
+    function setupContentCollapse(){
+      const pairs = [
+        ['recruitListPanel','recruitListCollapseBtn','Recruit list'],
+        ['profilePanelWrap','profileCollapseBtn','Recruit profile']
+      ];
+      pairs.forEach(([panelId, btnId])=>{
+        const panel = document.getElementById(panelId);
+        const btn = document.getElementById(btnId);
+        if(!panel || !btn) return;
+        btn.addEventListener('click', ()=>{
+          panel.classList.toggle('collapsed');
+          btn.textContent = panel.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+        });
       });
     }
 
@@ -3360,6 +3431,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
     moveCallStreakIntoSidebar();
     moveSidebarTools();
     initPulseCollapseButtons();
+    setupContentCollapse();
     applyPulseCollapsedState();
     populateFilterOptions(Object.values(recruitDetails));
     updateCountdown();
