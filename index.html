@@ -852,7 +852,99 @@
     .about-footer-note{font-size:12px;color:var(--muted);line-height:1.45;margin-top:12px}
     @media (max-width:800px){.about-grid{grid-template-columns:1fr}}
 
-</style>
+
+
+    /* Compact countdown + moveable tile grid */
+    .tile-grid{
+      display:grid;
+      grid-template-columns:repeat(12,minmax(0,1fr));
+      gap:14px;
+      align-items:start;
+    }
+    .tile-grid .pulse-card{
+      grid-column:span 4;
+      position:relative;
+      min-height:0;
+    }
+    .tile-grid .pulse-card.wide{grid-column:span 8}
+    .tile-grid .compact-countdown-tile{grid-column:span 4}
+    .tile-drag-handle{
+      position:absolute;
+      top:10px;
+      right:10px;
+      width:30px;
+      height:30px;
+      border-radius:10px;
+      display:grid;
+      place-items:center;
+      color:rgba(100,116,139,.65);
+      background:rgba(241,245,249,.72);
+      cursor:grab;
+      font-weight:900;
+      letter-spacing:-4px;
+      z-index:2;
+      user-select:none;
+    }
+    .tile-drag-handle:active{cursor:grabbing}
+    .tile.dragging{opacity:.55;transform:scale(.985)}
+    .tile-drop-target{outline:2px dashed rgba(196,18,48,.35);outline-offset:4px}
+    .compact-countdown-tile{
+      background:
+        radial-gradient(circle at top right, rgba(255,255,255,.16), transparent 30%),
+        linear-gradient(135deg,#001f46 0%,#002D62 52%,#C41230 100%);
+      color:#fff;
+      border-color:rgba(255,255,255,.12);
+      box-shadow:0 14px 28px rgba(0,45,98,.18);
+      overflow:hidden;
+      padding:14px;
+      gap:10px;
+    }
+    .compact-countdown-tile .tile-drag-handle{background:rgba(255,255,255,.14);color:#fff}
+    .compact-countdown-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-right:30px}
+    .compact-countdown-title{font-size:18px;font-weight:900;line-height:1.05;margin-top:8px}
+    .compact-countdown-sub{font-size:12px;opacity:.9;margin-top:4px}
+    .compact-countdown-body{display:grid;grid-template-columns:88px 1fr;gap:12px;align-items:center;margin-top:4px}
+    .compact-ring-wrap{width:86px;height:86px;margin:0}
+    .compact-ring-svg{width:86px;height:86px}
+    .compact-ring-center{inset:12px;background:rgba(255,255,255,.11)}
+    .compact-ring-center .ring-days{font-size:24px}
+    .compact-ring-center .ring-days-label{font-size:9px;letter-spacing:.08em}
+    .ring-percent{font-size:10px;font-weight:900;color:#ffd7df;margin-top:2px}
+    .compact-time-row{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:8px}
+    .mini-time-card{
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.1);
+      border-radius:12px;
+      min-height:46px;
+      display:grid;
+      place-items:center;
+      padding:6px 4px;
+      overflow:hidden;
+    }
+    .mini-time-card span{font-size:19px;font-weight:900;line-height:1;transition:transform .18s ease}
+    .mini-time-card small{font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;opacity:.86;margin-top:2px}
+    .mini-time-card.bump span{transform:translateY(-1px) scale(1.08)}
+    .compact-progress{height:7px;background:rgba(255,255,255,.2)}
+    .compact-countdown-meta{font-size:11px;margin-top:7px;gap:8px;color:rgba(255,255,255,.9)}
+    .compact-countdown-tile.collapsed .countdown-body{display:none}
+    .compact-countdown-tile.collapsed{padding-bottom:14px}
+    .compact-countdown-tile .pulse-collapse-btn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.12);width:32px;height:32px}
+    .compact-countdown-tile .pulse-banner{padding:6px 9px;font-size:11px}
+    .compact-countdown-tile .ring-progress{stroke:#fff;filter:drop-shadow(0 0 4px rgba(255,255,255,.35))}
+    .compact-countdown-tile .progress-fill{background:linear-gradient(90deg,#fff,#ffd7df 50%,#ff8ea2 100%)}
+    @media (max-width:1450px){
+      .tile-grid .pulse-card{grid-column:span 6}
+      .tile-grid .pulse-card.wide{grid-column:span 12}
+      .tile-grid .compact-countdown-tile{grid-column:span 6}
+    }
+    @media (max-width:900px){
+      .tile-grid{grid-template-columns:1fr}
+      .tile-grid .pulse-card,.tile-grid .pulse-card.wide,.tile-grid .compact-countdown-tile{grid-column:1/-1}
+      .compact-countdown-body{grid-template-columns:78px 1fr}
+      .compact-ring-wrap,.compact-ring-svg{width:76px;height:76px}
+    }
+
+  </style>
 </head>
 <body>
   <div class="password-gate" id="passwordGate">
@@ -936,45 +1028,45 @@
         </div>
       </div>
 
-      <section class="countdown" id="countdownSection">
-        <div class="countdown-top">
-          <div>
-            <div class="pulse-banner">June 15 Contact Day</div>
-            <div class="countdown-title">Everything Builds Toward Contact Day.</div>
-            <div class="countdown-subtitle">Track urgency, stay ahead of calls, and keep Fresno State recruiting organized before the biggest contact day on the board.</div>
+      <section class="recruiting-pulse tile-grid" id="recruitingPulse" aria-label="Moveable dashboard tiles">
+        <div class="pulse-card countdown compact-countdown-tile tile" id="countdownSection" draggable="true" data-tile-id="countdownSection">
+          <div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
+          <div class="compact-countdown-head">
+            <div>
+              <div class="pulse-banner">🔥 June 15</div>
+              <div class="compact-countdown-title">Contact Day Countdown</div>
+              <div class="compact-countdown-sub" id="countdownStatus">Stay ready for contact day.</div>
+            </div>
+            <button class="pulse-collapse-btn" id="countdownToggleBtn" type="button" data-collapse-target="countdownSection">−</button>
           </div>
-          <button class="btn secondary" id="countdownToggleBtn" type="button">Collapse Countdown</button>
+          <div class="countdown-body compact-countdown-body" id="countdownBody">
+            <div class="ring-wrap compact-ring-wrap">
+              <svg class="ring-svg compact-ring-svg" viewBox="0 0 160 160" aria-hidden="true">
+                <circle class="ring-track" cx="80" cy="80" r="70"></circle>
+                <circle class="ring-progress" id="ringProgress" cx="80" cy="80" r="70"></circle>
+              </svg>
+              <div class="ring-center compact-ring-center">
+                <div class="ring-days" id="daysLeftNumber">--</div>
+                <div class="ring-days-label">days</div>
+                <div class="ring-percent" id="countdownRingPercent">--%</div>
+              </div>
+            </div>
+            <div class="compact-countdown-main">
+              <div class="compact-time-row">
+                <div class="mini-time-card bump" id="flipDays"><span id="flipDaysValue">--</span><small>days</small></div>
+                <div class="mini-time-card" id="flipHours"><span id="flipHoursValue">--</span><small>hrs</small></div>
+                <div class="mini-time-card" id="flipMinutes"><span id="flipMinutesValue">--</span><small>min</small></div>
+                <div class="mini-time-card" id="flipSeconds"><span id="flipSecondsValue">--</span><small>sec</small></div>
+              </div>
+              <div class="progress-bar compact-progress"><div class="progress-fill" id="progressFill"></div></div>
+              <div class="countdown-meta compact-countdown-meta">
+                <span id="countdownProgressText">Loading progress...</span>
+                <span id="countdownHMS">--</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="countdown-body" id="countdownBody">
-          <div class="ring-wrap">
-            <svg class="ring-svg" viewBox="0 0 160 160" aria-hidden="true">
-              <circle class="ring-track" cx="80" cy="80" r="70"></circle>
-              <circle class="ring-progress" id="ringProgress" cx="80" cy="80" r="70"></circle>
-            </svg>
-            <div class="ring-center">
-              <div class="ring-days" id="daysLeftNumber">--</div>
-              <div class="ring-days-label">Days Left</div>
-            </div>
-          </div>
-          <div>
-            <div class="flip-grid">
-              <div class="flip-card" id="flipDays"><div><div class="flip-value" id="flipDaysValue">--</div><div class="flip-label">Days</div></div></div>
-              <div class="flip-card" id="flipHours"><div><div class="flip-value" id="flipHoursValue">--</div><div class="flip-label">Hours</div></div></div>
-              <div class="flip-card" id="flipMinutes"><div><div class="flip-value" id="flipMinutesValue">--</div><div class="flip-label">Minutes</div></div></div>
-              <div class="flip-card" id="flipSeconds"><div><div class="flip-value" id="flipSecondsValue">--</div><div class="flip-label">Seconds</div></div></div>
-            </div>
-            <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-            <div class="countdown-meta">
-              <span id="countdownStatus">Stay ready for contact day.</span>
-              <span id="countdownProgressText">Loading progress…</span>
-              <span id="countdownHMS">--</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="recruiting-pulse" id="recruitingPulse">
-        <div class="pulse-card" id="pressureBoardCard">
+        <div class="pulse-card tile" id="pressureBoardCard" draggable="true" data-tile-id="pressureBoardCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
           <div class="pulse-card-top">
             <div>
               <h3>Pressure Board</h3>
@@ -993,7 +1085,7 @@
           <div class="tiny-note" id="callStreakNote" style="margin-top:8px;">5+ logged contacts starts a streak.</div>
         </div>
 
-        <div class="pulse-card" id="commitWatchCard">
+        <div class="pulse-card tile" id="commitWatchCard" draggable="true" data-tile-id="commitWatchCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
           <div class="pulse-card-top">
             <div>
               <h3>Commit Watch</h3>
@@ -1004,7 +1096,7 @@
           <div class="pulse-list" id="commitWatchList"></div>
         </div>
 
-        <div class="pulse-card wide" id="rosterMatrixCard">
+        <div class="pulse-card wide tile" id="rosterMatrixCard" draggable="true" data-tile-id="rosterMatrixCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
           <div class="pulse-card-top">
             <div>
               <h3>Roster Planning Mode</h3>
@@ -1015,7 +1107,7 @@
           <div class="roster-matrix-wrap" id="rosterMatrixGrid"></div>
           <div class="tiny-note" id="rosterMatrixNote">Targets save on this browser/device. Each cell shows current tracked, committed, target, and remaining need.</div>
         </div>
-              <div class="pulse-card wide" id="eventTrackerCard">
+              <div class="pulse-card wide tile" id="eventTrackerCard" draggable="true" data-tile-id="eventTrackerCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
           <div class="pulse-card-top">
             <div>
               <h3>Tournament / Event Tracker</h3>
@@ -1026,7 +1118,7 @@
           <div class="event-tracker-wrap" id="eventTrackerList"></div>
         </div>
 
-        <div class="pulse-card" id="clubCoachCard">
+        <div class="pulse-card tile" id="clubCoachCard" draggable="true" data-tile-id="clubCoachCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
           <div class="pulse-card-top">
             <div>
               <h3>Club Coach Calls</h3>
@@ -1037,7 +1129,7 @@
           <div class="coach-call-list" id="clubCoachCallList"></div>
         </div>
 
-        <div class="pulse-card" id="manualTournamentsCard">
+        <div class="pulse-card tile" id="manualTournamentsCard" draggable="true" data-tile-id="manualTournamentsCard"><div class="tile-drag-handle" title="Drag to move">⋮⋮</div>
           <div class="pulse-card-top">
             <div>
               <h3>Manual Tournaments</h3>
@@ -1642,7 +1734,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
     }
     function loadCollapsedSections(){
-      const defaults = {commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true, clubCoachCard:true, manualTournamentsCard:true};
+      const defaults = {countdownSection:false, commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true, clubCoachCard:true, manualTournamentsCard:true};
       try{ return {...defaults, ...JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}')}; }catch(e){ return defaults; }
     }
     function saveCollapsedSections(state){
@@ -3048,6 +3140,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
       document.getElementById('daysLeftNumber').textContent = String(days);
       document.getElementById('ringProgress').style.strokeDashoffset = String(ringOffset);
       document.getElementById('progressFill').style.width = `${progress.toFixed(2)}%`;
+      const ringPercentEl = document.getElementById('countdownRingPercent');
+      if(ringPercentEl) ringPercentEl.textContent = `${progress.toFixed(0)}%`;
       document.getElementById('countdownProgressText').textContent = `${progress.toFixed(1)}% to June 15, 2026`;
       document.getElementById('countdownHMS').textContent = `${String(hours).padStart(2,'0')}h ${String(minutes).padStart(2,'0')}m ${String(seconds).padStart(2,'0')}s`;
       document.getElementById('countdownStatus').textContent = diff === 0 ? 'Contact Day is here.' : days <= 7 ? 'Final stretch to contact day.' : 'Stay ready for contact day.';
@@ -3061,6 +3155,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         const valueEl = document.getElementById(valueId);
         const cardEl = document.getElementById(cardId);
         const next = String(value).padStart(2,'0');
+        if(!valueEl || !cardEl) return;
         if(valueEl.dataset.prev !== next){
           cardEl.classList.remove('bump'); void cardEl.offsetWidth; cardEl.classList.add('bump');
         }
@@ -3357,11 +3452,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(idx >= 0 && idx < filteredIds.length - 1){ selectedRecruitId = filteredIds[idx+1]; rebuildRecruitList(selectedRecruitId); openCallMode(selectedRecruitId); }
     });
 
-    document.getElementById('countdownToggleBtn').addEventListener('click', ()=>{
-      document.getElementById('countdownSection').classList.toggle('collapsed');
-      document.getElementById('countdownToggleBtn').textContent =
-        document.getElementById('countdownSection').classList.contains('collapsed') ? 'Expand Countdown' : 'Collapse Countdown';
-    });
     document.getElementById('toggleQuickFiltersBtn').addEventListener('click', ()=>{
       document.getElementById('quickFilters').classList.toggle('collapsed');
       document.getElementById('toggleQuickFiltersBtn').textContent =
@@ -3464,6 +3554,71 @@ Let me know when you have time to connect. We're excited to stay in touch.
       reader.readAsText(file);
       fileInput.value = '';
     });
+
+
+    const TILE_ORDER_KEY = 'recruit_board_tile_order_v1';
+    function loadTileOrder(){
+      try{return JSON.parse(localStorage.getItem(TILE_ORDER_KEY) || '[]');}catch(e){return [];}
+    }
+    function saveTileOrder(){
+      const grid = document.getElementById('recruitingPulse');
+      if(!grid) return;
+      const order = [...grid.querySelectorAll('[data-tile-id]')].map(tile=>tile.dataset.tileId);
+      localStorage.setItem(TILE_ORDER_KEY, JSON.stringify(order));
+    }
+    function applyTileOrder(){
+      const grid = document.getElementById('recruitingPulse');
+      if(!grid) return;
+      const order = loadTileOrder();
+      order.forEach(id=>{
+        const tile = grid.querySelector(`[data-tile-id="${id}"]`);
+        if(tile) grid.appendChild(tile);
+      });
+    }
+    function getDragAfterElement(container, x, y){
+      const draggableElements = [...container.querySelectorAll('.tile:not(.dragging)')];
+      return draggableElements.reduce((closest, child)=>{
+        const box = child.getBoundingClientRect();
+        const offsetY = y - box.top - box.height / 2;
+        const offsetX = x - box.left - box.width / 2;
+        const distance = Math.abs(offsetY) * 2 + Math.abs(offsetX);
+        if((offsetY < 0 || offsetX < 0) && distance < closest.distance){
+          return {distance, element: child};
+        }
+        return closest;
+      }, {distance: Number.POSITIVE_INFINITY, element: null}).element;
+    }
+    function initTileGrid(){
+      const grid = document.getElementById('recruitingPulse');
+      if(!grid) return;
+      applyTileOrder();
+      grid.querySelectorAll('.tile').forEach(tile=>{
+        tile.addEventListener('dragstart', (e)=>{
+          if(!e.target.closest('.tile-drag-handle') || e.target.closest('button,input,select,textarea,a')){ e.preventDefault(); return; }
+          tile.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', tile.dataset.tileId || tile.id || 'tile');
+        });
+        tile.addEventListener('dragend', ()=>{
+          tile.classList.remove('dragging');
+          grid.querySelectorAll('.tile-drop-target').forEach(el=>el.classList.remove('tile-drop-target'));
+          saveTileOrder();
+        });
+      });
+      grid.addEventListener('dragover', (e)=>{
+        e.preventDefault();
+        const dragging = grid.querySelector('.dragging');
+        if(!dragging) return;
+        const afterElement = getDragAfterElement(grid, e.clientX, e.clientY);
+        grid.querySelectorAll('.tile-drop-target').forEach(el=>el.classList.remove('tile-drop-target'));
+        if(afterElement){
+          afterElement.classList.add('tile-drop-target');
+          grid.insertBefore(dragging, afterElement);
+        }else{
+          grid.appendChild(dragging);
+        }
+      });
+    }
 
     function moveSidebarTools(){
       const sidebarHost = document.getElementById('sidebarFiltersBody');
@@ -3630,6 +3785,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
     initAboutBoard();
     moveCallStreakIntoSidebar();
     moveSidebarTools();
+    initTileGrid();
     initPulseCollapseButtons();
     setupContentCollapse();
     applyPulseCollapsedState();
