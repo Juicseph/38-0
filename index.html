@@ -502,6 +502,13 @@
     .star-btn,.pin-btn{border:none;background:transparent;cursor:pointer;font-size:18px;padding:0}
     .star-on{color:#d4af37}
     .pin-on{color:var(--red)}
+    .gut-strip{display:inline-flex;align-items:center;gap:2px;background:#f1f4f9;border:1px solid var(--line);border-radius:999px;padding:2px;margin-left:2px}
+    .gut-btn{border:none;background:transparent;border-radius:999px;width:24px;height:24px;display:inline-grid;place-items:center;cursor:pointer;font-size:13px;line-height:1;opacity:.55;transition:.15s ease}
+    .gut-btn:hover{opacity:1;background:#fff;transform:translateY(-1px)}
+    .gut-btn.active{opacity:1;background:#fff;box-shadow:0 2px 8px rgba(17,36,63,.08)}
+    .gut-btn.gut-like.active{background:#ecfdf3;color:#18794e}
+    .gut-btn.gut-unsure.active{background:#fff7e8;color:#9a6700}
+    .gut-btn.gut-pass.active{background:#fff2f2;color:#b42318}
     .meta{font-size:13px;color:var(--muted);line-height:1.45}
     .tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
     .tag,.tier-badge,.urgency-badge,.offer-badge,.call-chip,.badge{
@@ -1426,6 +1433,10 @@
               <div class="chip-row" id="priorityChips"></div>
             </div>
             <div class="quick-filter-group">
+              <div class="quick-filter-label">Gut Feeling</div>
+              <div class="chip-row" id="gutChips"></div>
+            </div>
+            <div class="quick-filter-group">
               <div class="quick-filter-label">June 15 Call</div>
               <div class="chip-row" id="ownerChips"></div>
             </div>
@@ -1525,6 +1536,7 @@
         <div><label>Rating</label><input id="fRating" class="field" /></div>
         <input id="fEngagementScoreOverride" type="hidden" />
         <div><label>Engagement Status</label><select id="fEngagementStatus" class="field"><option value="Auto">Auto</option><option value="Hot">Hot</option><option value="Neutral">Neutral</option><option value="Cold">Cold</option><option value="Out">Out</option></select></div>
+        <div><label>Gut Feeling</label><select id="fGutFeeling" class="field"><option value="">None</option><option value="Like">👍 Like</option><option value="Unsure">🤔 Unsure</option><option value="Pass">👎 Pass</option></select></div>
         <div><label>Commit Probability</label><div class="probability-wrap"><input id="fCommitProbability" type="range" min="0" max="100" step="5" class="field" /><div class="probability-readout" id="commitProbabilityReadout">0%</div></div></div>
         <div class="span-2"><label>Archetype Tags</label><div class="archetype-chip-grid" id="fArchetypeTags">
           <label><input type="checkbox" value="Program Changer" /> Program Changer</label>
@@ -1827,7 +1839,7 @@
     let selectedRecruitId = Object.keys(recruitDetails)[0] || '';
     let filteredIds = [];
     let currentBoardView = 'list';
-    const filterState = { group:'', priority:'', june15Call:'', shortcut:'' };
+    const filterState = { group:'', priority:'', gutFeeling:'', june15Call:'', shortcut:'' };
     let compareIds = [];
     let customTags = loadCustomTags();
     let rosterMatrixTargets = loadRosterMatrixTargets();
@@ -2357,6 +2369,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         rating: row.rating || '',
         engagementScoreOverride: row.engagementScoreOverride || '',
         engagementStatus: row.engagementStatus || 'Auto',
+        gutFeeling: row.gutFeeling || row.gut || '',
         commitProbability: row.commitProbability || '',
         archetypeTags: splitMulti(row.archetypeTags || row.archetypes || ''),
         offerStatus: row.offerStatus || row.offer || row.commitmentStatus || '',
@@ -2440,7 +2453,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       }
       const preserveIfBlank = [
         'summary','followUp','academics','visitStatus','headshot','pdfFile','pdfName','profileLink','filmLink','phone','email','height','graduationYear',
-        'callPlanLocal','callPlanTimezone','callPlanPST','eventName','eventDate','eventLocation','offerStatus','wroteToUs',
+        'callPlanLocal','callPlanTimezone','callPlanPST','eventName','eventDate','eventLocation','offerStatus','wroteToUs','gutFeeling',
         'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status'
       ];
       preserveIfBlank.forEach(field => {
@@ -2540,10 +2553,12 @@ Let me know when you have time to connect. We're excited to stay in touch.
     function renderQuickFilterChips(recruits){
       const groupCounts = countBy(recruits, r=>r.group);
       const priorityCounts = countBy(recruits, r=>r.priority || r.status);
+      const gutCounts = countBy(recruits, r=>r.gutFeeling);
       const ownerCounts = countBy(recruits, r=>r.june15Call);
 
       renderChipGroup('groupChips', ['Liberos','Middles','Setters','Pins','Camp','To Text'], groupCounts, 'group', filterState.group);
       renderChipGroup('priorityChips', ['Priority','Warm','Watch List'], priorityCounts, 'priority', filterState.priority);
+      renderChipGroup('gutChips', ['Like','Unsure','Pass'], gutCounts, 'gutFeeling', filterState.gutFeeling);
       renderChipGroup('ownerChips', ['Leisa','Jerome','Orlando','Kelsey'], ownerCounts, 'june15Call', filterState.june15Call);
 
       const shortcuts = [
@@ -2608,6 +2623,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(statusSelect.value) active.push(`Status: ${escapeHtml(statusSelect.value)}`);
       if(filterState.group) active.push(`Group: ${escapeHtml(filterState.group)}`);
       if(filterState.priority) active.push(`Priority: ${escapeHtml(filterState.priority)}`);
+      if(filterState.gutFeeling) active.push(`Gut: ${escapeHtml(filterState.gutFeeling)}`);
       if(filterState.june15Call) active.push(`Owner: ${escapeHtml(filterState.june15Call)}`);
       if(filterState.shortcut) active.push(`Shortcut: ${escapeHtml(filterState.shortcut)}`);
       const list = document.getElementById('activeFilterList');
@@ -3110,6 +3126,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         ['June 15 Call', recruit.june15Call || '—'],
         ['Rating', recruit.rating || '—'],
         ['Commit Probability', recruit.commitProbability ? recruit.commitProbability + '%' : '—'],
+        ['Gut Feeling', recruit.gutFeeling || '—'],
         ['Archetypes', (recruit.archetypeTags && recruit.archetypeTags.length) ? recruit.archetypeTags.join(', ') : '—'],
         ['Last Contact', recruit.lastContactDate || '—'],
         ['Next Action Due', recruit.nextActionDue || '—']
@@ -3242,7 +3259,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const searchTerm = (searchInput.value || '').toLowerCase().trim();
       let filtered = recruits.filter(r=>{
         const haystack = [
-          r.name,r.club,r.city,r.state,r.position,r.group,r.summary,r.june15Call,
+          r.name,r.club,r.city,r.state,r.position,r.group,r.summary,r.june15Call,r.gutFeeling,
           (r.notes || []).join(' '),(r.tags || []).join(' '),r.email,r.phone
         ].join(' ').toLowerCase();
 
@@ -3252,9 +3269,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
         const matchesStatus = !statusSelect.value || r.status === statusSelect.value || r.priority === statusSelect.value;
         const matchesGroup = !filterState.group || r.group === filterState.group;
         const matchesPriority = !filterState.priority || r.priority === filterState.priority || r.status === filterState.priority;
+        const matchesGut = !filterState.gutFeeling || r.gutFeeling === filterState.gutFeeling;
         const matchesOwner = !filterState.june15Call || r.june15Call === filterState.june15Call;
         const matchesWeekend = !activeWeekendTournamentId || isRecruitInActiveWeekend(r.id);
-        return matchesSearch && matchesClass && matchesPosition && matchesStatus && matchesGroup && matchesPriority && matchesOwner && matchesWeekend && passesShortcut(r);
+        return matchesSearch && matchesClass && matchesPosition && matchesStatus && matchesGroup && matchesPriority && matchesGut && matchesOwner && matchesWeekend && passesShortcut(r);
       });
 
       filtered = applySort(filtered);
@@ -3280,6 +3298,11 @@ Let me know when you have time to connect. We're excited to stay in touch.
                     <div class="name">${r.name}</div>
                     <button class="star-btn ${r.favorite ? 'star-on' : ''}" data-star="${r.id}" type="button">★</button>
                     <button class="pin-btn ${r.pinned ? 'pin-on' : ''}" data-pin="${r.id}" type="button">${r.pinned ? '📌' : '📍'}</button>
+                    <span class="gut-strip" title="Gut Feeling">
+                      <button class="gut-btn gut-like ${r.gutFeeling === 'Like' ? 'active' : ''}" data-gut="${r.id}" data-gut-value="Like" type="button" title="Like">👍</button>
+                      <button class="gut-btn gut-unsure ${r.gutFeeling === 'Unsure' ? 'active' : ''}" data-gut="${r.id}" data-gut-value="Unsure" type="button" title="Unsure">🤔</button>
+                      <button class="gut-btn gut-pass ${r.gutFeeling === 'Pass' ? 'active' : ''}" data-gut="${r.id}" data-gut-value="Pass" type="button" title="Pass">👎</button>
+                    </span>
                   </div>
                   <div class="meta">${profileSubtitle(r)}</div>
                   ${cardStatusIcons(r) ? `<div class="status-icons">${cardStatusIcons(r)}</div>` : ``}
@@ -3313,7 +3336,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
       recruitList.querySelectorAll('.recruit-card').forEach(card=>{
         card.addEventListener('click', (e)=>{
-          if(e.target.closest('[data-star],[data-pin],[data-check],[data-compare],[data-log],a.quick-action-btn,button.quick-action-btn')) return;
+          if(e.target.closest('[data-star],[data-pin],[data-gut],[data-check],[data-compare],[data-log],a.quick-action-btn,button.quick-action-btn')) return;
           selectedRecruitId = card.dataset.id;
           rebuildRecruitList(selectedRecruitId);
         });
@@ -3333,6 +3356,16 @@ Let me know when you have time to connect. We're excited to stay in touch.
           const id = btn.dataset.pin;
           recruitDetails[id].pinned = !recruitDetails[id].pinned;
           recruitDetails[id].pinTier = recruitDetails[id].pinned ? (recruitDetails[id].pinTier || 1) : 0;
+          recruitDetails[id].updatedAt = new Date().toISOString();
+          saveData(); rebuildRecruitList(selectedRecruitId);
+        });
+      });
+      recruitList.querySelectorAll('[data-gut]').forEach(btn=>{
+        btn.addEventListener('click', (e)=>{
+          e.stopPropagation();
+          const id = btn.dataset.gut;
+          const value = btn.dataset.gutValue;
+          recruitDetails[id].gutFeeling = recruitDetails[id].gutFeeling === value ? '' : value;
           recruitDetails[id].updatedAt = new Date().toISOString();
           saveData(); rebuildRecruitList(selectedRecruitId);
         });
@@ -3491,14 +3524,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','commitProbability','archetypeTags','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','gutFeeling','commitProbability','archetypeTags','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
         ...rows.map(r => headers.map(h => {
           const map = {
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
-            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',commitProbability:r.commitProbability || '',archetypeTags:(r.archetypeTags||[]).join(', '),offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
+            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',gutFeeling:r.gutFeeling || '',commitProbability:r.commitProbability || '',archetypeTags:(r.archetypeTags||[]).join(', '),offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
             q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Answer1:r.q1Answer1,q1Question2:r.q1Question2,q1Answer2:r.q1Answer2,q1Question3:r.q1Question3,q1Answer3:r.q1Answer3,q2Question1:r.q2Question1,q2Answer1:r.q2Answer1,q2Question2:r.q2Question2,q2Answer2:r.q2Answer2,q2Question3:r.q2Question3,q2Answer3:r.q2Answer3,q3Question1:r.q3Question1,q3Answer1:r.q3Answer1,q3Question2:r.q3Question2,q3Answer2:r.q3Answer2,q3Question3:r.q3Question3,q3Answer3:r.q3Answer3,q4Question1:r.q4Question1,q4Answer1:r.q4Answer1,q4Question2:r.q4Question2,q4Answer2:r.q4Answer2,q4Question3:r.q4Question3,q4Answer3:r.q4Answer3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
             campAttended:r.campAttended,pdfName:r.pdfName || (r.pdfFile ? 'Uploaded' : ''),filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
@@ -3524,7 +3557,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       state:document.getElementById('fState'), club:document.getElementById('fClub'), priority:document.getElementById('fPriority'),
       phone:document.getElementById('fPhone'), email:document.getElementById('fEmail'), profileLink:document.getElementById('fProfileLink'),
       filmLink:document.getElementById('fFilmLink'), june15Call:document.getElementById('fJune15Call'),
-      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), commitProbability:document.getElementById('fCommitProbability'), archetypeTags:document.getElementById('fArchetypeTags'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
+      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), gutFeeling:document.getElementById('fGutFeeling'), commitProbability:document.getElementById('fCommitProbability'), archetypeTags:document.getElementById('fArchetypeTags'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
       height:document.getElementById('fHeight'), gradYear:document.getElementById('fGradYear'),
       lastContact:document.getElementById('fLastContact'), nextActionDue:document.getElementById('fNextActionDue'),
       callPlanLocal:document.getElementById('fCallPlanLocal'), callPlanTimezone:document.getElementById('fCallPlanTimezone'), callPlanPST:document.getElementById('fCallPlanPST'),
@@ -3565,6 +3598,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       formEls.rating.value = r?.rating || '';
       formEls.engagementScoreOverride.value = '';
       formEls.engagementStatus.value = r?.engagementStatus || 'Auto';
+      if(formEls.gutFeeling) formEls.gutFeeling.value = r?.gutFeeling || '';
       if(formEls.commitProbability){ formEls.commitProbability.value = r?.commitProbability || 0; const out=document.getElementById('commitProbabilityReadout'); if(out) out.textContent = (formEls.commitProbability.value || 0) + '%'; }
       if(formEls.archetypeTags){ const selected = new Set(r?.archetypeTags || []); formEls.archetypeTags.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = selected.has(cb.value)); }
       formEls.offerStatus.value = r?.offerStatus || '';
@@ -3696,6 +3730,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         status:formEls.priority.value || 'Active', june15Call:formEls.june15Call.value, rating:formEls.rating.value,
         engagementScoreOverride:'',
         engagementStatus:formEls.engagementStatus.value || 'Auto',
+        gutFeeling: formEls.gutFeeling ? formEls.gutFeeling.value : '',
         commitProbability:formEls.commitProbability ? formEls.commitProbability.value : '',
         archetypeTags:formEls.archetypeTags ? Array.from(formEls.archetypeTags.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value) : [],
         offerStatus:formEls.offerStatus.value, wroteToUs:formEls.wroteToUs.value, eventName:formEls.eventName.value, eventDate:formEls.eventDate.value, eventLocation:formEls.eventLocation.value, height:formEls.height.value,
@@ -3945,6 +3980,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       sortSelect.value = 'pins';
       filterState.group = '';
       filterState.priority = '';
+      filterState.gutFeeling = '';
       filterState.june15Call = '';
       filterState.shortcut = '';
       rebuildRecruitList(selectedRecruitId);
