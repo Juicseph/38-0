@@ -431,13 +431,16 @@
     .matrix-cell.matrix-need{border-color:#f2b8b5;background:#fff7f7}
     .matrix-label{font-size:10px;color:var(--muted);font-weight:800;text-align:center;text-transform:uppercase;letter-spacing:.04em}
     .matrix-commit{font-size:10px;color:#18407c;font-weight:800;text-align:center}
-    .status-icons{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-    .status-icon{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:4px 7px;font-size:11px;font-weight:900;color:#22324a}
+    .status-icons{display:flex;flex-wrap:nowrap;gap:4px;margin-top:6px;align-items:center;overflow-x:auto;max-width:100%;padding-bottom:1px;scrollbar-width:none}
+    .status-icons::-webkit-scrollbar{display:none}
+    .status-icon{display:inline-flex;align-items:center;gap:3px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:3px 6px;font-size:10px;font-weight:900;color:#22324a;line-height:1.1;white-space:nowrap;flex:0 0 auto}
+    .status-icon span:first-child{font-size:12px;line-height:1}
     .status-icon.hot{background:#fff2f4;border-color:#f3bcc8;color:#b42318}
     .status-icon.cold{background:#eef2f7;color:#475569}
     .status-icon.warn{background:#fff7e8;border-color:#f5d08a;color:#9a6700}
     .status-icon.schedule{background:#eef4ff;border-color:#c9d8f5;color:#18407c}
     .status-icon.priority{background:#fff7e8;border-color:#f5d08a;color:#9a6700}
+    .profile-status-icons{margin:0;display:inline-flex;vertical-align:middle}
     .content-panel.collapsed .recruit-list,
     .content-panel.collapsed .board-view,
     .content-panel.collapsed .profile-scroll{display:none!important}
@@ -662,7 +665,7 @@
     .sidebar-filters-host .filter-chip{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.12);color:#fff}
     .sidebar-filters-host .filter-chip.active{background:#fff;color:var(--red);border-color:#fff}
     .sidebar-filters-host .filter-count{background:rgba(255,255,255,.16);color:#fff}
-    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .event-tracker-wrap,.pulse-card.collapsed .coach-call-list,.pulse-card.collapsed .manual-event-list,.pulse-card.collapsed .board-health-grid,.pulse-card.collapsed .health-checks{display:none}
+    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .board-view-controls,.pulse-card.collapsed .event-tracker-wrap,.pulse-card.collapsed .coach-call-list,.pulse-card.collapsed .manual-event-list,.pulse-card.collapsed .board-health-grid,.pulse-card.collapsed .health-checks{display:none}
     .pulse-collapse-btn{border:none;background:#fff;color:var(--text);width:36px;height:36px;border-radius:12px;cursor:pointer;font-weight:800}
     .pulse-card.minimal{padding:14px}
     .pulse-mini-stack{display:grid;gap:8px}
@@ -1067,7 +1070,21 @@
     .archetype-chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
     .archetype-chip-grid label{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff;font-size:12px;font-weight:800;color:#405067;cursor:pointer}
     .archetype-chip-grid input{margin:0}
-    .commit-probability-pill{background:#f6f0ff;color:#5b21b6;border:1px solid #ddd6fe}
+     .commit-probability-pill{background:#f6f0ff;color:#5b21b6;border:1px solid #ddd6fe}
+    .status-probability-badge{
+      display:grid;
+      gap:3px;
+      justify-items:end;
+      align-content:center;
+      line-height:1.1;
+      min-width:78px;
+      text-align:right;
+    }
+    .status-probability-badge .status-text{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+    .status-probability-badge .prob-text{font-size:12px;font-weight:900;color:#5b21b6;white-space:nowrap}
+    .status-probability-badge .prob-high{color:#18794e}
+    .status-probability-badge .prob-mid{color:#9a6700}
+    .status-probability-badge .prob-low{color:#b42318}
     .archetype-pill{background:#eef4ff;color:#18407c;border:1px solid #c9d8f5}
 
     /* Board Health + Club Coach paired cleanly */
@@ -1082,6 +1099,14 @@
     #clubCoachCard .coach-call-item{padding:10px;border-radius:12px}
     #clubCoachCard .coach-call-name{font-size:14px}
     #clubCoachCard .coach-call-meta{font-size:11px}
+
+    #dailySheet.pulse-card{padding:14px;border-radius:16px;box-shadow:none;margin-top:0}
+    #dailySheet.pulse-card .daily-sheet-top{padding:0;margin-bottom:10px}
+    #dailySheet.pulse-card .daily-sheet-body{padding:0;max-height:220px;overflow:auto}
+    #dailySheet.pulse-card.collapsed .daily-sheet-body{display:none!important}
+    .board-view-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .board-view-controls .btn{width:100%;justify-content:center}
+    @media (max-width:1100px){#dailySheet.pulse-card{grid-column:auto}.board-view-controls{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -1291,10 +1316,20 @@
         </div>
 
 
+        <section class="daily-sheet pulse-card wide" id="dailySheet">
+          <div class="pulse-card-top daily-sheet-top">
+            <div>
+              <h3 style="margin:0;font-size:16px;">Today’s Calls</h3>
+              <div style="margin-top:4px;font-size:12px;color:var(--muted);" id="dailyMeta">No calls scheduled today.</div>
+            </div>
+            <button class="pulse-collapse-btn" id="dailyToggleBtn" type="button">−</button>
+          </div>
+          <div class="daily-sheet-body" id="dailyBody"></div>
+        </section>
         <div class="pulse-card wide" id="rosterMatrixCard">
           <div class="pulse-card-top">
             <div>
-              <h3>Roster Planning Mode</h3>
+              <h3>Roster Planning</h3>
               <p>Edit roster targets by position and class year. Current, committed, and remaining needs update automatically.</p>
             </div>
             <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="saveRosterMatrixBtn" type="button">Save Matrix</button><button class="pulse-collapse-btn" data-collapse-target="rosterMatrixCard" type="button">−</button></div>
@@ -1322,6 +1357,20 @@
             <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="addTournamentBtn" type="button">Add Tournament</button><button class="pulse-collapse-btn" data-collapse-target="manualTournamentsCard" type="button">−</button></div>
           </div>
           <div class="manual-event-list" id="manualTournamentList"></div>
+        </div>
+
+        <div class="pulse-card" id="boardViewControlsCard">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Board View</h3>
+              <p>Switch the recruit panel between list view and position board.</p>
+            </div>
+            <button class="pulse-collapse-btn" data-collapse-target="boardViewControlsCard" type="button">−</button>
+          </div>
+          <div class="pulse-mini-stack board-view-controls">
+            <button class="btn secondary" id="listViewBtn" type="button">List View</button>
+            <button class="btn secondary" id="boardViewBtn" type="button">Position Board</button>
+          </div>
         </div>
       </section>
 
@@ -1410,25 +1459,6 @@
         </div>
       </section>
 
-      <section class="daily-sheet" id="dailySheet">
-        <div class="daily-sheet-top">
-          <div>
-            <h3 style="margin:0;font-size:16px;">Today’s Calls</h3>
-            <div style="margin-top:4px;font-size:12px;color:var(--muted);" id="dailyMeta">No calls scheduled today.</div>
-          </div>
-          <button class="btn secondary" id="dailyToggleBtn" type="button">Collapse</button>
-        </div>
-        <div class="daily-sheet-body" id="dailyBody"></div>
-      </section>
-
-      <section class="content-panel" style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
-        <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Board View</div>
-        <div class="actions">
-          <button class="btn secondary" id="listViewBtn" type="button">List View</button>
-          <button class="btn secondary" id="boardViewBtn" type="button">Position Board</button>
-        </div>
-      </section>
-
             <section class="content-panel compare-bar">
         <div>
           <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Compare Mode</div>
@@ -1493,7 +1523,7 @@
         <div><label>Film Link</label><input id="fFilmLink" class="field" /></div>
         <div><label>June 15 Call</label><input id="fJune15Call" class="field" /></div>
         <div><label>Rating</label><input id="fRating" class="field" /></div>
-        <div><label>Engagement Score Override</label><input id="fEngagementScoreOverride" type="number" min="0" max="100" step="1" class="field" placeholder="Blank = auto score" /></div>
+        <input id="fEngagementScoreOverride" type="hidden" />
         <div><label>Engagement Status</label><select id="fEngagementStatus" class="field"><option value="Auto">Auto</option><option value="Hot">Hot</option><option value="Neutral">Neutral</option><option value="Cold">Cold</option><option value="Out">Out</option></select></div>
         <div><label>Commit Probability</label><div class="probability-wrap"><input id="fCommitProbability" type="range" min="0" max="100" step="5" class="field" /><div class="probability-readout" id="commitProbabilityReadout">0%</div></div></div>
         <div class="span-2"><label>Archetype Tags</label><div class="archetype-chip-grid" id="fArchetypeTags">
@@ -2113,10 +2143,9 @@ Let me know when you have time to connect. We're excited to stay in touch.
       }
       else {
         body.innerHTML = `<div class="compare-grid">${picks.map(r => {
-          const eMeta = engagementStatusMeta(r);
           return `<div class="compare-card">
             <h4>${escapeHtml(r.name)}</h4>
-            <div class="tag-row"><span class="score-badge ${eMeta.cls}">${eMeta.score} Engagement • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${escapeHtml(r.offerStatus)}</span>` : ''}</div>
+            <div class="tag-row">${cardStatusIcons(r)}${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${escapeHtml(r.offerStatus)}</span>` : ''}</div>
             <div class="compare-line"><strong>Profile:</strong> ${escapeHtml(profileSubtitle(r) || '—')}</div>
             <div class="compare-line"><strong>Rating:</strong> ${escapeHtml(r.rating || '—')} • <strong>Owner:</strong> ${escapeHtml(r.june15Call || '—')}</div>
             <div class="compare-line"><strong>Academics:</strong> ${escapeHtml(r.academics || '—')}</div>
@@ -3072,7 +3101,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
       }
       const urg = urgencyForRecruit(recruit);
       const tier = pinTierLabel(recruit);
-      const eMeta = engagementStatusMeta(recruit);
       const chipHtml = (recruit.tags || []).map(tag=>`<span class="tag">${tag}</span>`).join('');
       const statHtml = [
         ['Height', recruit.height || '—'],
@@ -3101,7 +3129,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
                 ${tier ? `<span class="tier-badge">${tier}</span>` : ''}
                 <span class="urgency-badge ${urg.cls}">${urg.label}</span>
                 ${recruit.callPlanPST ? `<span class="call-chip">Call ${recruit.callPlanPST} PST</span>` : ''}
-                <span class="score-badge ${eMeta.cls}">${eMeta.score} Engagement • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>
+                ${cardStatusIcons(recruit) ? `<span class="status-icons profile-status-icons">${cardStatusIcons(recruit)}</span>` : ''}
                 ${chipHtml}
               </div>
             </div>
@@ -3241,7 +3269,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
       recruitList.innerHTML = filtered.map(r=>{
         const urg = urgencyForRecruit(r);
         const tier = pinTierLabel(r);
-        const eMeta = engagementStatusMeta(r);
         return `
           <div class="recruit-card ${cardColorClass(r)} ${String(r.id)===String(activeId) ? 'active' : ''}" data-id="${r.id}">
             <div class="card-top">
@@ -3258,7 +3285,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
                   ${cardStatusIcons(r) ? `<div class="status-icons">${cardStatusIcons(r)}</div>` : ``}
                 </div>
               </div>
-              <div class="badge">${r.priority || r.status || 'Active'}</div>
+              <div class="badge status-probability-badge">
+                <span class="status-text">${r.priority || r.status || 'Active'}</span>
+                ${r.commitProbability ? `<span class="prob-text ${Number(r.commitProbability) >= 70 ? 'prob-high' : Number(r.commitProbability) >= 40 ? 'prob-mid' : 'prob-low'}">🎯 ${r.commitProbability}%</span>` : ''}
+              </div>
             </div>
             <div class="tag-row">
               <span class="tag club-tag">${r.club || 'No Club'}</span>
@@ -3266,8 +3296,6 @@ Let me know when you have time to connect. We're excited to stay in touch.
               <span class="urgency-badge ${urg.cls}">${urg.label}</span>
               ${r.callPlanPST ? `<span class="call-chip">Call ${r.callPlanPST} PST</span>` : ''}
               ${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${r.offerStatus}</span>` : ''}
-              <span class="score-badge ${eMeta.cls}">${eMeta.score} • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>
-              ${r.commitProbability ? `<span class="tag commit-probability-pill">${r.commitProbability}% Commit</span>` : ''}
               ${(r.archetypeTags || []).slice(0,2).map(tag=>`<span class="tag archetype-pill">${tag}</span>`).join('')}
               ${r.pdfFile ? `<span class="tag">PDF</span>` : ''}
               ${(r.tags || []).slice(0,2).map(tag=>`<span class="tag">${tag}</span>`).join('')}
@@ -3535,7 +3563,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       formEls.filmLink.value = r?.filmLink || '';
       formEls.june15Call.value = r?.june15Call || '';
       formEls.rating.value = r?.rating || '';
-      formEls.engagementScoreOverride.value = r?.engagementScoreOverride ?? '';
+      formEls.engagementScoreOverride.value = '';
       formEls.engagementStatus.value = r?.engagementStatus || 'Auto';
       if(formEls.commitProbability){ formEls.commitProbability.value = r?.commitProbability || 0; const out=document.getElementById('commitProbabilityReadout'); if(out) out.textContent = (formEls.commitProbability.value || 0) + '%'; }
       if(formEls.archetypeTags){ const selected = new Set(r?.archetypeTags || []); formEls.archetypeTags.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = selected.has(cb.value)); }
@@ -3666,7 +3694,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         name:formEls.name.value, classYear:formEls.classYear.value, group:formEls.group.value, position:formEls.position.value,
         city:formEls.city.value, state:formEls.state.value, club:formEls.club.value, priority:formEls.priority.value || 'Active',
         status:formEls.priority.value || 'Active', june15Call:formEls.june15Call.value, rating:formEls.rating.value,
-        engagementScoreOverride:formEls.engagementScoreOverride.value,
+        engagementScoreOverride:'',
         engagementStatus:formEls.engagementStatus.value || 'Auto',
         commitProbability:formEls.commitProbability ? formEls.commitProbability.value : '',
         archetypeTags:formEls.archetypeTags ? Array.from(formEls.archetypeTags.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value) : [],
@@ -3746,7 +3774,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.getElementById('dailyToggleBtn').addEventListener('click', ()=>{
       document.getElementById('dailySheet').classList.toggle('collapsed');
       document.getElementById('dailyToggleBtn').textContent =
-        document.getElementById('dailySheet').classList.contains('collapsed') ? 'Expand' : 'Collapse';
+        document.getElementById('dailySheet').classList.contains('collapsed') ? '+' : '−';
     });
     document.getElementById('snapshotToggleBtn').addEventListener('click', ()=>{
       document.getElementById('snapshotBody').classList.toggle('hidden');
