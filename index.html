@@ -609,11 +609,6 @@
     .score-badge{background:#eef4ff;color:#18407c;border:1px solid #c9d8f5;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:800}
     .score-hot{background:#fff2f2;color:#b42318;border-color:#f2b8b5}
     .score-warm{background:#fff7e8;color:#9a6700;border-color:#f5d08a}
-    .score-neutral{background:#eef2f7;color:#475569;border-color:#d7deea}
-    .score-out{background:#111827;color:#fff;border-color:#111827}
-    .qa-stack{display:grid;gap:8px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#fbfdff}
-    .qa-pair{display:grid;gap:8px}
-    .qa-pair .mini-label{font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
     .compare-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px}
     .compare-picks{display:flex;gap:8px;flex-wrap:wrap}
     .compare-pill{display:inline-flex;align-items:center;gap:8px;background:#f7f9fc;border:1px solid var(--line);border-radius:999px;padding:7px 10px;font-size:12px;font-weight:700}
@@ -790,7 +785,10 @@
     .modal-card.narrow{width:min(760px,100%)}
     @media (max-width:900px){.assignment-grid,.inline-form-grid{grid-template-columns:1fr}}
 
-  </style>
+      .qa-field-pair{display:grid;gap:6px}
+    .qa-answer-text{margin-top:4px;color:#334155}
+    .qa-question-text{font-weight:800;color:#172033}
+</style>
 </head>
 <body>
   <div class="password-gate" id="passwordGate">
@@ -1171,16 +1169,8 @@
         <div><label>Film Link</label><input id="fFilmLink" class="field" /></div>
         <div><label>June 15 Call</label><input id="fJune15Call" class="field" /></div>
         <div><label>Rating</label><input id="fRating" class="field" /></div>
-        <div><label>Engagement Status</label>
-          <select id="fEngagementStatusOverride" class="field">
-            <option value="">Auto</option>
-            <option value="Hot">Hot</option>
-            <option value="Neutral">Neutral</option>
-            <option value="Cold">Cold</option>
-            <option value="Out">Out</option>
-          </select>
-        </div>
-        <div><label>Manual Engagement Score</label><input id="fEngagementScoreOverride" type="number" min="0" max="100" step="1" class="field" placeholder="Blank = auto score" /></div>
+        <div><label>Engagement Score Override</label><input id="fEngagementScoreOverride" type="number" min="0" max="100" step="1" class="field" placeholder="Blank = auto score" /></div>
+        <div><label>Engagement Status</label><select id="fEngagementStatus" class="field"><option value="Auto">Auto</option><option value="Hot">Hot</option><option value="Neutral">Neutral</option><option value="Cold">Cold</option><option value="Out">Out</option></select></div>
         <div><label>Offer / Commitment</label>
           <select id="fOfferStatus" class="field">
             <option value="">None</option>
@@ -1216,18 +1206,21 @@
         <div><label>Q3</label><select id="fQ3" class="field"><option value="false">No</option><option value="true">Yes</option></select></div>
         <div><label>Q4</label><select id="fQ4" class="field"><option value="false">No</option><option value="true">Yes</option></select></div>
 
-        <div class="span-2 qa-stack"><div class="mini-label">Q1 - Slot 1</div><div class="qa-pair"><label>Question</label><input id="fQ1Question1" class="field" placeholder="Add Q1 question 1" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ1Answer1" rows="2" class="field" placeholder="Add Q1 answer 1"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q1 - Slot 2</div><div class="qa-pair"><label>Question</label><input id="fQ1Question2" class="field" placeholder="Add Q1 question 2" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ1Answer2" rows="2" class="field" placeholder="Add Q1 answer 2"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q1 - Slot 3</div><div class="qa-pair"><label>Question</label><input id="fQ1Question3" class="field" placeholder="Add Q1 question 3" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ1Answer3" rows="2" class="field" placeholder="Add Q1 answer 3"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q2 - Slot 1</div><div class="qa-pair"><label>Question</label><input id="fQ2Question1" class="field" placeholder="Add Q2 question 1" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ2Answer1" rows="2" class="field" placeholder="Add Q2 answer 1"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q2 - Slot 2</div><div class="qa-pair"><label>Question</label><input id="fQ2Question2" class="field" placeholder="Add Q2 question 2" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ2Answer2" rows="2" class="field" placeholder="Add Q2 answer 2"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q2 - Slot 3</div><div class="qa-pair"><label>Question</label><input id="fQ2Question3" class="field" placeholder="Add Q2 question 3" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ2Answer3" rows="2" class="field" placeholder="Add Q2 answer 3"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q3 - Slot 1</div><div class="qa-pair"><label>Question</label><input id="fQ3Question1" class="field" placeholder="Add Q3 question 1" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ3Answer1" rows="2" class="field" placeholder="Add Q3 answer 1"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q3 - Slot 2</div><div class="qa-pair"><label>Question</label><input id="fQ3Question2" class="field" placeholder="Add Q3 question 2" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ3Answer2" rows="2" class="field" placeholder="Add Q3 answer 2"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q3 - Slot 3</div><div class="qa-pair"><label>Question</label><input id="fQ3Question3" class="field" placeholder="Add Q3 question 3" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ3Answer3" rows="2" class="field" placeholder="Add Q3 answer 3"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q4 - Slot 1</div><div class="qa-pair"><label>Question</label><input id="fQ4Question1" class="field" placeholder="Add Q4 question 1" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ4Answer1" rows="2" class="field" placeholder="Add Q4 answer 1"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q4 - Slot 2</div><div class="qa-pair"><label>Question</label><input id="fQ4Question2" class="field" placeholder="Add Q4 question 2" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ4Answer2" rows="2" class="field" placeholder="Add Q4 answer 2"></textarea></div></div>
-        <div class="span-2 qa-stack"><div class="mini-label">Q4 - Slot 3</div><div class="qa-pair"><label>Question</label><input id="fQ4Question3" class="field" placeholder="Add Q4 question 3" /></div><div class="qa-pair"><label>Answer</label><textarea id="fQ4Answer3" rows="2" class="field" placeholder="Add Q4 answer 3"></textarea></div></div>
+        <div class="span-2 qa-field-pair"><label>Q1 - Question 1</label><textarea id="fQ1Question1" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q1 - Answer 1</label><textarea id="fQ1Answer1" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q1 - Question 2</label><textarea id="fQ1Question2" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q1 - Answer 2</label><textarea id="fQ1Answer2" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q1 - Question 3</label><textarea id="fQ1Question3" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q1 - Answer 3</label><textarea id="fQ1Answer3" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+
+        <div class="span-2 qa-field-pair"><label>Q2 - Question 1</label><textarea id="fQ2Question1" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q2 - Answer 1</label><textarea id="fQ2Answer1" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q2 - Question 2</label><textarea id="fQ2Question2" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q2 - Answer 2</label><textarea id="fQ2Answer2" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q2 - Question 3</label><textarea id="fQ2Question3" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q2 - Answer 3</label><textarea id="fQ2Answer3" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+
+        <div class="span-2 qa-field-pair"><label>Q3 - Question 1</label><textarea id="fQ3Question1" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q3 - Answer 1</label><textarea id="fQ3Answer1" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q3 - Question 2</label><textarea id="fQ3Question2" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q3 - Answer 2</label><textarea id="fQ3Answer2" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q3 - Question 3</label><textarea id="fQ3Question3" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q3 - Answer 3</label><textarea id="fQ3Answer3" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+
+        <div class="span-2 qa-field-pair"><label>Q4 - Question 1</label><textarea id="fQ4Question1" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q4 - Answer 1</label><textarea id="fQ4Answer1" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q4 - Question 2</label><textarea id="fQ4Question2" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q4 - Answer 2</label><textarea id="fQ4Answer2" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
+        <div class="span-2 qa-field-pair"><label>Q4 - Question 3</label><textarea id="fQ4Question3" rows="2" class="field" placeholder="Type the question"></textarea><label style="margin-top:8px;display:block;">Q4 - Answer 3</label><textarea id="fQ4Answer3" rows="3" class="field" placeholder="Type the athlete answer"></textarea></div>
 
         <div><label>Primary Event Name</label><input id="fEventName" class="field" placeholder="SCVA Red Rock" /></div>
         <div><label>Event Date</label><input id="fEventDate" type="date" class="field" /></div>
@@ -1609,14 +1602,9 @@
       score += ['q1','q2','q3','q4'].filter(q => recruit[q]).length * 4;
       return Math.max(0, Math.min(100, score));
     }
-    function engagementTier(score, recruit){
-      const manualLabel = String(recruit?.engagementStatusOverride || '').trim();
-      if(manualLabel === 'Hot') return {label:'Hot', cls:'score-hot'};
-      if(manualLabel === 'Neutral') return {label:'Neutral', cls:'score-neutral'};
-      if(manualLabel === 'Cold') return {label:'Cold', cls:''};
-      if(manualLabel === 'Out') return {label:'Out', cls:'score-out'};
+    function engagementTier(score){
       if(score >= 80) return {label:'Hot', cls:'score-hot'};
-      if(score >= 55) return {label:'Neutral', cls:'score-neutral'};
+      if(score >= 55) return {label:'Warm', cls:'score-warm'};
       return {label:'Cold', cls:''};
     }
     function toggleCompareRecruit(id, autoOpen=true){
@@ -1693,10 +1681,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
       }
       else {
         body.innerHTML = `<div class="compare-grid">${picks.map(r => {
-          const score = engagementScore(r); const tier = engagementTier(score, r);
+          const eMeta = engagementStatusMeta(r);
           return `<div class="compare-card">
             <h4>${escapeHtml(r.name)}</h4>
-            <div class="tag-row"><span class="score-badge ${tier.cls}">${score} Engagement • ${tier.label}${(r.engagementStatusOverride || r.engagementScoreOverride !== "" && r.engagementScoreOverride !== null && r.engagementScoreOverride !== undefined) ? " Manual" : ""}</span>${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${escapeHtml(r.offerStatus)}</span>` : ''}</div>
+            <div class="tag-row"><span class="score-badge ${eMeta.cls}">${eMeta.score} Engagement • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${escapeHtml(r.offerStatus)}</span>` : ''}</div>
             <div class="compare-line"><strong>Profile:</strong> ${escapeHtml(profileSubtitle(r) || '—')}</div>
             <div class="compare-line"><strong>Rating:</strong> ${escapeHtml(r.rating || '—')} • <strong>Owner:</strong> ${escapeHtml(r.june15Call || '—')}</div>
             <div class="compare-line"><strong>Academics:</strong> ${escapeHtml(r.academics || '—')}</div>
@@ -1802,31 +1790,33 @@ Let me know when you have time to connect. We're excited to stay in touch.
       return isNaN(d.getTime()) ? null : d;
     }
 
-    function getQuarterEntries(recruit, quarter){
+    function getQuarterQuestions(recruit, quarter){
       return [1,2,3].map(i => ({
         question: recruit[`${quarter}Question${i}`] || '',
         answer: recruit[`${quarter}Answer${i}`] || ''
       }));
     }
-    function getQuarterQuestions(recruit, quarter){
-      return getQuarterEntries(recruit, quarter).map(item => item.question).filter(Boolean);
-    }
     function renderQuarterQuestionSection(recruit, quarter){
       const complete = recruit[quarter] ? 'Complete' : 'Not Complete';
-      const items = getQuarterEntries(recruit, quarter).filter(item => item.question || item.answer);
+      const items = getQuarterQuestions(recruit, quarter).filter(item => item.question || item.answer);
       return `
         <div class="section">
           <h5>${quarter.toUpperCase()} Questions + Answers</h5>
           <p style="margin:0 0 10px;color:var(--muted);font-size:13px;"><strong>Status:</strong> ${complete}</p>
-          <div style="display:grid;gap:12px;">${items.length ? items.map((item, idx)=>`
-            <div class="mini">
-              <div class="label">Question ${idx+1}</div>
-              <div class="value">${escapeHtml(item.question || '—')}</div>
-              <div class="label" style="margin-top:10px;">Answer</div>
-              <div style="font-size:14px;line-height:1.5;color:#334155;">${escapeHtml(item.answer || '—')}</div>
-            </div>`).join('') : '<div style="font-size:14px;color:var(--muted);">No question responses added yet.</div>'}</div>
+          <ul>${items.length ? items.map((item, idx)=>`<li><div class="qa-question-text">Question ${idx+1}: ${item.question || '—'}</div><div class="qa-answer-text"><strong>Answer:</strong> ${item.answer || '—'}</div></li>`).join('') : '<li>No question responses added yet.</li>'}</ul>
         </div>
       `;
+    }
+    function engagementStatusMeta(recruit){
+      const status = recruit?.engagementStatus && recruit.engagementStatus !== 'Auto' ? recruit.engagementStatus : '';
+      if(status){
+        const map = {Hot:90, Neutral:55, Cold:25, Out:0};
+        const clsMap = {Hot:'score-hot', Neutral:'score-warm', Cold:'score-cold', Out:'score-out'};
+        return {score:map[status], label:status, cls:clsMap[status] || 'score-warm', manual:true, hasStatus:true};
+      }
+      const score = engagementScore(recruit);
+      const tier = engagementTier(score);
+      return {score, label:tier.label, cls:tier.cls, manual:recruit?.engagementScoreOverride !== "" && recruit?.engagementScoreOverride !== null && recruit?.engagementScoreOverride !== undefined, hasStatus:false};
     }
     function profileSubtitle(recruit){
       return [recruit.classYear,recruit.position,[recruit.city,recruit.state].filter(Boolean).join(', '),recruit.club].filter(Boolean).join(' • ');
@@ -1905,20 +1895,24 @@ Let me know when you have time to connect. We're excited to stay in touch.
         june15Call: row.june15Call || row.owner || '',
         rating: row.rating || '',
         engagementScoreOverride: row.engagementScoreOverride || '',
-        engagementStatusOverride: row.engagementStatusOverride || row.engagementStatus || '',
+        engagementStatus: row.engagementStatus || 'Auto',
         offerStatus: row.offerStatus || row.offer || row.commitmentStatus || '',
         wroteToUs: row.wroteToUs || '',
         q1: parseYesNo(row.q1), q2: parseYesNo(row.q2), q3: parseYesNo(row.q3), q4: parseYesNo(row.q4),
-        q1Question1: row.q1Question1 || row.question1 || row.q1Question || '', q1Answer1: row.q1Answer1 || '',
+        q1Question1: row.q1Question1 || '', q1Answer1: row.q1Answer1 || '', q1Question2: row.q1Question2 || '', q1Answer2: row.q1Answer2 || '', q1Question3: row.q1Question3 || '', q1Answer3: row.q1Answer3 || '',
+        q2Question1: row.q2Question1 || '', q2Answer1: row.q2Answer1 || '', q2Question2: row.q2Question2 || '', q2Answer2: row.q2Answer2 || '', q2Question3: row.q2Question3 || '', q2Answer3: row.q2Answer3 || '',
+        q3Question1: row.q3Question1 || '', q3Answer1: row.q3Answer1 || '', q3Question2: row.q3Question2 || '', q3Answer2: row.q3Answer2 || '', q3Question3: row.q3Question3 || '', q3Answer3: row.q3Answer3 || '',
+        q4Question1: row.q4Question1 || '', q4Answer1: row.q4Answer1 || '', q4Question2: row.q4Question2 || '', q4Answer2: row.q4Answer2 || '', q4Question3: row.q4Question3 || '', q4Answer3: row.q4Answer3 || '',
+        q1Question1: row.q1Question1 || row.question1 || row.q1Question || '',
         q1Question2: row.q1Question2 || '', q1Answer2: row.q1Answer2 || '',
         q1Question3: row.q1Question3 || '', q1Answer3: row.q1Answer3 || '',
-        q2Question1: row.q2Question1 || row.question2 || row.q2Question || '', q2Answer1: row.q2Answer1 || '',
+        q2Question1: row.q2Question1 || row.question2 || row.q2Question || '',
         q2Question2: row.q2Question2 || '', q2Answer2: row.q2Answer2 || '',
         q2Question3: row.q2Question3 || '', q2Answer3: row.q2Answer3 || '',
-        q3Question1: row.q3Question1 || row.question3 || row.q3Question || '', q3Answer1: row.q3Answer1 || '',
+        q3Question1: row.q3Question1 || row.question3 || row.q3Question || '',
         q3Question2: row.q3Question2 || '', q3Answer2: row.q3Answer2 || '',
         q3Question3: row.q3Question3 || '', q3Answer3: row.q3Answer3 || '',
-        q4Question1: row.q4Question1 || row.q4Question || '', q4Answer1: row.q4Answer1 || '',
+        q4Question1: row.q4Question1 || row.q4Question || '',
         q4Question2: row.q4Question2 || '', q4Answer2: row.q4Answer2 || '',
         q4Question3: row.q4Question3 || '', q4Answer3: row.q4Answer3 || '',
         summary: row.summary || '',
@@ -1982,7 +1976,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const preserveIfBlank = [
         'summary','followUp','academics','visitStatus','headshot','profileLink','filmLink','phone','email','height','graduationYear',
         'callPlanLocal','callPlanTimezone','callPlanPST','eventName','eventDate','eventLocation','offerStatus','wroteToUs',
-        'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status','engagementStatusOverride'
+        'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status'
       ];
       preserveIfBlank.forEach(field => {
         const liveValue = liveRecruit[field];
@@ -1995,8 +1989,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       });
       if(typeof localRecruit.pinTier !== 'undefined') merged.pinTier = localRecruit.pinTier;
       if(typeof localRecruit.engagementScoreOverride !== 'undefined') merged.engagementScoreOverride = localRecruit.engagementScoreOverride;
-      if(typeof localRecruit.engagementStatusOverride !== 'undefined') merged.engagementStatusOverride = localRecruit.engagementStatusOverride;
-      ['q1','q2','q3','q4'].forEach(q=>{ [1,2,3].forEach(i=>{ const qf=`${q}Question${i}`; const af=`${q}Answer${i}`; if(typeof localRecruit[qf] !== 'undefined' && (!liveRecruit[qf] || !String(liveRecruit[qf]).trim())) merged[qf] = localRecruit[qf]; if(typeof localRecruit[af] !== 'undefined' && (!liveRecruit[af] || !String(liveRecruit[af]).trim())) merged[af] = localRecruit[af]; }); });
+      if(typeof localRecruit.engagementStatus !== 'undefined') merged.engagementStatus = localRecruit.engagementStatus;
       if(localRecruit.updatedAt && (!liveRecruit.updatedAt || String(localRecruit.updatedAt) > String(liveRecruit.updatedAt))){
         merged.updatedAt = localRecruit.updatedAt;
       }
@@ -2547,8 +2540,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       }
       const urg = urgencyForRecruit(recruit);
       const tier = pinTierLabel(recruit);
-      const score = engagementScore(recruit);
-      const scoreTier = engagementTier(score, recruit);
+      const eMeta = engagementStatusMeta(recruit);
       const chipHtml = (recruit.tags || []).map(tag=>`<span class="tag">${tag}</span>`).join('');
       const statHtml = [
         ['Height', recruit.height || '—'],
@@ -2575,7 +2567,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
                 ${tier ? `<span class="tier-badge">${tier}</span>` : ''}
                 <span class="urgency-badge ${urg.cls}">${urg.label}</span>
                 ${recruit.callPlanPST ? `<span class="call-chip">Call ${recruit.callPlanPST} PST</span>` : ''}
-                <span class="score-badge ${scoreTier.cls}">${score} Engagement • ${scoreTier.label}${(recruit.engagementStatusOverride || recruit.engagementScoreOverride !== "" && recruit.engagementScoreOverride !== null && recruit.engagementScoreOverride !== undefined) ? " Manual" : ""}</span>
+                <span class="score-badge ${eMeta.cls}">${eMeta.score} Engagement • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>
                 ${chipHtml}
               </div>
             </div>
@@ -2702,8 +2694,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       recruitList.innerHTML = filtered.map(r=>{
         const urg = urgencyForRecruit(r);
         const tier = pinTierLabel(r);
-        const score = engagementScore(r);
-        const scoreTier = engagementTier(score, recruit);
+        const eMeta = engagementStatusMeta(r);
         return `
           <div class="recruit-card ${cardColorClass(r)} ${String(r.id)===String(activeId) ? 'active' : ''}" data-id="${r.id}">
             <div class="card-top">
@@ -2727,7 +2718,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
               <span class="urgency-badge ${urg.cls}">${urg.label}</span>
               ${r.callPlanPST ? `<span class="call-chip">Call ${r.callPlanPST} PST</span>` : ''}
               ${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${r.offerStatus}</span>` : ''}
-              <span class="score-badge ${scoreTier.cls}">${score} • ${scoreTier.label}${(r.engagementStatusOverride || r.engagementScoreOverride !== "" && r.engagementScoreOverride !== null && r.engagementScoreOverride !== undefined) ? " Manual" : ""}</span>
+              <span class="score-badge ${eMeta.cls}">${eMeta.score} • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>
               ${(r.tags || []).slice(0,2).map(tag=>`<span class="tag">${tag}</span>`).join('')}
             </div>
             <div class="quick-action-row">
@@ -2796,7 +2787,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
     function buildCallQuestions(recruit){
       const questions = [];
       ['q1','q2','q3','q4'].forEach(quarter=>{
-        getQuarterEntries(recruit, quarter).forEach(item=>{ if(item.question) questions.push(item.question); });
+        getQuarterQuestions(recruit, quarter).filter(item=>item.question || item.answer).forEach(item=>questions.push(item.answer ? `${item.question} — ${item.answer}` : item.question));
       });
       if(questions.length) return questions.slice(0,5);
       if(recruit.academics) questions.push(`How are you thinking about academics and fit right now?`);
@@ -2895,14 +2886,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatusOverride','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
         ...rows.map(r => headers.map(h => {
           const map = {
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
-            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatusOverride:r.engagementStatusOverride || '',offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
+            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
             q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Answer1:r.q1Answer1,q1Question2:r.q1Question2,q1Answer2:r.q1Answer2,q1Question3:r.q1Question3,q1Answer3:r.q1Answer3,q2Question1:r.q2Question1,q2Answer1:r.q2Answer1,q2Question2:r.q2Question2,q2Answer2:r.q2Answer2,q2Question3:r.q2Question3,q2Answer3:r.q2Answer3,q3Question1:r.q3Question1,q3Answer1:r.q3Answer1,q3Question2:r.q3Question2,q3Answer2:r.q3Answer2,q3Question3:r.q3Question3,q3Answer3:r.q3Answer3,q4Question1:r.q4Question1,q4Answer1:r.q4Answer1,q4Question2:r.q4Question2,q4Answer2:r.q4Answer2,q4Question3:r.q4Question3,q4Answer3:r.q4Answer3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
             campAttended:r.campAttended,filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
@@ -2928,12 +2919,16 @@ Let me know when you have time to connect. We're excited to stay in touch.
       state:document.getElementById('fState'), club:document.getElementById('fClub'), priority:document.getElementById('fPriority'),
       phone:document.getElementById('fPhone'), email:document.getElementById('fEmail'), profileLink:document.getElementById('fProfileLink'),
       filmLink:document.getElementById('fFilmLink'), june15Call:document.getElementById('fJune15Call'),
-      rating:document.getElementById('fRating'), engagementStatusOverride:document.getElementById('fEngagementStatusOverride'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
+      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
       height:document.getElementById('fHeight'), gradYear:document.getElementById('fGradYear'),
       lastContact:document.getElementById('fLastContact'), nextActionDue:document.getElementById('fNextActionDue'),
       callPlanLocal:document.getElementById('fCallPlanLocal'), callPlanTimezone:document.getElementById('fCallPlanTimezone'), callPlanPST:document.getElementById('fCallPlanPST'),
       camp:document.getElementById('fCamp'), favorite:document.getElementById('fFavorite'), pinned:document.getElementById('fPinned'), pinTier:document.getElementById('fPinTier'),
       q1:document.getElementById('fQ1'), q2:document.getElementById('fQ2'), q3:document.getElementById('fQ3'), q4:document.getElementById('fQ4'),
+      q1Question1:document.getElementById('fQ1Question1'), q1Answer1:document.getElementById('fQ1Answer1'), q1Question2:document.getElementById('fQ1Question2'), q1Answer2:document.getElementById('fQ1Answer2'), q1Question3:document.getElementById('fQ1Question3'), q1Answer3:document.getElementById('fQ1Answer3'),
+      q2Question1:document.getElementById('fQ2Question1'), q2Answer1:document.getElementById('fQ2Answer1'), q2Question2:document.getElementById('fQ2Question2'), q2Answer2:document.getElementById('fQ2Answer2'), q2Question3:document.getElementById('fQ2Question3'), q2Answer3:document.getElementById('fQ2Answer3'),
+      q3Question1:document.getElementById('fQ3Question1'), q3Answer1:document.getElementById('fQ3Answer1'), q3Question2:document.getElementById('fQ3Question2'), q3Answer2:document.getElementById('fQ3Answer2'), q3Question3:document.getElementById('fQ3Question3'), q3Answer3:document.getElementById('fQ3Answer3'),
+      q4Question1:document.getElementById('fQ4Question1'), q4Answer1:document.getElementById('fQ4Answer1'), q4Question2:document.getElementById('fQ4Question2'), q4Answer2:document.getElementById('fQ4Answer2'), q4Question3:document.getElementById('fQ4Question3'), q4Answer3:document.getElementById('fQ4Answer3'),
       q1Question1:document.getElementById('fQ1Question1'), q1Answer1:document.getElementById('fQ1Answer1'), q1Question2:document.getElementById('fQ1Question2'), q1Answer2:document.getElementById('fQ1Answer2'), q1Question3:document.getElementById('fQ1Question3'), q1Answer3:document.getElementById('fQ1Answer3'),
       q2Question1:document.getElementById('fQ2Question1'), q2Answer1:document.getElementById('fQ2Answer1'), q2Question2:document.getElementById('fQ2Question2'), q2Answer2:document.getElementById('fQ2Answer2'), q2Question3:document.getElementById('fQ2Question3'), q2Answer3:document.getElementById('fQ2Answer3'),
       q3Question1:document.getElementById('fQ3Question1'), q3Answer1:document.getElementById('fQ3Answer1'), q3Question2:document.getElementById('fQ3Question2'), q3Answer2:document.getElementById('fQ3Answer2'), q3Question3:document.getElementById('fQ3Question3'), q3Answer3:document.getElementById('fQ3Answer3'),
@@ -2963,8 +2958,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
       formEls.filmLink.value = r?.filmLink || '';
       formEls.june15Call.value = r?.june15Call || '';
       formEls.rating.value = r?.rating || '';
-      formEls.engagementStatusOverride.value = r?.engagementStatusOverride || '';
       formEls.engagementScoreOverride.value = r?.engagementScoreOverride ?? '';
+      formEls.engagementStatus.value = r?.engagementStatus || 'Auto';
       formEls.offerStatus.value = r?.offerStatus || '';
       formEls.wroteToUs.value = r?.wroteToUs || '';
       formEls.eventName.value = r?.eventName || '';
@@ -3073,8 +3068,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         name:formEls.name.value, classYear:formEls.classYear.value, group:formEls.group.value, position:formEls.position.value,
         city:formEls.city.value, state:formEls.state.value, club:formEls.club.value, priority:formEls.priority.value || 'Active',
         status:formEls.priority.value || 'Active', june15Call:formEls.june15Call.value, rating:formEls.rating.value,
-        engagementStatusOverride:formEls.engagementStatusOverride.value,
         engagementScoreOverride:formEls.engagementScoreOverride.value,
+        engagementStatus:formEls.engagementStatus.value || 'Auto',
         offerStatus:formEls.offerStatus.value, wroteToUs:formEls.wroteToUs.value, eventName:formEls.eventName.value, eventDate:formEls.eventDate.value, eventLocation:formEls.eventLocation.value, height:formEls.height.value,
         graduationYear:formEls.gradYear.value, lastContactDate:formEls.lastContact.value, nextActionDue:formEls.nextActionDue.value,
         callPlanLocal:formEls.callPlanLocal.value, callPlanTimezone:formEls.callPlanTimezone.value,
