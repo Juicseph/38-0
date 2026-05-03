@@ -662,7 +662,7 @@
     .sidebar-filters-host .filter-chip{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.12);color:#fff}
     .sidebar-filters-host .filter-chip.active{background:#fff;color:var(--red);border-color:#fff}
     .sidebar-filters-host .filter-count{background:rgba(255,255,255,.16);color:#fff}
-    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .event-tracker-wrap,.pulse-card.collapsed .coach-call-list,.pulse-card.collapsed .manual-event-list{display:none}
+    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .event-tracker-wrap,.pulse-card.collapsed .coach-call-list,.pulse-card.collapsed .manual-event-list,.pulse-card.collapsed .board-health-grid,.pulse-card.collapsed .health-checks{display:none}
     .pulse-collapse-btn{border:none;background:#fff;color:var(--text);width:36px;height:36px;border-radius:12px;cursor:pointer;font-weight:800}
     .pulse-card.minimal{padding:14px}
     .pulse-mini-stack{display:grid;gap:8px}
@@ -1051,6 +1051,37 @@
     .comm-log-note{font-size:13px;line-height:1.45;color:#334155;white-space:pre-wrap}
     .event-mode-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;background:#eef4ff;border:1px solid #c9d8f5;color:#18407c;font-size:11px;font-weight:900}
 
+
+    .board-health-grid{display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:center}
+    .health-ring{width:78px;height:78px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--red) calc(var(--health,0)*1%), #e8edf5 0);position:relative}
+    .health-ring::after{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff}
+    .health-ring-value{position:relative;z-index:1;font-size:20px;font-weight:900;color:var(--navy)}
+    .health-bar{height:8px;border-radius:999px;background:#eef2f7;overflow:hidden;margin-top:6px}
+    .health-bar span{display:block;height:100%;width:0;background:linear-gradient(90deg,#C41230,#002D62);border-radius:999px;transition:width .25s ease}
+    .health-checks{display:grid;gap:7px;margin-top:10px}
+    .health-check{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted)}
+    .health-check strong{color:var(--text)}
+    .probability-wrap{display:grid;grid-template-columns:1fr 70px;gap:10px;align-items:center}
+    .probability-wrap input[type=range]{width:100%}
+    .probability-readout{border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;font-weight:900;background:#fff}
+    .archetype-chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+    .archetype-chip-grid label{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff;font-size:12px;font-weight:800;color:#405067;cursor:pointer}
+    .archetype-chip-grid input{margin:0}
+    .commit-probability-pill{background:#f6f0ff;color:#5b21b6;border:1px solid #ddd6fe}
+    .archetype-pill{background:#eef4ff;color:#18407c;border:1px solid #c9d8f5}
+
+    /* Board Health + Club Coach paired cleanly */
+    #boardHealthCard,#clubCoachCard{align-self:stretch}
+    #boardHealthCard .pulse-card-top,#clubCoachCard .pulse-card-top{align-items:flex-start}
+    #boardHealthCard .board-health-grid{grid-template-columns:68px 1fr;gap:10px}
+    #boardHealthCard .health-ring{width:64px;height:64px}
+    #boardHealthCard .health-ring::after{inset:7px}
+    #boardHealthCard .health-ring-value{font-size:17px}
+    #boardHealthCard .health-checks{gap:5px;margin-top:8px}
+    #clubCoachCard .coach-call-list{max-height:220px;overflow:auto}
+    #clubCoachCard .coach-call-item{padding:10px;border-radius:12px}
+    #clubCoachCard .coach-call-name{font-size:14px}
+    #clubCoachCard .coach-call-meta{font-size:11px}
   </style>
 </head>
 <body>
@@ -1229,6 +1260,37 @@
           <div class="pulse-list" id="commitWatchList"></div>
         </div>
 
+        <div class="pulse-card" id="boardHealthCard">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Board Health</h3>
+              <p>Quick read on contact, eval, next steps, and profiles.</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;"><span class="status-pill">Score</span><button class="pulse-collapse-btn" data-collapse-target="boardHealthCard" type="button">−</button></div>
+          </div>
+          <div class="board-health-grid">
+            <div class="health-ring" id="boardHealthRing" style="--health:0"><div class="health-ring-value" id="boardHealthScore">0%</div></div>
+            <div>
+              <div style="font-weight:900;font-size:14px;" id="boardHealthLabel">Needs data</div>
+              <div class="tiny-note" id="boardHealthSummary">Add recruits to calculate health.</div>
+              <div class="health-bar"><span id="boardHealthBar"></span></div>
+            </div>
+          </div>
+          <div class="health-checks" id="boardHealthChecks"></div>
+        </div>
+
+        <div class="pulse-card" id="clubCoachCard">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Club Coach Calls</h3>
+              <p>Track outreach and follow-up with club coaches.</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="addClubCoachCallBtn" type="button">Add Call</button><button class="pulse-collapse-btn" data-collapse-target="clubCoachCard" type="button">−</button></div>
+          </div>
+          <div class="coach-call-list" id="clubCoachCallList"></div>
+        </div>
+
+
         <div class="pulse-card wide" id="rosterMatrixCard">
           <div class="pulse-card-top">
             <div>
@@ -1249,17 +1311,6 @@
             <div style="display:flex;gap:8px;align-items:center;"><span class="status-pill">Events</span><button class="pulse-collapse-btn" data-collapse-target="eventTrackerCard" type="button">−</button></div>
           </div>
           <div class="event-tracker-wrap" id="eventTrackerList"></div>
-        </div>
-
-        <div class="pulse-card" id="clubCoachCard">
-          <div class="pulse-card-top">
-            <div>
-              <h3>Club Coach Calls</h3>
-              <p>Track outreach and follow-up with club coaches.</p>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="addClubCoachCallBtn" type="button">Add Call</button><button class="pulse-collapse-btn" data-collapse-target="clubCoachCard" type="button">−</button></div>
-          </div>
-          <div class="coach-call-list" id="clubCoachCallList"></div>
         </div>
 
         <div class="pulse-card" id="manualTournamentsCard">
@@ -1444,6 +1495,15 @@
         <div><label>Rating</label><input id="fRating" class="field" /></div>
         <div><label>Engagement Score Override</label><input id="fEngagementScoreOverride" type="number" min="0" max="100" step="1" class="field" placeholder="Blank = auto score" /></div>
         <div><label>Engagement Status</label><select id="fEngagementStatus" class="field"><option value="Auto">Auto</option><option value="Hot">Hot</option><option value="Neutral">Neutral</option><option value="Cold">Cold</option><option value="Out">Out</option></select></div>
+        <div><label>Commit Probability</label><div class="probability-wrap"><input id="fCommitProbability" type="range" min="0" max="100" step="5" class="field" /><div class="probability-readout" id="commitProbabilityReadout">0%</div></div></div>
+        <div class="span-2"><label>Archetype Tags</label><div class="archetype-chip-grid" id="fArchetypeTags">
+          <label><input type="checkbox" value="Program Changer" /> Program Changer</label>
+          <label><input type="checkbox" value="System Fit" /> System Fit</label>
+          <label><input type="checkbox" value="Development Player" /> Development Player</label>
+          <label><input type="checkbox" value="Late Riser" /> Late Riser</label>
+          <label><input type="checkbox" value="Culture Fit" /> Culture Fit</label>
+          <label><input type="checkbox" value="Academic Fit" /> Academic Fit</label>
+        </div></div>
         <div><label>Offer / Commitment</label>
           <select id="fOfferStatus" class="field">
             <option value="">None</option>
@@ -1783,7 +1843,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
     }
     function loadCollapsedSections(){
-      const defaults = {commitWatchCard:true, rosterMatrixCard:true, eventTrackerCard:true, clubCoachCard:true, manualTournamentsCard:true};
+      const defaults = {commitWatchCard:true, boardHealthCard:false, clubCoachCard:false, rosterMatrixCard:true, eventTrackerCard:true, manualTournamentsCard:true};
       try{ return {...defaults, ...JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}')}; }catch(e){ return defaults; }
     }
     function saveCollapsedSections(state){
@@ -2268,6 +2328,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         rating: row.rating || '',
         engagementScoreOverride: row.engagementScoreOverride || '',
         engagementStatus: row.engagementStatus || 'Auto',
+        commitProbability: row.commitProbability || '',
+        archetypeTags: splitMulti(row.archetypeTags || row.archetypes || ''),
         offerStatus: row.offerStatus || row.offer || row.commitmentStatus || '',
         wroteToUs: row.wroteToUs || '',
         q1: parseYesNo(row.q1), q2: parseYesNo(row.q2), q3: parseYesNo(row.q3), q4: parseYesNo(row.q4),
@@ -2692,6 +2754,50 @@ Let me know when you have time to connect. We're excited to stay in touch.
       return Math.floor((Date.now() - d.getTime())/(1000*60*60*24));
     }
 
+    function hasTextValue(value){ return String(value || '').trim() !== ''; }
+    function recruitHasRecentContact(recruit){
+      const days = daysSince(recruit.lastContactDate);
+      return days < 14;
+    }
+    function calculateBoardHealth(recruits){
+      const total = recruits.length || 0;
+      if(!total) return {score:0, checks:[], label:'Needs data', summary:'Add recruits to calculate health.'};
+      const pct = fn => Math.round((recruits.filter(fn).length / total) * 100);
+      const recent = pct(recruitHasRecentContact);
+      const evals = pct(r => (r.evaluation || []).length || hasTextValue(r.followUp));
+      const next = pct(r => hasTextValue(r.nextActionDue) || hasTextValue(r.callPlanLocal));
+      const profiles = pct(r => hasTextValue(r.phone) && hasTextValue(r.position) && (hasTextValue(r.filmLink) || hasTextValue(r.profileLink) || hasTextValue(r.pdfFile)));
+      const score = Math.round((recent * .35) + (evals * .25) + (next * .25) + (profiles * .15));
+      const label = score >= 85 ? 'Board is dialed' : score >= 70 ? 'Solid, keep tightening' : score >= 50 ? 'Needs attention' : 'At-risk board';
+      return {
+        score,
+        label,
+        summary:`${total} recruit${total===1?'':'s'} tracked • ${recent}% recent contact`,
+        checks:[
+          ['Recent contact', recent, 'within 14 days'],
+          ['Eval / follow-up', evals, 'has eval or action'],
+          ['Next step planned', next, 'date or call plan'],
+          ['Profile complete', profiles, 'phone + position + link/PDF']
+        ]
+      };
+    }
+    function renderBoardHealth(recruits){
+      const data = calculateBoardHealth(recruits);
+      const scoreEl = document.getElementById('boardHealthScore');
+      const ringEl = document.getElementById('boardHealthRing');
+      const labelEl = document.getElementById('boardHealthLabel');
+      const summaryEl = document.getElementById('boardHealthSummary');
+      const barEl = document.getElementById('boardHealthBar');
+      const checksEl = document.getElementById('boardHealthChecks');
+      if(!scoreEl || !ringEl || !labelEl || !summaryEl || !barEl || !checksEl) return;
+      scoreEl.textContent = data.score + '%';
+      ringEl.style.setProperty('--health', data.score);
+      labelEl.textContent = data.label;
+      summaryEl.textContent = data.summary;
+      barEl.style.width = data.score + '%';
+      checksEl.innerHTML = data.checks.map(([label,pct,note])=>`<div class="health-check"><span><strong>${label}</strong> <span>${note}</span></span><strong>${pct}%</strong></div>`).join('');
+    }
+
     function renderRecruitingPulse(recruits){
       const pressureCandidates = recruits
         .filter(r => isOfferLive(r))
@@ -2770,6 +2876,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         </div>
       `).join('') : '<div class="tiny-note">No commit watch names yet.</div>';
 
+      renderBoardHealth(recruits);
       renderRosterMatrix(recruits);
       renderEventTracker(recruits);
       renderClubCoachCalls();
@@ -2974,6 +3081,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         ['Email', recruit.email || '—'],
         ['June 15 Call', recruit.june15Call || '—'],
         ['Rating', recruit.rating || '—'],
+        ['Commit Probability', recruit.commitProbability ? recruit.commitProbability + '%' : '—'],
+        ['Archetypes', (recruit.archetypeTags && recruit.archetypeTags.length) ? recruit.archetypeTags.join(', ') : '—'],
         ['Last Contact', recruit.lastContactDate || '—'],
         ['Next Action Due', recruit.nextActionDue || '—']
       ].map(([label,value])=>`<div class="mini"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
@@ -3158,6 +3267,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
               ${r.callPlanPST ? `<span class="call-chip">Call ${r.callPlanPST} PST</span>` : ''}
               ${r.offerStatus ? `<span class="offer-badge ${offerBadgeClass(r.offerStatus)}">${r.offerStatus}</span>` : ''}
               <span class="score-badge ${eMeta.cls}">${eMeta.score} • ${eMeta.label}${eMeta.manual ? " Manual" : ""}</span>
+              ${r.commitProbability ? `<span class="tag commit-probability-pill">${r.commitProbability}% Commit</span>` : ''}
+              ${(r.archetypeTags || []).slice(0,2).map(tag=>`<span class="tag archetype-pill">${tag}</span>`).join('')}
               ${r.pdfFile ? `<span class="tag">PDF</span>` : ''}
               ${(r.tags || []).slice(0,2).map(tag=>`<span class="tag">${tag}</span>`).join('')}
             </div>
@@ -3352,14 +3463,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','commitProbability','archetypeTags','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
         ...rows.map(r => headers.map(h => {
           const map = {
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
-            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
+            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',commitProbability:r.commitProbability || '',archetypeTags:(r.archetypeTags||[]).join(', '),offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
             q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Answer1:r.q1Answer1,q1Question2:r.q1Question2,q1Answer2:r.q1Answer2,q1Question3:r.q1Question3,q1Answer3:r.q1Answer3,q2Question1:r.q2Question1,q2Answer1:r.q2Answer1,q2Question2:r.q2Question2,q2Answer2:r.q2Answer2,q2Question3:r.q2Question3,q2Answer3:r.q2Answer3,q3Question1:r.q3Question1,q3Answer1:r.q3Answer1,q3Question2:r.q3Question2,q3Answer2:r.q3Answer2,q3Question3:r.q3Question3,q3Answer3:r.q3Answer3,q4Question1:r.q4Question1,q4Answer1:r.q4Answer1,q4Question2:r.q4Question2,q4Answer2:r.q4Answer2,q4Question3:r.q4Question3,q4Answer3:r.q4Answer3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
             campAttended:r.campAttended,pdfName:r.pdfName || (r.pdfFile ? 'Uploaded' : ''),filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
@@ -3385,7 +3496,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       state:document.getElementById('fState'), club:document.getElementById('fClub'), priority:document.getElementById('fPriority'),
       phone:document.getElementById('fPhone'), email:document.getElementById('fEmail'), profileLink:document.getElementById('fProfileLink'),
       filmLink:document.getElementById('fFilmLink'), june15Call:document.getElementById('fJune15Call'),
-      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
+      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), commitProbability:document.getElementById('fCommitProbability'), archetypeTags:document.getElementById('fArchetypeTags'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
       height:document.getElementById('fHeight'), gradYear:document.getElementById('fGradYear'),
       lastContact:document.getElementById('fLastContact'), nextActionDue:document.getElementById('fNextActionDue'),
       callPlanLocal:document.getElementById('fCallPlanLocal'), callPlanTimezone:document.getElementById('fCallPlanTimezone'), callPlanPST:document.getElementById('fCallPlanPST'),
@@ -3426,6 +3537,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
       formEls.rating.value = r?.rating || '';
       formEls.engagementScoreOverride.value = r?.engagementScoreOverride ?? '';
       formEls.engagementStatus.value = r?.engagementStatus || 'Auto';
+      if(formEls.commitProbability){ formEls.commitProbability.value = r?.commitProbability || 0; const out=document.getElementById('commitProbabilityReadout'); if(out) out.textContent = (formEls.commitProbability.value || 0) + '%'; }
+      if(formEls.archetypeTags){ const selected = new Set(r?.archetypeTags || []); formEls.archetypeTags.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = selected.has(cb.value)); }
       formEls.offerStatus.value = r?.offerStatus || '';
       formEls.wroteToUs.value = r?.wroteToUs || '';
       formEls.eventName.value = r?.eventName || '';
@@ -3519,6 +3632,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
     formEls.callPlanLocal.addEventListener('change', refreshCallPlanPST);
     formEls.callPlanTimezone.addEventListener('change', refreshCallPlanPST);
+    if(formEls.commitProbability){ formEls.commitProbability.addEventListener('input', ()=>{ const out=document.getElementById('commitProbabilityReadout'); if(out) out.textContent = formEls.commitProbability.value + '%'; }); }
 
     form.addEventListener('submit', async (e)=>{
       e.preventDefault();
@@ -3554,6 +3668,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         status:formEls.priority.value || 'Active', june15Call:formEls.june15Call.value, rating:formEls.rating.value,
         engagementScoreOverride:formEls.engagementScoreOverride.value,
         engagementStatus:formEls.engagementStatus.value || 'Auto',
+        commitProbability:formEls.commitProbability ? formEls.commitProbability.value : '',
+        archetypeTags:formEls.archetypeTags ? Array.from(formEls.archetypeTags.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value) : [],
         offerStatus:formEls.offerStatus.value, wroteToUs:formEls.wroteToUs.value, eventName:formEls.eventName.value, eventDate:formEls.eventDate.value, eventLocation:formEls.eventLocation.value, height:formEls.height.value,
         graduationYear:formEls.gradYear.value, lastContactDate:formEls.lastContact.value, nextActionDue:formEls.nextActionDue.value,
         callPlanLocal:formEls.callPlanLocal.value, callPlanTimezone:formEls.callPlanTimezone.value,
