@@ -1035,6 +1035,22 @@
       .micro-time{min-width:auto}
       .content{grid-template-columns:1fr}
     }
+  
+
+    /* Communication log + Tournament Weekend Mode */
+    .weekend-mode-bar{padding:10px 12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border-left:4px solid var(--red)}
+    .weekend-mode-title{font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+    .weekend-mode-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .weekend-mode-select{min-width:240px;border:1px solid var(--line);border-radius:12px;padding:9px 11px;background:#fff;font-weight:800;color:var(--text)}
+    .weekend-mode-active{background:var(--red-soft);border-color:#f3bcc8;color:var(--red)}
+    .comm-log-list{display:grid;gap:8px}
+    .comm-log-item{border:1px solid var(--line);border-radius:14px;padding:10px;background:#fbfdff}
+    .comm-log-top{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:5px}
+    .comm-log-type{font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:var(--navy)}
+    .comm-log-date{font-size:12px;color:var(--muted);font-weight:800}
+    .comm-log-note{font-size:13px;line-height:1.45;color:#334155;white-space:pre-wrap}
+    .event-mode-badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;background:#eef4ff;border:1px solid #c9d8f5;color:#18407c;font-size:11px;font-weight:900}
+
   </style>
 </head>
 <body>
@@ -1141,6 +1157,17 @@
           </div>
         </div>
       </div>
+
+      <section class="content-panel weekend-mode-bar" id="weekendModeBar">
+        <div>
+          <div class="weekend-mode-title">Tournament Weekend Mode</div>
+          <div class="tiny-note" id="weekendModeMeta">Choose a tournament to focus the board on assigned athletes.</div>
+        </div>
+        <div class="weekend-mode-controls">
+          <select class="weekend-mode-select" id="weekendModeSelect"><option value="">All Tournaments</option></select>
+          <button class="btn secondary" id="clearWeekendModeBtn" type="button">Clear</button>
+        </div>
+      </section>
 
       <section class="content">
         <div class="content-panel" id="recruitListPanel">
@@ -1523,6 +1550,29 @@
   </div>
 
 
+  <div class="modal-wrap" id="communicationLogModal">
+    <div class="modal-card narrow">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
+        <div>
+          <h3 id="communicationLogTitle" style="margin:0;font-size:24px;">Log Communication</h3>
+          <div class="tiny-note" id="communicationLogRecruitMeta">Track calls, texts, emails, and notes for this athlete.</div>
+        </div>
+        <button class="btn secondary" id="communicationLogCloseBtn" type="button">Close</button>
+      </div>
+      <form id="communicationLogForm" class="modal-grid">
+        <input type="hidden" id="communicationRecruitId" />
+        <div><label>Type</label><select id="communicationType" class="field"><option>Call</option><option>Text</option><option>Email</option><option>Club Coach Note</option><option>In-Person</option><option>Other</option></select></div>
+        <div><label>Date</label><input id="communicationDate" type="date" class="field" /></div>
+        <div class="span-2"><label>Quick Result</label><input id="communicationResult" class="field" placeholder="Good convo / Left voicemail / Sent follow-up" /></div>
+        <div class="span-2"><label>Notes</label><textarea id="communicationNote" rows="4" class="field" placeholder="What happened? What needs to happen next?"></textarea></div>
+        <div class="span-2" style="display:flex;justify-content:flex-end;gap:10px;">
+          <button class="btn secondary" type="button" id="communicationQuickTodayBtn">Use Today</button>
+          <button class="btn" type="submit">Save Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="modal-wrap" id="tutorialModal">
     <div class="modal-card tutorial-card">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px;">
@@ -1618,6 +1668,7 @@
     const CUSTOM_TAGS_KEY = 'recruit_board_custom_tags_v1';
     const CLUB_COACH_CALLS_KEY = 'recruit_board_club_coach_calls_v1';
     const MANUAL_TOURNAMENTS_KEY = 'recruit_board_manual_tournaments_v1';
+    const WEEKEND_MODE_KEY = 'recruit_board_active_weekend_tournament_v1';
     const LIVE_SHEET_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyvN9QdtIouvn6HlpwXaf9bv6r2063_dgJaPYcRvnPjWN8iniUp4kM8P5fHG1coan5Xng/exec';
     const LIVE_SYNC_ENABLED = LIVE_SHEET_WEBAPP_URL && !LIVE_SHEET_WEBAPP_URL.includes('PASTE_YOUR');
     const TARGET_DATE = new Date('2026-06-15T00:00:00');
@@ -1693,6 +1744,8 @@
     let clubCoachCalls = loadClubCoachCalls();
     let manualTournaments = loadManualTournaments();
     let activeTournamentAssignId = '';
+    let activeWeekendTournamentId = localStorage.getItem(WEEKEND_MODE_KEY) || '';
+    let activeCommunicationRecruitId = '';
 
     const appShell = document.getElementById('appShell');
     const passwordGate = document.getElementById('passwordGate');
@@ -1866,6 +1919,86 @@
         setTimeout(openCompareModal, 0);
       }
     }
+    function tournamentRecruitIds(event){
+      return (event.assignedRecruitIds || event.recruitIds || []).map(String);
+    }
+    function getActiveWeekendTournament(){
+      if(!activeWeekendTournamentId) return null;
+      return manualTournaments.find(event => String(event.id) === String(activeWeekendTournamentId)) || null;
+    }
+    function isRecruitInActiveWeekend(id){
+      const event = getActiveWeekendTournament();
+      if(!event) return true;
+      return tournamentRecruitIds(event).includes(String(id));
+    }
+    function priorityRank(recruit){
+      const p = String(recruit.priority || recruit.status || '').toLowerCase();
+      if(p.includes('priority')) return 0;
+      if(p.includes('warm')) return 1;
+      if(p.includes('watch')) return 2;
+      return 3;
+    }
+    function renderWeekendModeControls(){
+      const select = document.getElementById('weekendModeSelect');
+      const meta = document.getElementById('weekendModeMeta');
+      const bar = document.getElementById('weekendModeBar');
+      if(!select || !meta || !bar) return;
+      const events = [...manualTournaments].sort((a,b)=>byDateValue(a.date).localeCompare(byDateValue(b.date)) || String(a.name||'').localeCompare(String(b.name||'')));
+      select.innerHTML = '<option value="">All Tournaments</option>' + events.map(event => `<option value="${escapeHtml(event.id)}">${escapeHtml([event.name || 'Unnamed Tournament', event.date || '', event.location || ''].filter(Boolean).join(' • '))}</option>`).join('');
+      if(activeWeekendTournamentId && !events.some(event => String(event.id) === String(activeWeekendTournamentId))){
+        activeWeekendTournamentId = '';
+        localStorage.removeItem(WEEKEND_MODE_KEY);
+      }
+      select.value = activeWeekendTournamentId || '';
+      const active = getActiveWeekendTournament();
+      bar.classList.toggle('weekend-mode-active', Boolean(active));
+      if(active){
+        const count = tournamentRecruitIds(active).length;
+        meta.textContent = `Focused on ${active.name || 'selected tournament'}${active.date ? ' • ' + active.date : ''}${active.location ? ' • ' + active.location : ''} • ${count} assigned athlete${count===1?'':'s'}.`;
+      }else{
+        meta.textContent = events.length ? 'Choose a tournament to focus the board on assigned athletes.' : 'Add a manual tournament, assign athletes, then use weekend mode.';
+      }
+    }
+    function setWeekendMode(id){
+      activeWeekendTournamentId = id || '';
+      if(activeWeekendTournamentId) localStorage.setItem(WEEKEND_MODE_KEY, activeWeekendTournamentId);
+      else localStorage.removeItem(WEEKEND_MODE_KEY);
+      renderWeekendModeControls();
+      rebuildRecruitList(selectedRecruitId);
+    }
+    function communicationLogEntries(recruit){
+      return Array.isArray(recruit?.communicationLog) ? recruit.communicationLog : [];
+    }
+    function openCommunicationLogModal(id){
+      const recruit = recruitDetails[id];
+      if(!recruit) return;
+      activeCommunicationRecruitId = String(id);
+      document.getElementById('communicationRecruitId').value = String(id);
+      document.getElementById('communicationLogTitle').textContent = `Log Communication • ${recruit.name || 'Recruit'}`;
+      document.getElementById('communicationLogRecruitMeta').textContent = profileSubtitle(recruit) || 'Track calls, texts, emails, and notes for this athlete.';
+      document.getElementById('communicationType').value = 'Call';
+      document.getElementById('communicationDate').value = new Date().toISOString().slice(0,10);
+      document.getElementById('communicationResult').value = '';
+      document.getElementById('communicationNote').value = '';
+      document.getElementById('communicationLogModal').classList.add('active');
+    }
+    function closeCommunicationLogModal(){
+      document.getElementById('communicationLogModal').classList.remove('active');
+    }
+    function renderCommunicationLogHtml(recruit){
+      const entries = communicationLogEntries(recruit).slice().sort((a,b)=>String(b.date||'').localeCompare(String(a.date||'')) || String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+      if(!entries.length){
+        return '<div class="tiny-note">No communication logged yet. Use Log Contact to add calls, texts, emails, or in-person notes.</div>';
+      }
+      return `<div class="comm-log-list">${entries.slice(0,8).map(item => `
+        <div class="comm-log-item">
+          <div class="comm-log-top"><span class="comm-log-type">${escapeHtml(item.type || 'Contact')}</span><span class="comm-log-date">${escapeHtml(item.date || '—')}</span></div>
+          ${item.result ? `<div style="font-size:13px;font-weight:800;color:#162336;margin-bottom:4px;">${escapeHtml(item.result)}</div>` : ''}
+          <div class="comm-log-note">${escapeHtml(item.note || 'No notes added.')}</div>
+        </div>
+      `).join('')}</div>`;
+    }
+
     function moveCallStreakIntoSidebar(){
       const mount = document.getElementById('callStreakSidebarMount');
       const card = document.getElementById('callStreakMiniCard');
@@ -1885,16 +2018,9 @@
       if(openBtn) openBtn.addEventListener('click', openCompareModal);
     }
     function logRecruitContact(id){
-      const recruit = recruitDetails[id];
-      if(!recruit) return;
-      const today = new Date().toISOString().slice(0,10);
-      recruit.lastContactDate = today;
-      recruit.updatedAt = new Date().toISOString();
-      const note = {date: today, text:'Logged contact from quick action.'};
-      recruit.notesHistory = Array.isArray(recruit.notesHistory) ? recruit.notesHistory.concat(note) : [note];
-      saveData();
-      rebuildRecruitList(id);
+      openCommunicationLogModal(id);
     }
+
     function buildAutoFollowUp(recruit){
       const note = (recruit.notes || [])[0] || 'our last conversation';
       const quarterBits = ['q1','q2','q3','q4'].flatMap(q => [1,2,3].map(i => recruit[`${q}Question${i}`])).filter(Boolean);
@@ -2212,7 +2338,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
     function mergeRecruitRecord(localRecruit, liveRecruit){
       const merged = { ...localRecruit, ...liveRecruit };
-      const arrayFields = ['notes','evaluation','actions','tags'];
+      const arrayFields = ['notes','evaluation','actions','tags','communicationLog'];
       arrayFields.forEach(field => {
         if((!liveRecruit[field] || !liveRecruit[field].length) && localRecruit[field]?.length){
           merged[field] = localRecruit[field];
@@ -2699,6 +2825,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
             ${event.notes ? `<div class="coach-call-notes">${escapeHtml(event.notes)}</div>` : ''}
             <div class="tag-row" style="margin-top:10px;">${names.length ? names.slice(0,6).map(r=>`<button class="tag" type="button" data-open-recruit-from-event="${r.id}">${escapeHtml(r.name)}</button>`).join('') : '<span class="tiny-note">No athletes assigned yet.</span>'}</div>
             <div class="tiny-actions" style="margin-top:10px;">
+              <button class="tiny-btn" type="button" data-weekend-tournament="${event.id}">Weekend Mode</button>
               <button class="tiny-btn" type="button" data-edit-tournament="${event.id}">Edit Tournament</button>
               <button class="tiny-btn" type="button" data-assign-tournament="${event.id}">Assign Athletes</button>
             </div>
@@ -2707,6 +2834,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       }).join('') : '<div class="tiny-note">No manual tournaments added yet.</div>';
       box.querySelectorAll('[data-edit-tournament]').forEach(btn=>btn.addEventListener('click', ()=>openTournamentModal(btn.dataset.editTournament)));
       box.querySelectorAll('[data-assign-tournament]').forEach(btn=>btn.addEventListener('click', ()=>openTournamentAssignModal(btn.dataset.assignTournament)));
+      box.querySelectorAll('[data-weekend-tournament]').forEach(btn=>btn.addEventListener('click', ()=>setWeekendMode(btn.dataset.weekendTournament)));
       box.querySelectorAll('[data-open-recruit-from-event]').forEach(btn=>btn.addEventListener('click', ()=>{ selectedRecruitId = btn.dataset.openRecruitFromEvent; rebuildRecruitList(selectedRecruitId); }));
     }
 
@@ -2930,6 +3058,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
           </div>
         </div>
 
+        <div class="section">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;">
+            <h5 style="margin:0;">Communication Log</h5>
+            <button class="btn secondary" id="addCommunicationLogBtn" type="button">Add Log</button>
+          </div>
+          ${renderCommunicationLogHtml(recruit)}
+        </div>
+
         <div class="section"><h5>Key Notes</h5><ul>${(recruit.notes && recruit.notes.length ? recruit.notes : ['No notes yet.']).map(item=>`<li>${item}</li>`).join('')}</ul></div>
         <div class="section"><h5>Notes History</h5><div class="timeline">${(recruit.notesHistory && recruit.notesHistory.length ? recruit.notesHistory : [{date:'—', text:'No notes history yet.'}]).slice().reverse().map(item=>`<div class="timeline-item"><div class="timeline-date">${item.date || '—'}</div><div>${item.text || '—'}</div></div>`).join('')}</div></div>
         <div class="section"><h5>Evaluation Areas</h5><ul>${(recruit.evaluation && recruit.evaluation.length ? recruit.evaluation : ['No evaluation notes yet.']).map(item=>`<li>${item}</li>`).join('')}</ul></div>
@@ -2954,6 +3090,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const viewPdfBtn = document.getElementById('viewRecruitPdfBtn');
       if(viewPdfBtn) viewPdfBtn.onclick = ()=>openRecruitPdf(recruitId);
       document.getElementById('logContactBtn').onclick = ()=>logRecruitContact(recruitId);
+      document.getElementById('addCommunicationLogBtn').onclick = ()=>openCommunicationLogModal(recruitId);
       document.getElementById('compareToggleProfileBtn').onclick = ()=>toggleCompareRecruit(recruitId);
     }
 
@@ -2979,7 +3116,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
         const matchesGroup = !filterState.group || r.group === filterState.group;
         const matchesPriority = !filterState.priority || r.priority === filterState.priority || r.status === filterState.priority;
         const matchesOwner = !filterState.june15Call || r.june15Call === filterState.june15Call;
-        return matchesSearch && matchesClass && matchesPosition && matchesStatus && matchesGroup && matchesPriority && matchesOwner && passesShortcut(r);
+        const matchesWeekend = !activeWeekendTournamentId || isRecruitInActiveWeekend(r.id);
+        return matchesSearch && matchesClass && matchesPosition && matchesStatus && matchesGroup && matchesPriority && matchesOwner && matchesWeekend && passesShortcut(r);
       });
 
       filtered = applySort(filtered);
@@ -2988,7 +3126,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(!filteredIds.includes(String(activeId))) activeId = filteredIds[0] || '';
       selectedRecruitId = activeId;
 
-      listMeta.textContent = filteredIds.length ? `${filteredIds.length} recruit${filteredIds.length===1?'':'s'} showing` : 'No recruits match these filters yet.';
+      const activeWeekend = getActiveWeekendTournament();
+      listMeta.textContent = filteredIds.length ? `${filteredIds.length} recruit${filteredIds.length===1?'':'s'} showing${activeWeekend ? ' • Weekend Mode: ' + activeWeekend.name : ''}` : 'No recruits match these filters yet.';
 
       recruitList.innerHTML = filtered.map(r=>{
         const urg = urgencyForRecruit(r);
@@ -3534,6 +3673,32 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.getElementById('compareOpenBtn').addEventListener('click', openCompareModal);
     document.getElementById('compareCloseBtn').addEventListener('click', closeCompareModal);
     document.getElementById('compareModal').addEventListener('click', e=>{ if(e.target.id === 'compareModal') closeCompareModal(); });
+    document.getElementById('communicationLogCloseBtn').addEventListener('click', closeCommunicationLogModal);
+    document.getElementById('communicationLogModal').addEventListener('click', e=>{ if(e.target.id === 'communicationLogModal') closeCommunicationLogModal(); });
+    document.getElementById('communicationQuickTodayBtn').addEventListener('click', ()=>{ document.getElementById('communicationDate').value = new Date().toISOString().slice(0,10); });
+    document.getElementById('communicationLogForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const id = document.getElementById('communicationRecruitId').value || activeCommunicationRecruitId;
+      const recruit = recruitDetails[id];
+      if(!recruit) return;
+      const date = document.getElementById('communicationDate').value || new Date().toISOString().slice(0,10);
+      const entry = {
+        id: String(Date.now()),
+        type: document.getElementById('communicationType').value || 'Contact',
+        date,
+        result: document.getElementById('communicationResult').value || '',
+        note: document.getElementById('communicationNote').value || '',
+        createdAt: new Date().toISOString()
+      };
+      recruit.communicationLog = communicationLogEntries(recruit).concat(entry);
+      recruit.lastContactDate = date;
+      recruit.updatedAt = new Date().toISOString();
+      const historyText = `${entry.type}${entry.result ? ' - ' + entry.result : ''}${entry.note ? ': ' + entry.note : ''}`;
+      recruit.notesHistory = Array.isArray(recruit.notesHistory) ? recruit.notesHistory.concat({date, text:historyText}) : [{date, text:historyText}];
+      saveData();
+      closeCommunicationLogModal();
+      rebuildRecruitList(id);
+    });
     document.getElementById('tagManagerBtn').addEventListener('click', openTagManager);
     document.getElementById('tagManagerCloseBtn').addEventListener('click', closeTagManager);
     document.getElementById('tagManagerModal').addEventListener('click', e=>{ if(e.target.id === 'tagManagerModal') closeTagManager(); });
@@ -3551,6 +3716,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
     positionSelect.addEventListener('change', ()=>rebuildRecruitList(selectedRecruitId));
     statusSelect.addEventListener('change', ()=>rebuildRecruitList(selectedRecruitId));
     sortSelect.addEventListener('change', ()=>rebuildRecruitList(selectedRecruitId));
+    document.getElementById('weekendModeSelect').addEventListener('change', e=>setWeekendMode(e.target.value));
+    document.getElementById('clearWeekendModeBtn').addEventListener('click', ()=>setWeekendMode(''));
 
     fileInput.addEventListener('change', e=>{
       const file = e.target.files[0];
@@ -3741,6 +3908,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
     setupContentCollapse();
     applyPulseCollapsedState();
     populateFilterOptions(Object.values(recruitDetails));
+    renderWeekendModeControls();
     updateCountdown();
     setInterval(updateCountdown, 1000);
     renderComparePicks();
