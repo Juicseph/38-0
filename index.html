@@ -2318,10 +2318,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
         const diffDays = Math.ceil((basis.getTime() - now.getTime())/(1000*60*60*24));
         if(diffDays <= 1) return {label:'Call Today', cls:'urgency-today', order:0};
         if(diffDays <= 7) return {label:'This Week', cls:'urgency-week', order:1};
-        return {label:'Future', cls:'urgency-future', order:2};
+        return {label:'On Track', cls:'urgency-future', order:2};
       }
       if(!last || ((now.getTime()-last.getTime())/(1000*60*60*24) > 21)) return {label:'No Recent Contact', cls:'urgency-stale', order:3};
-      return {label:'Future', cls:'urgency-future', order:2};
+      return {label:'On Track', cls:'urgency-future', order:2};
     }
     function pinTierLabel(recruit){
       const t = Number(recruit.pinTier || 0);
