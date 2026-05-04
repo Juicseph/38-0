@@ -1114,6 +1114,56 @@
     .board-view-controls{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     .board-view-controls .btn{width:100%;justify-content:center}
     @media (max-width:1100px){#dailySheet.pulse-card{grid-column:auto}.board-view-controls{grid-template-columns:1fr}}
+  
+    /* Recruiting days used counter - compact header pill */
+    .recruiting-days-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      min-height:38px;
+      padding:6px 8px 6px 12px;
+      border:1px solid #d5e0ee;
+      background:#fff;
+      border-radius:999px;
+      box-shadow:0 8px 20px rgba(17,36,63,.05);
+      white-space:nowrap;
+    }
+    .recruiting-days-label{
+      font-size:11px;
+      font-weight:900;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.07em;
+      line-height:1;
+    }
+    .recruiting-days-value{
+      min-width:26px;
+      text-align:center;
+      font-size:18px;
+      font-weight:950;
+      color:var(--navy);
+      line-height:1;
+    }
+    .recruiting-days-controls{display:inline-flex;gap:4px;align-items:center}
+    .recruiting-days-btn{
+      width:26px;height:26px;
+      border:none;
+      border-radius:999px;
+      background:#eef4ff;
+      color:#18407c;
+      font-weight:950;
+      cursor:pointer;
+      display:grid;
+      place-items:center;
+      line-height:1;
+    }
+    .recruiting-days-btn:hover{background:#dbe9ff}
+    .recruiting-days-btn:active{transform:scale(.96)}
+    .app.sidebar-collapsed .recruiting-days-pill{display:inline-flex}
+    @media (max-width:900px){
+      .recruiting-days-pill{order:4}
+    }
+
   </style>
 </head>
 <body>
@@ -1204,6 +1254,13 @@
             <div class="micro-time" id="countdownHMS">--</div>
           </div>
         </section>
+
+        <div class="recruiting-days-pill" id="recruitingDaysCounter" title="Track recruiting days used">
+          <span class="recruiting-days-label">Days Used</span>
+          <button class="recruiting-days-btn" id="recruitingDaysMinus" type="button" aria-label="Decrease recruiting days used">−</button>
+          <span class="recruiting-days-value" id="recruitingDaysValue">0</span>
+          <button class="recruiting-days-btn" id="recruitingDaysPlus" type="button" aria-label="Increase recruiting days used">+</button>
+        </div>
         <div class="command-actions actions">
           <span class="status-pill" id="liveStatus">Live Sheet: URL Needed</span>
           <button class="btn secondary" id="refreshLiveBtn" type="button">Refresh</button>
@@ -4080,8 +4137,31 @@ Let me know when you have time to connect. We're excited to stay in touch.
       document.addEventListener('click', ()=>moreMenu.classList.remove('active'));
     }
 
+
+    // Recruiting Days Used Counter
+    const RECRUITING_DAYS_USED_KEY = 'recruiting_days_used_v1';
+    function getRecruitingDaysUsed(){
+      const raw = localStorage.getItem(RECRUITING_DAYS_USED_KEY);
+      const n = Number(raw || 0);
+      return Number.isFinite(n) ? Math.max(0, Math.min(999, Math.round(n))) : 0;
+    }
+    function setRecruitingDaysUsed(nextValue){
+      const safe = Math.max(0, Math.min(999, Math.round(Number(nextValue) || 0)));
+      localStorage.setItem(RECRUITING_DAYS_USED_KEY, String(safe));
+      const valueEl = document.getElementById('recruitingDaysValue');
+      if(valueEl) valueEl.textContent = String(safe);
+    }
+    function initRecruitingDaysCounter(){
+      setRecruitingDaysUsed(getRecruitingDaysUsed());
+      const plus = document.getElementById('recruitingDaysPlus');
+      const minus = document.getElementById('recruitingDaysMinus');
+      if(plus) plus.addEventListener('click', (e)=>{ e.stopPropagation(); setRecruitingDaysUsed(getRecruitingDaysUsed()+1); });
+      if(minus) minus.addEventListener('click', (e)=>{ e.stopPropagation(); setRecruitingDaysUsed(getRecruitingDaysUsed()-1); });
+    }
+
     // boot
     initPassword();
+    initRecruitingDaysCounter();
     moveCallStreakIntoSidebar();
     moveSidebarTools();
     initPulseCollapseButtons();
