@@ -1093,6 +1093,14 @@
     .status-probability-badge .prob-mid{color:#9a6700}
     .status-probability-badge .prob-low{color:#b42318}
     .archetype-pill{background:#eef4ff;color:#18407c;border:1px solid #c9d8f5}
+    .trait-pill{background:#fff7e8;color:#8a5200;border:1px solid #f5d08a;white-space:nowrap}
+    .trait-chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+    .trait-chip-grid label{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff;font-size:12px;font-weight:800;color:#405067;cursor:pointer}
+    .trait-chip-grid input{margin:0}
+    .trait-strip{display:inline-flex;align-items:center;gap:6px;margin-left:2px;white-space:nowrap}
+    .trait-mini{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:12px;background:#fff7e8;color:#8a5200;border:1px solid #f5d08a;font-size:15px;font-weight:900;line-height:1;cursor:help}
+    .trait-mini-more{width:auto;min-width:32px;padding:0 8px;font-size:12px}
+    .quick-action-row .trait-strip{align-self:center}
 
     /* Board Health + Club Coach paired cleanly */
     #boardHealthCard,#clubCoachCard{align-self:stretch}
@@ -1494,6 +1502,10 @@
               <div class="chip-row" id="gutChips"></div>
             </div>
             <div class="quick-filter-group">
+              <div class="quick-filter-label">Recruit Traits</div>
+              <div class="chip-row" id="traitChips"></div>
+            </div>
+            <div class="quick-filter-group">
               <div class="quick-filter-label">June 15 Call</div>
               <div class="chip-row" id="ownerChips"></div>
             </div>
@@ -1602,6 +1614,20 @@
           <label><input type="checkbox" value="Late Riser" /> Late Riser</label>
           <label><input type="checkbox" value="Culture Fit" /> Culture Fit</label>
           <label><input type="checkbox" value="Academic Fit" /> Academic Fit</label>
+        </div></div>
+        <div class="span-2"><label>Recruit Traits</label><div class="trait-chip-grid" id="fRecruitTraits">
+          <label><input type="checkbox" value="Competitor" /> 🔥 Competitor</label>
+          <label><input type="checkbox" value="High IQ" /> 🧠 High IQ</label>
+          <label><input type="checkbox" value="Elite Defender" /> 🛡 Elite Defender</label>
+          <label><input type="checkbox" value="Explosive" /> ⚡ Explosive</label>
+          <label><input type="checkbox" value="Finisher" /> 🎯 Finisher</label>
+          <label><input type="checkbox" value="Leader" /> 🗣 Leader</label>
+          <label><input type="checkbox" value="High Academic" /> 🎓 High Academic</label>
+          <label><input type="checkbox" value="Culture Fit" /> 🤝 Culture Fit</label>
+          <label><input type="checkbox" value="Upside" /> 🌱 Upside</label>
+          <label><input type="checkbox" value="Late Bloomer" /> ⏳ Late Bloomer</label>
+          <label><input type="checkbox" value="Raw Talent" /> 🧪 Raw Talent</label>
+          <label><input type="checkbox" value="Motor" /> 🔁 Motor</label>
         </div></div>
         <div><label>Offer / Commitment</label>
           <select id="fOfferStatus" class="field">
@@ -1882,6 +1908,29 @@
       }
     };
 
+
+    const TRAIT_META = {
+      'Competitor':'🔥', 'High IQ':'🧠', 'Elite Defender':'🛡', 'Explosive':'⚡', 'Finisher':'🎯', 'Leader':'🗣',
+      'High Academic':'🎓', 'Culture Fit':'🤝', 'Upside':'🌱', 'Late Bloomer':'⏳', 'Raw Talent':'🧪', 'Motor':'🔁'
+    };
+    const TRAIT_OPTIONS = Object.keys(TRAIT_META);
+
+    function traitBadgeHtml(trait, compact=false){
+      const icon = TRAIT_META[trait] || '🏷';
+      if(compact){
+        return `<span class="trait-mini" title="${escapeHtml(trait)}" aria-label="${escapeHtml(trait)}">${icon}</span>`;
+      }
+      return `<span class="tag trait-pill" title="${escapeHtml(trait)}">${icon} ${escapeHtml(trait)}</span>`;
+    }
+
+    function recruitTraitStrip(recruit){
+      const traits = Array.isArray(recruit?.recruitTraits) ? recruit.recruitTraits : splitMulti(recruit?.recruitTraits || '');
+      if(!traits.length) return '';
+      const shown = traits.slice(0,4).map(trait => traitBadgeHtml(trait, true)).join('');
+      const more = traits.length > 4 ? `<span class="trait-mini trait-mini-more" title="${escapeHtml(traits.slice(4).join(', '))}" aria-label="More traits: ${escapeHtml(traits.slice(4).join(', '))}">+${traits.length-4}</span>` : '';
+      return `<span class="trait-strip" title="${escapeHtml(traits.join(', '))}">${shown}${more}</span>`;
+    }
+
     function migrateRecruitQuestionFields(data){
       Object.values(data || {}).forEach(recruit=>{
         if(!recruit || typeof recruit !== 'object') return;
@@ -1896,7 +1945,7 @@
     let selectedRecruitId = Object.keys(recruitDetails)[0] || '';
     let filteredIds = [];
     let currentBoardView = 'list';
-    const filterState = { group:'', priority:'', gutFeeling:'', june15Call:'', shortcut:'' };
+    const filterState = { group:'', priority:'', gutFeeling:'', recruitTrait:'', june15Call:'', shortcut:'' };
     let compareIds = [];
     let customTags = loadCustomTags();
     let rosterMatrixTargets = loadRosterMatrixTargets();
@@ -2429,6 +2478,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         gutFeeling: row.gutFeeling || row.gut || '',
         commitProbability: row.commitProbability || '',
         archetypeTags: splitMulti(row.archetypeTags || row.archetypes || ''),
+        recruitTraits: splitMulti(row.recruitTraits || row.traits || row.playerTraits || ''),
         offerStatus: row.offerStatus || row.offer || row.commitmentStatus || '',
         wroteToUs: row.wroteToUs || '',
         q1: parseYesNo(row.q1), q2: parseYesNo(row.q2), q3: parseYesNo(row.q3), q4: parseYesNo(row.q4),
@@ -2499,7 +2549,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
 
     function mergeRecruitRecord(localRecruit, liveRecruit){
       const merged = { ...localRecruit, ...liveRecruit };
-      const arrayFields = ['notes','evaluation','actions','tags','communicationLog'];
+      const arrayFields = ['notes','evaluation','actions','tags','communicationLog','archetypeTags','recruitTraits'];
       arrayFields.forEach(field => {
         if((!liveRecruit[field] || !liveRecruit[field].length) && localRecruit[field]?.length){
           merged[field] = localRecruit[field];
@@ -2611,11 +2661,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const groupCounts = countBy(recruits, r=>r.group);
       const priorityCounts = countBy(recruits, r=>r.priority || r.status);
       const gutCounts = countBy(recruits, r=>r.gutFeeling);
+      const traitCounts = {};
+      recruits.forEach(r => (r.recruitTraits || []).forEach(t => traitCounts[t] = (traitCounts[t] || 0) + 1));
       const ownerCounts = countBy(recruits, r=>r.june15Call);
 
       renderChipGroup('groupChips', ['Liberos','Middles','Setters','Pins','Camp','To Text'], groupCounts, 'group', filterState.group);
       renderChipGroup('priorityChips', ['Priority','Warm','Watch List'], priorityCounts, 'priority', filterState.priority);
       renderChipGroup('gutChips', ['Like','Unsure','Pass'], gutCounts, 'gutFeeling', filterState.gutFeeling);
+      renderChipGroup('traitChips', TRAIT_OPTIONS, traitCounts, 'recruitTrait', filterState.recruitTrait);
       renderChipGroup('ownerChips', ['Leisa','Jerome','Orlando','Kelsey'], ownerCounts, 'june15Call', filterState.june15Call);
 
       const shortcuts = [
@@ -2681,6 +2734,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(filterState.group) active.push(`Group: ${escapeHtml(filterState.group)}`);
       if(filterState.priority) active.push(`Priority: ${escapeHtml(filterState.priority)}`);
       if(filterState.gutFeeling) active.push(`Gut: ${escapeHtml(filterState.gutFeeling)}`);
+      if(filterState.recruitTrait) active.push(`Trait: ${escapeHtml(filterState.recruitTrait)}`);
       if(filterState.june15Call) active.push(`Owner: ${escapeHtml(filterState.june15Call)}`);
       if(filterState.shortcut) active.push(`Shortcut: ${escapeHtml(filterState.shortcut)}`);
       const list = document.getElementById('activeFilterList');
@@ -3185,6 +3239,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         ['Commit Probability', recruit.commitProbability ? recruit.commitProbability + '%' : '—'],
         ['Gut Feeling', recruit.gutFeeling || '—'],
         ['Archetypes', (recruit.archetypeTags && recruit.archetypeTags.length) ? recruit.archetypeTags.join(', ') : '—'],
+        ['Recruit Traits', (recruit.recruitTraits && recruit.recruitTraits.length) ? recruit.recruitTraits.join(', ') : '—'],
         ['Last Contact', recruit.lastContactDate || '—'],
         ['Next Action Due', recruit.nextActionDue || '—']
       ].map(([label,value])=>`<div class="mini"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
@@ -3316,7 +3371,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const searchTerm = (searchInput.value || '').toLowerCase().trim();
       let filtered = recruits.filter(r=>{
         const haystack = [
-          r.name,r.club,r.city,r.state,r.position,r.group,r.summary,r.june15Call,r.gutFeeling,
+          r.name,r.club,r.city,r.state,r.position,r.group,r.summary,r.june15Call,r.gutFeeling,(r.recruitTraits || []).join(' '),
           (r.notes || []).join(' '),(r.tags || []).join(' '),r.email,r.phone
         ].join(' ').toLowerCase();
 
@@ -3327,9 +3382,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
         const matchesGroup = !filterState.group || r.group === filterState.group;
         const matchesPriority = !filterState.priority || r.priority === filterState.priority || r.status === filterState.priority;
         const matchesGut = !filterState.gutFeeling || r.gutFeeling === filterState.gutFeeling;
+        const matchesTrait = !filterState.recruitTrait || (r.recruitTraits || []).includes(filterState.recruitTrait);
         const matchesOwner = !filterState.june15Call || r.june15Call === filterState.june15Call;
         const matchesWeekend = !activeWeekendTournamentId || isRecruitInActiveWeekend(r.id);
-        return matchesSearch && matchesClass && matchesPosition && matchesStatus && matchesGroup && matchesPriority && matchesGut && matchesOwner && matchesWeekend && passesShortcut(r);
+        return matchesSearch && matchesClass && matchesPosition && matchesStatus && matchesGroup && matchesPriority && matchesGut && matchesTrait && matchesOwner && matchesWeekend && passesShortcut(r);
       });
 
       filtered = applySort(filtered);
@@ -3386,6 +3442,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
               ${r.phone ? `<a class="quick-action-btn" href="tel:${r.phone}">Call</a>` : ''}
               ${r.phone ? `<a class="quick-action-btn" href="sms:${r.phone}">Text</a>` : ''}
               ${r.email ? `<a class="quick-action-btn" href="mailto:${r.email}">Email</a>` : ''}
+              ${recruitTraitStrip(r)}
             </div>
           </div>
         `;
@@ -3581,14 +3638,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','gutFeeling','commitProbability','archetypeTags','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','gutFeeling','commitProbability','archetypeTags','recruitTraits','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
         ...rows.map(r => headers.map(h => {
           const map = {
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
-            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',gutFeeling:r.gutFeeling || '',commitProbability:r.commitProbability || '',archetypeTags:(r.archetypeTags||[]).join(', '),offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
+            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',gutFeeling:r.gutFeeling || '',commitProbability:r.commitProbability || '',archetypeTags:(r.archetypeTags||[]).join(', '),recruitTraits:(r.recruitTraits||[]).join(', '),offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
             q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Answer1:r.q1Answer1,q1Question2:r.q1Question2,q1Answer2:r.q1Answer2,q1Question3:r.q1Question3,q1Answer3:r.q1Answer3,q2Question1:r.q2Question1,q2Answer1:r.q2Answer1,q2Question2:r.q2Question2,q2Answer2:r.q2Answer2,q2Question3:r.q2Question3,q2Answer3:r.q2Answer3,q3Question1:r.q3Question1,q3Answer1:r.q3Answer1,q3Question2:r.q3Question2,q3Answer2:r.q3Answer2,q3Question3:r.q3Question3,q3Answer3:r.q3Answer3,q4Question1:r.q4Question1,q4Answer1:r.q4Answer1,q4Question2:r.q4Question2,q4Answer2:r.q4Answer2,q4Question3:r.q4Question3,q4Answer3:r.q4Answer3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
             campAttended:r.campAttended,pdfName:r.pdfName || (r.pdfFile ? 'Uploaded' : ''),filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
@@ -3614,7 +3671,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       state:document.getElementById('fState'), club:document.getElementById('fClub'), priority:document.getElementById('fPriority'),
       phone:document.getElementById('fPhone'), email:document.getElementById('fEmail'), profileLink:document.getElementById('fProfileLink'),
       filmLink:document.getElementById('fFilmLink'), june15Call:document.getElementById('fJune15Call'),
-      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), gutFeeling:document.getElementById('fGutFeeling'), commitProbability:document.getElementById('fCommitProbability'), archetypeTags:document.getElementById('fArchetypeTags'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
+      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), gutFeeling:document.getElementById('fGutFeeling'), commitProbability:document.getElementById('fCommitProbability'), archetypeTags:document.getElementById('fArchetypeTags'), recruitTraits:document.getElementById('fRecruitTraits'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
       height:document.getElementById('fHeight'), gradYear:document.getElementById('fGradYear'),
       lastContact:document.getElementById('fLastContact'), nextActionDue:document.getElementById('fNextActionDue'),
       callPlanLocal:document.getElementById('fCallPlanLocal'), callPlanTimezone:document.getElementById('fCallPlanTimezone'), callPlanPST:document.getElementById('fCallPlanPST'),
@@ -3658,6 +3715,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(formEls.gutFeeling) formEls.gutFeeling.value = r?.gutFeeling || '';
       if(formEls.commitProbability){ formEls.commitProbability.value = r?.commitProbability || 0; const out=document.getElementById('commitProbabilityReadout'); if(out) out.textContent = (formEls.commitProbability.value || 0) + '%'; }
       if(formEls.archetypeTags){ const selected = new Set(r?.archetypeTags || []); formEls.archetypeTags.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = selected.has(cb.value)); }
+      if(formEls.recruitTraits){ const selectedTraits = new Set(r?.recruitTraits || []); formEls.recruitTraits.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = selectedTraits.has(cb.value)); }
       formEls.offerStatus.value = r?.offerStatus || '';
       formEls.wroteToUs.value = r?.wroteToUs || '';
       formEls.eventName.value = r?.eventName || '';
@@ -3790,6 +3848,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
         gutFeeling: formEls.gutFeeling ? formEls.gutFeeling.value : '',
         commitProbability:formEls.commitProbability ? formEls.commitProbability.value : '',
         archetypeTags:formEls.archetypeTags ? Array.from(formEls.archetypeTags.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value) : [],
+        recruitTraits:formEls.recruitTraits ? Array.from(formEls.recruitTraits.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value) : [],
         offerStatus:formEls.offerStatus.value, wroteToUs:formEls.wroteToUs.value, eventName:formEls.eventName.value, eventDate:formEls.eventDate.value, eventLocation:formEls.eventLocation.value, height:formEls.height.value,
         graduationYear:formEls.gradYear.value, lastContactDate:formEls.lastContact.value, nextActionDue:formEls.nextActionDue.value,
         callPlanLocal:formEls.callPlanLocal.value, callPlanTimezone:formEls.callPlanTimezone.value,
@@ -4038,6 +4097,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       filterState.group = '';
       filterState.priority = '';
       filterState.gutFeeling = '';
+      filterState.recruitTrait = '';
       filterState.june15Call = '';
       filterState.shortcut = '';
       rebuildRecruitList(selectedRecruitId);
