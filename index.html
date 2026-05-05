@@ -2287,10 +2287,13 @@
     .comp-bar{height:9px;border-radius:999px;background:#e8eef7;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);}
     .dark .comp-bar{background:#1e2e45;}
     .comp-bar-fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#1b7f57,#f0ad1b,#C41230);transition:width .35s ease;}
-    .comp-input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-    .comp-input-row label,.scenario-input-row label{display:grid;gap:5px;font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
-    .comp-input-row input,.scenario-input-row input,.scenario-input-row select{border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:#fff;color:var(--text);min-width:0;}
-    .dark .comp-input-row input,.dark .scenario-input-row input,.dark .scenario-input-row select{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
+    .comp-input-row{display:grid;grid-template-columns:1fr;gap:8px;}
+    .position-budget-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+    .position-budget-title{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+    .position-budget-note{font-size:11px;color:var(--muted);line-height:1.35;}
+    .comp-input-row label,.position-budget-grid label,.scenario-input-row label{display:grid;gap:5px;font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+    .comp-input-row input,.position-budget-grid input,.scenario-input-row input,.scenario-input-row select{border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:#fff;color:var(--text);min-width:0;}
+    .dark .comp-input-row input,.dark .position-budget-grid input,.dark .scenario-input-row input,.dark .scenario-input-row select{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
     .comp-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     .comp-breakdown-list{display:grid;gap:6px;max-height:150px;overflow:auto;}
     .comp-pill-row{display:flex;flex-wrap:wrap;gap:6px;}
@@ -2708,8 +2711,15 @@
               <div class="comp-row"><span>Remaining</span><strong id="compRemainingText">$0</strong></div>
               <div class="comp-input-row">
                 <label>Team Budget<input id="compTeamBudgetInput" type="number" min="0" step="500" /></label>
-                <label>Position Budget<input id="compPositionBudgetInput" type="number" min="0" step="500" placeholder="Optional" /></label>
               </div>
+              <div class="position-budget-title">Position Budgets</div>
+              <div class="position-budget-grid">
+                <label>Pins<input class="position-budget-input" data-position-budget="Pins" type="number" min="0" step="500" placeholder="Optional" /></label>
+                <label>Middles<input class="position-budget-input" data-position-budget="Middles" type="number" min="0" step="500" placeholder="Optional" /></label>
+                <label>Setters<input class="position-budget-input" data-position-budget="Setters" type="number" min="0" step="500" placeholder="Optional" /></label>
+                <label>Liberos<input class="position-budget-input" data-position-budget="Liberos" type="number" min="0" step="500" placeholder="Optional" /></label>
+              </div>
+              <div class="position-budget-note">Optional budgets by position group. Scenario builder uses the selected recruit's group.</div>
             </div>
             <div class="comp-mini-card">
               <div class="comp-kicker">Offer Scenario Builder</div>
@@ -4694,10 +4704,32 @@ Let me know when you have time to connect. We're excited to stay in touch.
     function loadCompBudget(){
       try{return JSON.parse(localStorage.getItem(COMP_BUDGET_KEY) || '{}');}catch(e){return {};}
     }
+    function normalizeCompPosition(value){
+      const raw = String(value || '').trim().toLowerCase();
+      if(['pins','pin','outside hitter','outside','opposite','right side','oh','rs'].includes(raw)) return 'Pins';
+      if(['middles','middle','middle blocker','mb'].includes(raw)) return 'Middles';
+      if(['setters','setter','s'].includes(raw)) return 'Setters';
+      if(['liberos','libero','ds','defensive specialist'].includes(raw)) return 'Liberos';
+      return value ? String(value) : 'Other';
+    }
+    function getPositionBudgets(){
+      const budget = loadCompBudget();
+      const out = {Pins:0, Middles:0, Setters:0, Liberos:0, ...(budget.positionBudgets || {})};
+      if(!budget.positionBudgets && budget.positionBudget){
+        out.Pins = Number(budget.positionBudget || 0);
+        out.Middles = Number(budget.positionBudget || 0);
+        out.Setters = Number(budget.positionBudget || 0);
+        out.Liberos = Number(budget.positionBudget || 0);
+      }
+      return out;
+    }
     function saveCompBudget(){
       const team = Number(document.getElementById('compTeamBudgetInput')?.value || 0);
-      const position = Number(document.getElementById('compPositionBudgetInput')?.value || 0);
-      localStorage.setItem(COMP_BUDGET_KEY, JSON.stringify({teamBudget:team, positionBudget:position}));
+      const positionBudgets = {};
+      document.querySelectorAll('[data-position-budget]').forEach(input=>{
+        positionBudgets[input.dataset.positionBudget] = Number(input.value || 0);
+      });
+      localStorage.setItem(COMP_BUDGET_KEY, JSON.stringify({teamBudget:team, positionBudgets}));
       renderCompensationPlanner();
     }
     function renderSpendList(containerId, entries){
@@ -4720,10 +4752,12 @@ Let me know when you have time to connect. We're excited to stay in touch.
         result.innerHTML = 'Choose a recruit and amount to preview remaining budget.';
         return;
       }
-      const positionSpend = recruits.filter(r => (r.position || r.group || 'Other') === (recruit.position || recruit.group || 'Other')).reduce((sum, r)=>sum + totalComp(r), 0);
-      const positionBudget = Number(budget.positionBudget || 0);
+      const recruitPosition = normalizeCompPosition(recruit.group || recruit.position || 'Other');
+      const positionSpend = recruits.filter(r => normalizeCompPosition(r.group || r.position || 'Other') === recruitPosition).reduce((sum, r)=>sum + totalComp(r), 0);
+      const positionBudgets = getPositionBudgets();
+      const positionBudget = Number(positionBudgets[recruitPosition] || 0);
       const posAfter = positionBudget ? positionBudget - positionSpend - amount : 0;
-      result.innerHTML = `<strong>${escapeHtml(recruit.name || 'Recruit')}</strong><br>Scenario offer: <strong>${formatMoney(amount)}</strong><br>Team remaining after: <strong>${teamBudget ? formatMoney(remainingAfter) : 'Set team budget'}</strong><br>Position remaining after: <strong>${positionBudget ? formatMoney(posAfter) : 'Optional budget not set'}</strong>`;
+      result.innerHTML = `<strong>${escapeHtml(recruit.name || 'Recruit')}</strong><br>Scenario offer: <strong>${formatMoney(amount)}</strong><br>Team remaining after: <strong>${teamBudget ? formatMoney(remainingAfter) : 'Set team budget'}</strong><br>${escapeHtml(recruitPosition)} remaining after: <strong>${positionBudget ? formatMoney(posAfter) : 'Position budget not set'}</strong>`;
     }
     function renderCompensationPlanner(){
       const grid = document.getElementById('compensationPlannerGrid');
@@ -4735,9 +4769,11 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const remaining = teamBudget - used;
       const pct = teamBudget ? Math.min(100, Math.max(0, used / teamBudget * 100)) : 0;
       const teamInput = document.getElementById('compTeamBudgetInput');
-      const posInput = document.getElementById('compPositionBudgetInput');
+      const positionBudgets = getPositionBudgets();
       if(teamInput && document.activeElement !== teamInput) teamInput.value = teamBudget || '';
-      if(posInput && document.activeElement !== posInput) posInput.value = Number(budget.positionBudget || 0) || '';
+      document.querySelectorAll('[data-position-budget]').forEach(input=>{
+        if(document.activeElement !== input) input.value = Number(positionBudgets[input.dataset.positionBudget] || 0) || '';
+      });
       const setText = (id, text)=>{ const el=document.getElementById(id); if(el) el.textContent=text; };
       setText('compTotalBudgetText', teamBudget ? formatMoney(teamBudget) : 'Set budget');
       setText('compUsedText', formatMoney(used));
@@ -4749,12 +4785,18 @@ Let me know when you have time to connect. We're excited to stay in touch.
         const amount = totalComp(r);
         if(!amount) return;
         const cls = r.classYear || 'No Class';
-        const pos = r.group || r.position || 'Other';
+        const pos = normalizeCompPosition(r.group || r.position || 'Other');
         byClass[cls] = (byClass[cls] || 0) + amount;
         byPosition[pos] = (byPosition[pos] || 0) + amount;
       });
       renderSpendList('compClassSpend', Object.entries(byClass).sort());
-      renderSpendList('compPositionSpend', Object.entries(byPosition).sort((a,b)=>b[1]-a[1]));
+      const positionBudgetEntries = ['Pins','Middles','Setters','Liberos'].map(pos=>{
+        const spent = Number(byPosition[pos] || 0);
+        const cap = Number(positionBudgets[pos] || 0);
+        const label = cap ? `${pos} • ${formatMoneyShort(spent)} / ${formatMoneyShort(cap)} • ${formatMoneyShort(cap - spent)} left` : `${pos} • ${formatMoneyShort(spent)} spent`;
+        return [label, spent];
+      });
+      renderSpendList('compPositionSpend', positionBudgetEntries);
       const top = recruits.filter(r=>totalComp(r)>0).sort((a,b)=>totalComp(b)-totalComp(a)).slice(0,6);
       const topBox = document.getElementById('compTopAllocations');
       if(topBox){
