@@ -19,6 +19,116 @@
       --radius:18px;
       --sidebar:320px;
     }
+    body.theme-dark{
+      --bg:#0f172a;
+      --panel:#111827;
+      --line:#263246;
+      --text:#f8fafc;
+      --muted:#a8b3c7;
+      --red-soft:#3b1220;
+      --shadow:0 16px 34px rgba(0,0,0,.24);
+    }
+    @media (prefers-color-scheme: dark){
+      body.theme-auto{
+        --bg:#0f172a;
+        --panel:#111827;
+        --line:#263246;
+        --text:#f8fafc;
+        --muted:#a8b3c7;
+        --red-soft:#3b1220;
+        --shadow:0 16px 34px rgba(0,0,0,.24);
+      }
+    }
+    .theme-toggle{
+      display:inline-grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:4px;
+      margin-top:10px;
+      padding:4px;
+      border-radius:999px;
+      background:rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      width:100%;
+      max-width:230px;
+    }
+    .theme-choice{
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:7px 8px;
+      background:transparent;
+      color:#d2dced;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      line-height:1;
+    }
+    .theme-choice.active{
+      background:#fff;
+      color:var(--navy);
+      box-shadow:0 8px 18px rgba(0,0,0,.14);
+    }
+    body.theme-dark .content-panel,
+    body.theme-dark .controls,
+    body.theme-dark .quick-filters,
+    body.theme-dark .daily-sheet,
+    body.theme-dark .section,
+    body.theme-dark .mini,
+    body.theme-dark .recruit-card,
+    body.theme-dark .mini-card,
+    body.theme-dark .position-column,
+    body.theme-dark .modal-card,
+    body.theme-dark .call-mode-card,
+    body.theme-dark .call-box,
+    body.theme-dark .event-item,
+    body.theme-dark .event-group,
+    body.theme-dark .tutorial-step{
+      background:var(--panel);
+      border-color:var(--line);
+    }
+    body.theme-dark .field,
+    body.theme-dark input,
+    body.theme-dark select,
+    body.theme-dark textarea{
+      background:#0b1220;
+      color:var(--text);
+      border-color:var(--line);
+    }
+    body.theme-dark .tag,
+    body.theme-dark .badge{
+      background:#1f2937;
+      color:#dbeafe;
+    }
+    body.theme-dark .btn.secondary{
+      background:#111827;
+      color:var(--text);
+      border-color:var(--line);
+    }
+    @media (prefers-color-scheme: dark){
+      body.theme-auto .content-panel,
+      body.theme-auto .controls,
+      body.theme-auto .quick-filters,
+      body.theme-auto .daily-sheet,
+      body.theme-auto .section,
+      body.theme-auto .mini,
+      body.theme-auto .recruit-card,
+      body.theme-auto .mini-card,
+      body.theme-auto .position-column,
+      body.theme-auto .modal-card,
+      body.theme-auto .call-mode-card,
+      body.theme-auto .call-box,
+      body.theme-auto .event-item,
+      body.theme-auto .event-group,
+      body.theme-auto .tutorial-step{background:var(--panel);border-color:var(--line)}
+      body.theme-auto .field,
+      body.theme-auto input,
+      body.theme-auto select,
+      body.theme-auto textarea{background:#0b1220;color:var(--text);border-color:var(--line)}
+      body.theme-auto .tag,
+      body.theme-auto .badge{background:#1f2937;color:#dbeafe}
+      body.theme-auto .btn.secondary{background:#111827;color:var(--text);border-color:var(--line)}
+    }
     *{box-sizing:border-box}
     body{
       margin:0;
@@ -672,7 +782,7 @@
     .sidebar-filters-host .filter-chip{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.12);color:#fff}
     .sidebar-filters-host .filter-chip.active{background:#fff;color:var(--red);border-color:#fff}
     .sidebar-filters-host .filter-count{background:rgba(255,255,255,.16);color:#fff}
-    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .board-view-controls,.pulse-card.collapsed .event-tracker-wrap,.pulse-card.collapsed .coach-call-list,.pulse-card.collapsed .manual-event-list,.pulse-card.collapsed .board-health-grid,.pulse-card.collapsed .health-checks{display:none}
+    .pulse-card.collapsed .pulse-list,.pulse-card.collapsed .roster-matrix-wrap,.pulse-card.collapsed .tiny-note,.pulse-card.collapsed .pulse-mini-stack,.pulse-card.collapsed .board-view-controls,.pulse-card.collapsed .event-tracker-wrap,.pulse-card.collapsed .coach-call-list,.pulse-card.collapsed .manual-event-list,.pulse-card.collapsed .board-health-grid,.pulse-card.collapsed .health-checks,.pulse-card.collapsed .compensation-grid{display:none}
     .pulse-collapse-btn{border:none;background:#fff;color:var(--text);width:36px;height:36px;border-radius:12px;cursor:pointer;font-weight:800}
     .pulse-card.minimal{padding:14px}
     .pulse-mini-stack{display:grid;gap:8px}
@@ -1097,9 +1207,50 @@
     .trait-chip-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
     .trait-chip-grid label{display:inline-flex;gap:6px;align-items:center;border:1px solid var(--line);border-radius:999px;padding:7px 10px;background:#fff;font-size:12px;font-weight:800;color:#405067;cursor:pointer}
     .trait-chip-grid input{margin:0}
-    .trait-strip{display:inline-flex;align-items:center;gap:6px;margin-left:2px;white-space:nowrap}
-    .trait-mini{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:12px;background:#fff7e8;color:#8a5200;border:1px solid #f5d08a;font-size:15px;font-weight:900;line-height:1;cursor:help}
+    .trait-strip{display:inline-flex;align-items:center;gap:6px;margin-left:2px;white-space:nowrap;position:relative;overflow:visible}
+    .trait-mini{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:12px;background:#fff7e8;color:#8a5200;border:1px solid #f5d08a;font-size:15px;font-weight:900;line-height:1;cursor:help;position:relative;overflow:visible}
     .trait-mini-more{width:auto;min-width:32px;padding:0 8px;font-size:12px}
+    .trait-mini[data-tooltip]::after{
+      content:attr(data-tooltip);
+      position:absolute;
+      left:50%;
+      bottom:calc(100% + 9px);
+      transform:translateX(-50%) translateY(4px);
+      min-width:max-content;
+      max-width:240px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:#162336;
+      color:#fff;
+      font-size:12px;
+      font-weight:800;
+      line-height:1.25;
+      white-space:normal;
+      text-align:center;
+      box-shadow:0 10px 24px rgba(16,24,38,.22);
+      opacity:0;
+      pointer-events:none;
+      z-index:99999;
+      transition:opacity .14s ease, transform .14s ease;
+    }
+    .trait-mini[data-tooltip]::before{
+      content:"";
+      position:absolute;
+      left:50%;
+      bottom:calc(100% + 3px);
+      transform:translateX(-50%) translateY(4px);
+      border:6px solid transparent;
+      border-top-color:#162336;
+      opacity:0;
+      pointer-events:none;
+      z-index:99998;
+      transition:opacity .14s ease, transform .14s ease;
+    }
+    .trait-mini[data-tooltip]:hover::after,
+    .trait-mini[data-tooltip]:focus-visible::after,
+    .trait-mini[data-tooltip]:hover::before,
+    .trait-mini[data-tooltip]:focus-visible::before{opacity:1;transform:translateX(-50%) translateY(0)}
+    .recruit-card,.mini-card,.quick-action-row{overflow:visible}
     .quick-action-row .trait-strip{align-self:center}
 
     /* Board Health + Club Coach paired cleanly */
@@ -1172,6 +1323,1212 @@
       .recruiting-days-pill{order:4}
     }
 
+  
+
+    /* Single-line command header + Notion-style scroll collapse */
+    .topbar{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:space-between!important;
+      gap:10px!important;
+      flex-wrap:nowrap!important;
+      padding:8px 10px!important;
+      min-height:58px!important;
+      border-radius:16px!important;
+      position:sticky!important;
+      top:8px!important;
+      z-index:300!important;
+      transition:padding .18s ease, min-height .18s ease, border-radius .18s ease, box-shadow .18s ease, transform .18s ease;
+    }
+    .topbar-title{
+      min-width:245px!important;
+      max-width:330px!important;
+      flex:0 1 330px!important;
+      display:block!important;
+    }
+    .topbar-title h2{
+      font-size:19px!important;
+      line-height:1!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+    .topbar-title p{display:none!important;}
+    .micro-countdown{
+      flex:1 1 390px!important;
+      min-width:260px!important;
+      max-width:520px!important;
+      min-height:38px!important;
+      height:40px!important;
+      padding:5px 10px!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:10px!important;
+      grid-template-rows:none!important;
+      border-radius:999px!important;
+      box-shadow:0 7px 18px rgba(0,45,98,.11)!important;
+    }
+    .micro-countdown::after{
+      width:64px!important;
+      height:64px!important;
+      inset:-18px -20px auto auto!important;
+    }
+    .micro-row{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:flex-start!important;
+      gap:8px!important;
+      min-width:0!important;
+      flex:0 0 auto!important;
+    }
+    .micro-row:nth-child(2){
+      flex:1 1 auto!important;
+      min-width:0!important;
+      justify-content:flex-end!important;
+    }
+    .micro-title-wrap{gap:6px!important;}
+    .micro-flame{
+      width:26px!important;
+      height:26px!important;
+      flex-basis:26px!important;
+      font-size:14px!important;
+    }
+    .micro-label{
+      max-width:185px!important;
+      font-size:10px!important;
+      letter-spacing:.08em!important;
+    }
+    .micro-final-week{font-size:8px!important;padding:2px 6px!important;}
+    .micro-days{font-size:23px!important;}
+    .micro-days-copy{font-size:10px!important;letter-spacing:.08em!important;}
+    .micro-time{font-size:11px!important;min-width:72px!important;}
+    .micro-progress-shell{height:4px!important;min-width:62px!important;max-width:150px!important;}
+    .micro-progress-text{font-size:9px!important;}
+    .recruiting-days-pill{
+      flex:0 0 auto!important;
+      min-height:36px!important;
+      padding:5px 7px 5px 10px!important;
+      gap:6px!important;
+      box-shadow:none!important;
+    }
+    .recruiting-days-label{font-size:10px!important;letter-spacing:.07em!important;}
+    .recruiting-days-value{font-size:16px!important;min-width:22px!important;}
+    .recruiting-days-btn{width:24px!important;height:24px!important;}
+    .command-actions{
+      flex:0 0 auto!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:7px!important;
+      margin-left:0!important;
+    }
+    .command-actions .status-pill{
+      max-width:128px!important;
+      padding:7px 9px!important;
+      font-size:11px!important;
+    }
+    .command-actions .btn{
+      padding:8px 10px!important;
+      min-height:36px!important;
+      font-size:12px!important;
+      border-radius:12px!important;
+    }
+    .topbar.header-collapsed{
+      min-height:46px!important;
+      padding:5px 8px!important;
+      border-radius:14px!important;
+      box-shadow:0 10px 30px rgba(17,36,63,.12)!important;
+      backdrop-filter:blur(10px);
+    }
+    .topbar.header-collapsed .topbar-title{max-width:260px!important;min-width:210px!important;}
+    .topbar.header-collapsed .topbar-title h2{font-size:16px!important;}
+    .topbar.header-collapsed .micro-countdown{height:34px!important;min-height:34px!important;padding:4px 8px!important;max-width:430px!important;}
+    .topbar.header-collapsed .micro-label{display:none!important;}
+    .topbar.header-collapsed .micro-flame{width:24px!important;height:24px!important;flex-basis:24px!important;}
+    .topbar.header-collapsed .micro-days{font-size:19px!important;}
+    .topbar.header-collapsed .micro-days-copy{font-size:9px!important;}
+    .topbar.header-collapsed .micro-progress-text{display:none!important;}
+    .topbar.header-collapsed .micro-time{font-size:10px!important;min-width:64px!important;}
+    .topbar.header-collapsed .recruiting-days-pill{min-height:32px!important;padding:4px 6px!important;}
+    .topbar.header-collapsed .recruiting-days-label{display:none!important;}
+    .topbar.header-collapsed .command-actions .status-pill{max-width:98px!important;}
+    @media (max-width:1320px){
+      .topbar{gap:8px!important;}
+      .topbar-title{min-width:205px!important;max-width:260px!important;}
+      .topbar-title h2{font-size:17px!important;}
+      .micro-countdown{max-width:430px!important;min-width:240px!important;}
+      .micro-label{max-width:120px!important;}
+      .command-actions .status-pill{max-width:110px!important;}
+      .command-actions .btn{padding:8px 9px!important;}
+      .recruiting-days-label{display:none!important;}
+    }
+    @media (max-width:1050px){
+      .topbar{flex-wrap:wrap!important;align-items:center!important;}
+      .topbar-title{flex:1 1 260px!important;max-width:none!important;}
+      .micro-countdown{order:2;flex:1 1 100%!important;max-width:none!important;}
+      .recruiting-days-pill{order:1;}
+      .command-actions{order:3;width:100%;justify-content:flex-start!important;flex-wrap:wrap!important;}
+    }
+
+  
+
+    /* FINAL CLEANUP: readable one-line command bar + cleaner dark mode */
+    .topbar{
+      display:grid!important;
+      grid-template-columns:minmax(260px,1fr) minmax(300px,360px) auto auto!important;
+      align-items:center!important;
+      gap:10px!important;
+      min-height:52px!important;
+      padding:8px 10px!important;
+      overflow:visible!important;
+    }
+    .topbar-title{min-width:0!important;max-width:none!important;flex:none!important;}
+    .topbar-title h2{font-size:18px!important;line-height:1.05!important;letter-spacing:-.035em!important;}
+    .micro-countdown{
+      width:100%!important;
+      min-width:0!important;
+      max-width:none!important;
+      height:38px!important;
+      min-height:38px!important;
+      padding:5px 9px!important;
+      display:grid!important;
+      grid-template-columns:auto 1fr auto!important;
+      grid-template-rows:1fr!important;
+      align-items:center!important;
+      gap:8px!important;
+      overflow:hidden!important;
+    }
+    .micro-countdown .micro-row{display:contents!important;}
+    .micro-title-wrap{display:contents!important;}
+    .micro-title-wrap > div{display:none!important;}
+    .micro-flame{grid-column:1!important;width:27px!important;height:27px!important;flex:0 0 27px!important;font-size:14px!important;}
+    .micro-final-week{display:none!important;}
+    .micro-mainline{grid-column:2!important;display:flex!important;align-items:baseline!important;gap:5px!important;min-width:0!important;}
+    .micro-days{font-size:22px!important;line-height:1!important;}
+    .micro-days-copy{font-size:10px!important;letter-spacing:.06em!important;white-space:nowrap!important;}
+    .micro-progress-shell{display:none!important;}
+    .micro-progress-text{grid-column:3!important;font-size:10px!important;white-space:nowrap!important;opacity:.9!important;}
+    .micro-time{grid-column:3!important;font-size:11px!important;min-width:68px!important;text-align:right!important;white-space:nowrap!important;}
+    .micro-progress-text + .micro-time{margin-left:4px!important;}
+    .micro-countdown .micro-progress-text{display:none!important;}
+    .recruiting-days-pill{height:38px!important;min-height:38px!important;padding:5px 8px!important;gap:6px!important;}
+    .recruiting-days-label{font-size:10px!important;}
+    .recruiting-days-btn{width:25px!important;height:25px!important;}
+    .recruiting-days-value{font-size:16px!important;min-width:22px!important;}
+    .command-actions{gap:7px!important;flex-wrap:nowrap!important;}
+    .command-actions .status-pill{height:38px!important;display:inline-flex!important;align-items:center!important;max-width:138px!important;padding:7px 10px!important;}
+    .command-actions .btn{height:38px!important;padding:8px 12px!important;}
+    .topbar.header-collapsed{grid-template-columns:minmax(220px,1fr) minmax(230px,300px) auto auto!important;min-height:44px!important;}
+    .topbar.header-collapsed .micro-countdown{height:32px!important;min-height:32px!important;}
+    @media (max-width:1450px){
+      .topbar{grid-template-columns:minmax(220px,1fr) minmax(250px,320px) auto auto!important;}
+      .topbar-title h2{font-size:16px!important;}
+      .command-actions .status-pill{max-width:118px!important;}
+      .command-actions .btn{padding:8px 10px!important;}
+      .recruiting-days-label{display:none!important;}
+    }
+    @media (max-width:1120px){
+      .topbar{grid-template-columns:1fr auto!important;grid-auto-rows:auto!important;}
+      .micro-countdown{grid-column:1 / -1!important;order:3!important;}
+      .recruiting-days-pill{justify-self:end!important;}
+      .command-actions{grid-column:1 / -1!important;justify-content:flex-start!important;flex-wrap:wrap!important;}
+    }
+
+    body.theme-dark .topbar,
+    body.theme-dark .content-panel,
+    body.theme-dark .controls,
+    body.theme-dark .quick-filters,
+    body.theme-dark .daily-sheet,
+    body.theme-dark .section,
+    body.theme-dark .mini,
+    body.theme-dark .recruit-card,
+    body.theme-dark .mini-card,
+    body.theme-dark .position-column,
+    body.theme-dark .modal-card,
+    body.theme-dark .call-mode-card,
+    body.theme-dark .call-box,
+    body.theme-dark .event-item,
+    body.theme-dark .event-group,
+    body.theme-dark .tutorial-step,
+    body.theme-dark .password-card,
+    body.theme-dark .more-menu{
+      background:#111827!important;
+      color:#f8fafc!important;
+      border-color:#263246!important;
+      box-shadow:0 14px 34px rgba(0,0,0,.28)!important;
+    }
+    body.theme-dark .sidebar{background:#071b3d!important;}
+    body.theme-dark .main{background:var(--bg)!important;}
+    body.theme-dark .panel-header p,
+    body.theme-dark .meta,
+    body.theme-dark .daily-meta,
+    body.theme-dark .board-mini-meta,
+    body.theme-dark .control label,
+    body.theme-dark .quick-filter-label,
+    body.theme-dark .quick-filter-title,
+    body.theme-dark .label,
+    body.theme-dark .section p,
+    body.theme-dark .section li,
+    body.theme-dark .comm-log-note,
+    body.theme-dark .qa-answer-text{color:#cbd5e1!important;}
+    body.theme-dark .name,
+    body.theme-dark h2,
+    body.theme-dark h3,
+    body.theme-dark h4,
+    body.theme-dark h5,
+    body.theme-dark .value,
+    body.theme-dark .qa-question-text{color:#f8fafc!important;}
+    body.theme-dark .field,
+    body.theme-dark input,
+    body.theme-dark select,
+    body.theme-dark textarea,
+    body.theme-dark .password-input{
+      background:#0b1220!important;
+      color:#f8fafc!important;
+      border-color:#334155!important;
+    }
+    body.theme-dark .btn.secondary,
+    body.theme-dark .more-menu .btn,
+    body.theme-dark .recruiting-days-pill,
+    body.theme-dark .status-pill{
+      background:#0b1220!important;
+      color:#e5edff!important;
+      border-color:#334155!important;
+    }
+    body.theme-dark .tag,
+    body.theme-dark .badge,
+    body.theme-dark .filter-chip,
+    body.theme-dark .trait-mini,
+    body.theme-dark .thumb-placeholder,
+    body.theme-dark .headshot-placeholder{
+      background:#1f2937!important;
+      color:#e5edff!important;
+      border-color:#334155!important;
+    }
+    body.theme-dark .filter-count{background:#334155!important;color:#f8fafc!important;}
+    body.theme-dark .hero{background:linear-gradient(135deg,#111827,#0b1220)!important;border-color:#334155!important;}
+    body.theme-dark a{color:#bfdbfe;}
+    @media (prefers-color-scheme: dark){
+      body.theme-auto .topbar,
+      body.theme-auto .content-panel,
+      body.theme-auto .section,
+      body.theme-auto .mini,
+      body.theme-auto .recruit-card,
+      body.theme-auto .mini-card,
+      body.theme-auto .position-column,
+      body.theme-auto .modal-card,
+      body.theme-auto .call-mode-card,
+      body.theme-auto .call-box,
+      body.theme-auto .event-item,
+      body.theme-auto .event-group,
+      body.theme-auto .more-menu{background:#111827!important;color:#f8fafc!important;border-color:#263246!important;}
+      body.theme-auto .field,
+      body.theme-auto input,
+      body.theme-auto select,
+      body.theme-auto textarea{background:#0b1220!important;color:#f8fafc!important;border-color:#334155!important;}
+      body.theme-auto .btn.secondary,
+      body.theme-auto .status-pill{background:#0b1220!important;color:#e5edff!important;border-color:#334155!important;}
+    }
+
+
+
+    /* HEADER REBALANCE: use open space for countdown + progress/status */
+    .topbar{
+      display:grid!important;
+      grid-template-columns:minmax(270px,360px) minmax(520px,1fr) auto auto!important;
+      align-items:center!important;
+      gap:12px!important;
+      min-height:58px!important;
+      padding:9px 12px!important;
+      overflow:visible!important;
+    }
+    .topbar-title{
+      min-width:0!important;
+      max-width:360px!important;
+      overflow:hidden!important;
+    }
+    .topbar-title h2{
+      font-size:19px!important;
+      line-height:1.05!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+    }
+    .micro-countdown{
+      width:100%!important;
+      min-width:0!important;
+      max-width:none!important;
+      height:48px!important;
+      min-height:48px!important;
+      padding:7px 14px!important;
+      display:grid!important;
+      grid-template-columns:auto auto minmax(150px,1fr) auto auto!important;
+      grid-template-rows:1fr!important;
+      align-items:center!important;
+      gap:10px!important;
+      border-radius:999px!important;
+      overflow:hidden!important;
+    }
+    .micro-countdown .micro-row,
+    .micro-countdown .micro-title-wrap{
+      display:contents!important;
+    }
+    .micro-title-wrap > div{
+      display:block!important;
+      min-width:0!important;
+    }
+    .micro-flame{
+      grid-column:1!important;
+      width:32px!important;
+      height:32px!important;
+      flex:0 0 32px!important;
+      font-size:16px!important;
+    }
+    .micro-label{
+      grid-column:2!important;
+      display:block!important;
+      max-width:210px!important;
+      font-size:10px!important;
+      line-height:1.05!important;
+      letter-spacing:.08em!important;
+      text-transform:uppercase!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      opacity:.98!important;
+    }
+    .micro-mainline{
+      grid-column:2!important;
+      grid-row:1!important;
+      display:flex!important;
+      align-items:baseline!important;
+      gap:5px!important;
+      transform:translateY(10px)!important;
+      white-space:nowrap!important;
+    }
+    .micro-days{
+      font-size:26px!important;
+      line-height:1!important;
+      letter-spacing:-.05em!important;
+    }
+    .micro-days-copy{
+      font-size:10px!important;
+      letter-spacing:.08em!important;
+      white-space:nowrap!important;
+    }
+    .micro-progress-shell{
+      grid-column:3!important;
+      display:block!important;
+      width:100%!important;
+      min-width:130px!important;
+      max-width:none!important;
+      height:6px!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.22)!important;
+      border:1px solid rgba(255,255,255,.18)!important;
+      overflow:hidden!important;
+    }
+    .micro-progress-fill{
+      display:block!important;
+      height:100%!important;
+      border-radius:999px!important;
+      background:linear-gradient(90deg,#fff,#ffd7df 55%,#ff9aad)!important;
+    }
+    .micro-progress-text{
+      grid-column:4!important;
+      display:block!important;
+      font-size:10px!important;
+      font-weight:950!important;
+      white-space:nowrap!important;
+      opacity:.96!important;
+    }
+    .micro-time{
+      grid-column:5!important;
+      display:block!important;
+      font-size:12px!important;
+      font-weight:950!important;
+      min-width:78px!important;
+      text-align:right!important;
+      white-space:nowrap!important;
+    }
+    .micro-final-week{
+      grid-column:4!important;
+      display:none!important;
+      justify-self:start!important;
+      transform:translateY(-12px)!important;
+    }
+    .micro-countdown.final-week .micro-final-week{display:inline-flex!important;}
+    .topbar.header-collapsed{
+      grid-template-columns:minmax(240px,330px) minmax(430px,1fr) auto auto!important;
+      min-height:46px!important;
+      padding:6px 10px!important;
+    }
+    .topbar.header-collapsed .micro-countdown{
+      height:36px!important;
+      min-height:36px!important;
+      padding:5px 10px!important;
+      grid-template-columns:auto auto minmax(110px,1fr) auto!important;
+      gap:8px!important;
+    }
+    .topbar.header-collapsed .micro-label{display:none!important;}
+    .topbar.header-collapsed .micro-mainline{grid-column:2!important;transform:none!important;}
+    .topbar.header-collapsed .micro-progress-shell{grid-column:3!important;height:4px!important;}
+    .topbar.header-collapsed .micro-progress-text{display:none!important;}
+    .topbar.header-collapsed .micro-time{grid-column:4!important;font-size:11px!important;min-width:70px!important;}
+    @media (max-width:1500px){
+      .topbar{grid-template-columns:minmax(230px,320px) minmax(450px,1fr) auto auto!important;gap:9px!important;}
+      .topbar-title h2{font-size:17px!important;}
+      .micro-label{max-width:165px!important;}
+      .command-actions .status-pill{max-width:120px!important;}
+      .command-actions .btn{padding:8px 10px!important;}
+    }
+    @media (max-width:1180px){
+      .topbar{grid-template-columns:1fr auto!important;grid-auto-rows:auto!important;}
+      .micro-countdown{grid-column:1 / -1!important;grid-row:2!important;}
+      .recruiting-days-pill{justify-self:end!important;}
+      .command-actions{grid-column:1 / -1!important;grid-row:3!important;justify-content:flex-start!important;flex-wrap:wrap!important;}
+    }
+
+  
+
+    /* HERO LITE COUNTDOWN RESTORE - final layout override */
+    .topbar{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:space-between!important;
+      gap:12px!important;
+      flex-wrap:nowrap!important;
+      padding:10px 12px!important;
+      min-height:58px!important;
+      overflow:visible!important;
+    }
+    .topbar-title{flex:1 1 auto!important;min-width:220px!important;max-width:none!important;}
+    .topbar-title h2{font-size:22px!important;line-height:1.1!important;white-space:nowrap!important;}
+    .topbar-title p{display:none!important;}
+    .topbar .recruiting-days-pill{flex:0 0 auto!important;height:40px!important;padding:6px 10px!important;}
+    .topbar .command-actions{flex:0 0 auto!important;display:flex!important;align-items:center!important;gap:8px!important;}
+    .topbar .command-actions .btn{padding:9px 12px!important;font-size:13px!important;}
+    .topbar .command-actions .status-pill{padding:8px 10px!important;font-size:11px!important;max-width:155px!important;}
+
+    .main > .hero-lite-countdown{
+      display:grid!important;
+      width:100%!important;
+      max-width:none!important;
+      min-width:0!important;
+      min-height:96px!important;
+      grid-template-rows:auto auto!important;
+      gap:12px!important;
+      border-radius:24px!important;
+      padding:16px 20px!important;
+      margin:0!important;
+      color:#fff!important;
+      background:linear-gradient(115deg,#002D62 0%,#123f7e 44%,#81275d 72%,#C41230 100%)!important;
+      background-size:180% 100%!important;
+      animation:countdownShimmer 7s ease-in-out infinite!important;
+      border:1px solid rgba(255,255,255,.14)!important;
+      box-shadow:0 16px 34px rgba(0,45,98,.18)!important;
+      overflow:hidden!important;
+      position:relative!important;
+    }
+    .main > .hero-lite-countdown::after{
+      content:""!important;
+      position:absolute!important;
+      right:-22px!important;
+      top:-46px!important;
+      width:170px!important;
+      height:170px!important;
+      border-radius:50%!important;
+      background:rgba(255,255,255,.12)!important;
+      pointer-events:none!important;
+    }
+    .main > .hero-lite-countdown .micro-row{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:space-between!important;
+      gap:16px!important;
+      position:relative!important;
+      z-index:1!important;
+      min-width:0!important;
+    }
+    .main > .hero-lite-countdown .micro-title-wrap{gap:12px!important;min-width:0!important;}
+    .main > .hero-lite-countdown .micro-flame{
+      width:48px!important;
+      height:48px!important;
+      flex:0 0 48px!important;
+      font-size:24px!important;
+      background:rgba(255,255,255,.14)!important;
+      border:1px solid rgba(255,255,255,.08)!important;
+    }
+    .main > .hero-lite-countdown .micro-label{
+      font-size:15px!important;
+      line-height:1!important;
+      font-weight:950!important;
+      letter-spacing:.09em!important;
+      text-transform:uppercase!important;
+      white-space:nowrap!important;
+    }
+    .main > .hero-lite-countdown .micro-final-week{
+      font-size:11px!important;
+      padding:5px 10px!important;
+      border-radius:999px!important;
+    }
+    .main > .hero-lite-countdown .micro-mainline{gap:10px!important;align-items:baseline!important;}
+    .main > .hero-lite-countdown .micro-days{
+      font-size:54px!important;
+      line-height:.9!important;
+      font-weight:950!important;
+      letter-spacing:-.06em!important;
+    }
+    .main > .hero-lite-countdown .micro-days-copy{
+      font-size:16px!important;
+      font-weight:950!important;
+      letter-spacing:.08em!important;
+      white-space:nowrap!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-shell{
+      height:8px!important;
+      min-width:180px!important;
+      max-width:none!important;
+      flex:1 1 320px!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.2)!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-fill{
+      background:linear-gradient(90deg,#fff,#ffd7df)!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-text{
+      display:block!important;
+      font-size:13px!important;
+      font-weight:950!important;
+      white-space:nowrap!important;
+      opacity:.94!important;
+    }
+    .main > .hero-lite-countdown .micro-time{
+      font-size:18px!important;
+      font-weight:950!important;
+      min-width:116px!important;
+      text-align:right!important;
+      white-space:nowrap!important;
+    }
+    .topbar.header-collapsed{padding:7px 10px!important;min-height:48px!important;}
+    .topbar.header-collapsed .topbar-title h2{font-size:19px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown{
+      min-height:66px!important;
+      padding:10px 16px!important;
+      gap:6px!important;
+      border-radius:18px!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown .micro-flame{width:34px!important;height:34px!important;flex-basis:34px!important;font-size:18px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-label{font-size:12px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-days{font-size:34px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-days-copy{font-size:12px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-progress-shell{height:5px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-progress-text{font-size:11px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-time{font-size:13px!important;min-width:86px!important;}
+
+    @media (max-width:1180px){
+      .topbar{flex-wrap:wrap!important;}
+      .topbar-title{flex:1 1 100%!important;}
+      .topbar .recruiting-days-pill{order:2!important;}
+      .topbar .command-actions{order:3!important;flex:1 1 auto!important;justify-content:flex-end!important;}
+      .main > .hero-lite-countdown .micro-days{font-size:44px!important;}
+      .main > .hero-lite-countdown .micro-progress-shell{min-width:120px!important;}
+    }
+    @media (max-width:760px){
+      .main > .hero-lite-countdown{min-height:112px!important;padding:14px!important;}
+      .main > .hero-lite-countdown .micro-row{flex-wrap:wrap!important;gap:10px!important;}
+      .main > .hero-lite-countdown .micro-progress-shell{order:3;flex-basis:100%!important;min-width:100%!important;}
+      .main > .hero-lite-countdown .micro-days{font-size:40px!important;}
+      .main > .hero-lite-countdown .micro-time{font-size:14px!important;min-width:auto!important;}
+      .topbar-title h2{font-size:18px!important;white-space:normal!important;}
+    }
+
+  
+
+    /* HERO LITE COUNTDOWN FIX: prevent label clipping + restore clear progress/status bar */
+    .main > .hero-lite-countdown{
+      grid-template-columns:1fr!important;
+      grid-template-rows:auto auto!important;
+      min-height:118px!important;
+      padding:18px 22px!important;
+      gap:14px!important;
+      overflow:hidden!important;
+    }
+    .main > .hero-lite-countdown .micro-row{
+      width:100%!important;
+      min-width:0!important;
+    }
+    .main > .hero-lite-countdown .micro-row:first-child{
+      display:flex!important;
+      align-items:center!important;
+      justify-content:space-between!important;
+      gap:12px!important;
+    }
+    .main > .hero-lite-countdown .micro-title-wrap{
+      display:flex!important;
+      align-items:center!important;
+      gap:12px!important;
+      min-width:0!important;
+      flex:1 1 auto!important;
+      overflow:visible!important;
+    }
+    .main > .hero-lite-countdown .micro-label{
+      display:block!important;
+      max-width:none!important;
+      overflow:visible!important;
+      text-overflow:clip!important;
+      white-space:normal!important;
+      line-height:1.15!important;
+      font-size:16px!important;
+    }
+    .main > .hero-lite-countdown .micro-row:nth-child(2){
+      display:grid!important;
+      grid-template-columns:auto minmax(220px,1fr) auto auto!important;
+      align-items:center!important;
+      gap:16px!important;
+    }
+    .main > .hero-lite-countdown .micro-mainline{
+      display:flex!important;
+      align-items:baseline!important;
+      gap:10px!important;
+      min-width:150px!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-shell{
+      display:block!important;
+      visibility:visible!important;
+      min-width:220px!important;
+      width:100%!important;
+      height:10px!important;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.16)!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-fill{
+      display:block!important;
+      min-width:4px!important;
+      height:100%!important;
+      border-radius:999px!important;
+      box-shadow:0 0 14px rgba(255,255,255,.35)!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-text{
+      display:block!important;
+      min-width:72px!important;
+      text-align:left!important;
+      font-size:13px!important;
+    }
+    .main > .hero-lite-countdown .micro-time{
+      min-width:112px!important;
+      font-size:18px!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown{
+      min-height:78px!important;
+      padding:10px 16px!important;
+      gap:8px!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown .micro-row:nth-child(2){
+      grid-template-columns:auto minmax(140px,1fr) auto!important;
+      gap:10px!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown .micro-progress-text{display:none!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-time{min-width:92px!important;font-size:13px!important;}
+    @media (max-width:900px){
+      .main > .hero-lite-countdown .micro-row:nth-child(2){
+        grid-template-columns:auto 1fr auto!important;
+      }
+      .main > .hero-lite-countdown .micro-progress-text{grid-column:2!important;font-size:11px!important;}
+      .main > .hero-lite-countdown .micro-time{grid-column:3!important;grid-row:1 / span 2!important;}
+    }
+    @media (max-width:620px){
+      .main > .hero-lite-countdown{min-height:132px!important;}
+      .main > .hero-lite-countdown .micro-row:nth-child(2){grid-template-columns:1fr auto!important;}
+      .main > .hero-lite-countdown .micro-progress-shell{grid-column:1 / -1!important;min-width:100%!important;}
+      .main > .hero-lite-countdown .micro-progress-text{grid-column:1!important;}
+      .main > .hero-lite-countdown .micro-time{grid-column:2!important;grid-row:auto!important;}
+    }
+
+
+    /* FINAL HERO LITE COUNTDOWN FIX: readable, compact, animated, color-shifting */
+    .main > .hero-lite-countdown{
+      display:grid!important;
+      grid-template-columns:minmax(280px, .9fr) auto minmax(380px, 1.1fr)!important;
+      grid-template-rows:1fr!important;
+      align-items:center!important;
+      gap:22px!important;
+      min-height:104px!important;
+      height:auto!important;
+      padding:18px 26px!important;
+      margin:0 0 2px!important;
+      border-radius:24px!important;
+      overflow:hidden!important;
+      color:#fff!important;
+      background:linear-gradient(115deg,#002D62 0%,#103f80 48%,#6c356f 75%,#C41230 100%)!important;
+      background-size:200% 100%!important;
+      animation:countdownShimmer 8s ease-in-out infinite!important;
+      box-shadow:0 16px 34px rgba(0,45,98,.18)!important;
+      border:1px solid rgba(255,255,255,.14)!important;
+      position:relative!important;
+    }
+    .main > .hero-lite-countdown.countdown-warm{
+      background:linear-gradient(115deg,#002D62 0%,#24427a 35%,#81406b 70%,#C41230 100%)!important;
+    }
+    .main > .hero-lite-countdown.countdown-hot,
+    .main > .hero-lite-countdown.final-week{
+      background:linear-gradient(115deg,#002D62 0%,#5b2d70 35%,#a12655 68%,#C41230 100%)!important;
+      box-shadow:0 18px 38px rgba(196,18,48,.22)!important;
+    }
+    .main > .hero-lite-countdown.countdown-urgent,
+    .main > .hero-lite-countdown.final-day{
+      background:linear-gradient(115deg,#2b174f 0%,#7b1e54 40%,#C41230 78%,#ff6f61 100%)!important;
+      animation:countdownShimmer 4s ease-in-out infinite, countdownShake .72s ease-in-out infinite!important;
+      box-shadow:0 18px 42px rgba(196,18,48,.28)!important;
+    }
+    .main > .hero-lite-countdown::after{
+      content:""!important;
+      position:absolute!important;
+      right:-30px!important;
+      top:-76px!important;
+      width:210px!important;
+      height:210px!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.12)!important;
+      pointer-events:none!important;
+    }
+    .main > .hero-lite-countdown .micro-row{
+      display:contents!important;
+      min-width:0!important;
+    }
+    .main > .hero-lite-countdown .micro-title-wrap{
+      grid-column:1!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:14px!important;
+      min-width:0!important;
+      position:relative!important;
+      z-index:1!important;
+    }
+    .main > .hero-lite-countdown .micro-flame{
+      width:48px!important;
+      height:48px!important;
+      flex:0 0 48px!important;
+      border-radius:999px!important;
+      display:grid!important;
+      place-items:center!important;
+      font-size:24px!important;
+      background:rgba(255,255,255,.13)!important;
+      border:1px solid rgba(255,255,255,.12)!important;
+      animation:microPulse 1.7s ease-in-out infinite!important;
+    }
+    .main > .hero-lite-countdown .micro-label{
+      display:block!important;
+      max-width:100%!important;
+      white-space:normal!important;
+      overflow:visible!important;
+      text-overflow:clip!important;
+      font-size:15px!important;
+      line-height:1.12!important;
+      font-weight:950!important;
+      letter-spacing:.1em!important;
+      text-transform:uppercase!important;
+    }
+    .main > .hero-lite-countdown .micro-final-week{
+      grid-column:1!important;
+      justify-self:start!important;
+      align-self:end!important;
+      margin-left:62px!important;
+      position:relative!important;
+      z-index:1!important;
+      font-size:11px!important;
+      padding:5px 10px!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.18)!important;
+      border:1px solid rgba(255,255,255,.18)!important;
+      white-space:nowrap!important;
+    }
+    .main > .hero-lite-countdown .micro-mainline{
+      grid-column:2!important;
+      display:flex!important;
+      align-items:baseline!important;
+      gap:10px!important;
+      white-space:nowrap!important;
+      position:relative!important;
+      z-index:1!important;
+      min-width:190px!important;
+    }
+    .main > .hero-lite-countdown .micro-days{
+      font-size:56px!important;
+      line-height:.9!important;
+      font-weight:950!important;
+      letter-spacing:-.06em!important;
+      transition:transform .18s ease!important;
+    }
+    .main > .hero-lite-countdown .micro-days-copy{
+      font-size:16px!important;
+      line-height:1!important;
+      font-weight:950!important;
+      letter-spacing:.08em!important;
+      text-transform:uppercase!important;
+      white-space:nowrap!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-shell{
+      grid-column:3!important;
+      justify-self:stretch!important;
+      align-self:center!important;
+      height:10px!important;
+      min-width:220px!important;
+      max-width:none!important;
+      width:100%!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.22)!important;
+      overflow:hidden!important;
+      position:relative!important;
+      z-index:1!important;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-fill{
+      height:100%!important;
+      width:0;
+      border-radius:999px!important;
+      background:linear-gradient(90deg,#ffffff 0%,#ffe1e8 45%,#ff8ea2 100%)!important;
+      background-size:220% 100%!important;
+      animation:progressGlow 2.8s ease-in-out infinite!important;
+      transition:width .8s ease!important;
+    }
+    @keyframes progressGlow{
+      0%,100%{background-position:0% 50%;filter:brightness(1)}
+      50%{background-position:100% 50%;filter:brightness(1.12)}
+    }
+    .main > .hero-lite-countdown .micro-progress-text{
+      grid-column:3!important;
+      justify-self:end!important;
+      align-self:end!important;
+      display:block!important;
+      position:relative!important;
+      z-index:1!important;
+      margin-right:138px!important;
+      font-size:13px!important;
+      font-weight:950!important;
+      white-space:nowrap!important;
+      opacity:.95!important;
+    }
+    .main > .hero-lite-countdown .micro-time{
+      grid-column:3!important;
+      justify-self:end!important;
+      align-self:end!important;
+      position:relative!important;
+      z-index:1!important;
+      font-size:20px!important;
+      line-height:1!important;
+      font-weight:950!important;
+      min-width:128px!important;
+      text-align:right!important;
+      white-space:nowrap!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown{
+      min-height:72px!important;
+      padding:12px 20px!important;
+      grid-template-columns:minmax(230px,.8fr) auto minmax(270px,1fr)!important;
+      gap:16px!important;
+      border-radius:18px!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown .micro-flame{width:36px!important;height:36px!important;flex-basis:36px!important;font-size:19px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-label{font-size:12px!important;letter-spacing:.08em!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-days{font-size:38px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-days-copy{font-size:12px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-progress-shell{height:6px!important;min-width:160px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-progress-text{font-size:11px!important;margin-right:94px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-time{font-size:14px!important;min-width:86px!important;}
+    @media (max-width:1100px){
+      .main > .hero-lite-countdown{
+        grid-template-columns:1fr auto!important;
+        grid-template-rows:auto auto!important;
+        min-height:118px!important;
+        gap:10px 18px!important;
+      }
+      .main > .hero-lite-countdown .micro-title-wrap{grid-column:1!important;grid-row:1!important;}
+      .main > .hero-lite-countdown .micro-mainline{grid-column:2!important;grid-row:1!important;min-width:0!important;}
+      .main > .hero-lite-countdown .micro-progress-shell{grid-column:1 / -1!important;grid-row:2!important;}
+      .main > .hero-lite-countdown .micro-progress-text{grid-column:1!important;grid-row:3!important;justify-self:start!important;margin-right:0!important;}
+      .main > .hero-lite-countdown .micro-time{grid-column:2!important;grid-row:3!important;}
+      .main > .hero-lite-countdown .micro-days{font-size:44px!important;}
+    }
+    @media (max-width:700px){
+      .main > .hero-lite-countdown{grid-template-columns:1fr!important;min-height:0!important;padding:16px!important;}
+      .main > .hero-lite-countdown .micro-title-wrap,
+      .main > .hero-lite-countdown .micro-mainline,
+      .main > .hero-lite-countdown .micro-progress-shell,
+      .main > .hero-lite-countdown .micro-progress-text,
+      .main > .hero-lite-countdown .micro-time{grid-column:1!important;justify-self:start!important;}
+      .main > .hero-lite-countdown .micro-time{font-size:16px!important;}
+    }
+
+
+
+    /* Compensation Planner + tightened hero countdown */
+    .main > .hero-lite-countdown{
+      min-height:92px!important;
+      padding:14px 22px!important;
+      gap:18px!important;
+      grid-template-columns:minmax(260px,.9fr) auto minmax(340px,1.1fr)!important;
+      border-radius:22px!important;
+    }
+    .main > .hero-lite-countdown .micro-flame{width:42px!important;height:42px!important;flex-basis:42px!important;font-size:22px!important;}
+    .main > .hero-lite-countdown .micro-label{font-size:14px!important;letter-spacing:.09em!important;}
+    .main > .hero-lite-countdown .micro-days{font-size:50px!important;}
+    .main > .hero-lite-countdown .micro-days-copy{font-size:14px!important;}
+    .main > .hero-lite-countdown .micro-progress-shell{height:8px!important;min-width:200px!important;}
+    .main > .hero-lite-countdown .micro-progress-text{font-size:12px!important;margin-right:124px!important;}
+    .main > .hero-lite-countdown .micro-time{font-size:18px!important;min-width:116px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown{min-height:64px!important;padding:9px 16px!important;}
+    .compensation-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:12px;align-items:start;}
+    .comp-mini-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px;display:grid;gap:8px;min-width:0;}
+    .dark .comp-mini-card{background:#0f1b2d;border-color:#26364d;color:#e5edf8;}
+    .comp-kicker{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+    .comp-big{font-size:24px;font-weight:950;line-height:1;color:var(--text);}
+    .dark .comp-big{color:#f8fbff;}
+    .comp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;line-height:1.35;}
+    .comp-row strong{font-weight:900;}
+    .comp-bar{height:9px;border-radius:999px;background:#e8eef7;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(0,0,0,.04);}
+    .dark .comp-bar{background:#1e2e45;}
+    .comp-bar-fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#1b7f57,#f0ad1b,#C41230);transition:width .35s ease;}
+    .comp-input-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+    .comp-input-row label,.scenario-input-row label{display:grid;gap:5px;font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+    .comp-input-row input,.scenario-input-row input,.scenario-input-row select{border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:#fff;color:var(--text);min-width:0;}
+    .dark .comp-input-row input,.dark .scenario-input-row input,.dark .scenario-input-row select{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
+    .comp-breakdown{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .comp-breakdown-list{display:grid;gap:6px;max-height:150px;overflow:auto;}
+    .comp-pill-row{display:flex;flex-wrap:wrap;gap:6px;}
+    .comp-pill{display:inline-flex;align-items:center;gap:5px;border-radius:999px;background:#eef4ff;color:#18407c;border:1px solid #c9d8f5;padding:5px 8px;font-size:11px;font-weight:900;}
+    .dark .comp-pill{background:#162844;color:#dbeafe;border-color:#29496f;}
+    .scenario-input-row{display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:end;}
+    .scenario-result{border:1px dashed var(--line);border-radius:14px;padding:10px;background:#f8fbff;font-size:13px;line-height:1.45;}
+    .dark .scenario-result{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
+    .money-chip{background:#f3fff7;color:#18794e;border:1px solid #b7e4c7;}
+    .dark .money-chip{background:#0f2d1f;color:#b7f7ce;border-color:#23593c;}
+    @media (max-width:1100px){.compensation-grid{grid-template-columns:1fr}.comp-breakdown{grid-template-columns:1fr}.scenario-input-row{grid-template-columns:1fr}}
+
+
+    /* FINAL CLEANUP: compact hero countdown with visible progress + compensation hover */
+    .main > .hero-lite-countdown{
+      min-height:96px!important;
+      padding:14px 20px!important;
+      gap:10px!important;
+      border-radius:22px!important;
+    }
+    .main > .hero-lite-countdown .micro-row:first-child{gap:12px!important;}
+    .main > .hero-lite-countdown .micro-flame{width:50px!important;height:50px!important;flex-basis:50px!important;font-size:25px!important;animation:flamePulse 1.85s ease-in-out infinite!important;}
+    .main > .hero-lite-countdown .micro-label{font-size:15px!important;letter-spacing:.08em!important;white-space:nowrap!important;}
+    .main > .hero-lite-countdown .micro-row:nth-child(2){grid-template-columns:auto minmax(260px,1fr) auto auto!important;gap:14px!important;}
+    .main > .hero-lite-countdown .micro-days{font-size:46px!important;line-height:.9!important;}
+    .main > .hero-lite-countdown .micro-days-copy{font-size:13px!important;letter-spacing:.08em!important;}
+    .main > .hero-lite-countdown .micro-progress-shell{height:9px!important;min-width:260px!important;background:rgba(255,255,255,.22)!important;}
+    .main > .hero-lite-countdown .micro-progress-fill{background:linear-gradient(90deg,#fff,#ffe1e7,#ffb3c2)!important;background-size:200% 100%!important;animation:progressGlow 2.9s ease-in-out infinite!important;}
+    .main > .hero-lite-countdown .micro-progress-text{font-size:12px!important;font-weight:900!important;}
+    .main > .hero-lite-countdown .micro-time{font-size:16px!important;min-width:104px!important;}
+    @keyframes flamePulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.18)}50%{transform:scale(1.06);box-shadow:0 0 0 10px rgba(255,255,255,0)}}
+    @keyframes progressGlow{0%,100%{background-position:0% 50%;filter:brightness(1)}50%{background-position:100% 50%;filter:brightness(1.12)}}
+    .money-chip.hover-money{position:relative;cursor:help;white-space:nowrap;}
+    .money-chip.hover-money:hover,.money-chip.hover-money:focus{outline:none;box-shadow:0 0 0 3px rgba(27,127,87,.12)}
+    @media (max-width:900px){
+      .main > .hero-lite-countdown{min-height:108px!important;padding:13px 14px!important;}
+      .main > .hero-lite-countdown .micro-label{white-space:normal!important;font-size:13px!important;}
+      .main > .hero-lite-countdown .micro-row:nth-child(2){grid-template-columns:auto 1fr auto!important;gap:10px!important;}
+      .main > .hero-lite-countdown .micro-progress-shell{grid-column:1 / -1!important;min-width:100%!important;order:4!important;}
+      .main > .hero-lite-countdown .micro-progress-text{grid-column:1 / -1!important;order:5!important;}
+    }
+
+  
+
+    /* FINAL OVERRIDE: tight scoreboard countdown strip */
+    .main > .hero-lite-countdown{
+      display:grid!important;
+      grid-template-columns:minmax(210px,.8fr) auto minmax(220px,1fr) auto auto!important;
+      grid-template-rows:1fr!important;
+      align-items:center!important;
+      gap:14px!important;
+      min-height:64px!important;
+      height:auto!important;
+      padding:10px 18px!important;
+      margin:0 0 2px!important;
+      border-radius:20px!important;
+      overflow:hidden!important;
+      color:#fff!important;
+      background:linear-gradient(115deg,#002D62 0%,#123f7e 46%,#74356d 78%,#C41230 100%)!important;
+      background-size:200% 100%!important;
+      animation:countdownShimmer 8s ease-in-out infinite!important;
+      box-shadow:0 12px 28px rgba(0,45,98,.16)!important;
+      border:1px solid rgba(255,255,255,.12)!important;
+      position:relative!important;
+    }
+    .main > .hero-lite-countdown::after{
+      content:""!important;
+      position:absolute!important;
+      right:-42px!important;
+      top:-68px!important;
+      width:160px!important;
+      height:160px!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.12)!important;
+      pointer-events:none!important;
+    }
+    .main > .hero-lite-countdown .micro-row{display:contents!important;min-width:0!important;}
+    .main > .hero-lite-countdown .micro-title-wrap{
+      grid-column:1!important;
+      display:flex!important;
+      align-items:center!important;
+      gap:10px!important;
+      min-width:0!important;
+      position:relative!important;
+      z-index:1!important;
+    }
+    .main > .hero-lite-countdown .micro-flame{
+      width:38px!important;
+      height:38px!important;
+      flex:0 0 38px!important;
+      border-radius:999px!important;
+      display:grid!important;
+      place-items:center!important;
+      font-size:20px!important;
+      background:rgba(255,255,255,.14)!important;
+      border:1px solid rgba(255,255,255,.12)!important;
+      animation:flamePulse 1.85s ease-in-out infinite!important;
+    }
+    .main > .hero-lite-countdown .micro-label{
+      font-size:13px!important;
+      line-height:1.05!important;
+      font-weight:950!important;
+      letter-spacing:.08em!important;
+      text-transform:uppercase!important;
+      white-space:nowrap!important;
+      overflow:hidden!important;
+      text-overflow:ellipsis!important;
+      max-width:100%!important;
+    }
+    .main > .hero-lite-countdown .micro-final-week{
+      grid-column:1!important;
+      display:none!important;
+      justify-self:start!important;
+      margin-left:48px!important;
+      margin-top:2px!important;
+      font-size:10px!important;
+      padding:3px 7px!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.18)!important;
+      border:1px solid rgba(255,255,255,.18)!important;
+      position:relative!important;
+      z-index:1!important;
+    }
+    .main > .hero-lite-countdown.final-week .micro-final-week{display:inline-flex!important;}
+    .main > .hero-lite-countdown .micro-mainline{
+      grid-column:2!important;
+      display:flex!important;
+      align-items:baseline!important;
+      gap:6px!important;
+      white-space:nowrap!important;
+      min-width:0!important;
+      position:relative!important;
+      z-index:1!important;
+    }
+    .main > .hero-lite-countdown .micro-days{
+      font-size:38px!important;
+      line-height:.9!important;
+      font-weight:950!important;
+      letter-spacing:-.05em!important;
+    }
+    .main > .hero-lite-countdown .micro-days-copy{
+      font-size:12px!important;
+      line-height:1!important;
+      font-weight:950!important;
+      letter-spacing:.08em!important;
+      text-transform:uppercase!important;
+      white-space:nowrap!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-shell{
+      grid-column:3!important;
+      justify-self:stretch!important;
+      align-self:center!important;
+      height:7px!important;
+      min-width:160px!important;
+      width:100%!important;
+      border-radius:999px!important;
+      background:rgba(255,255,255,.22)!important;
+      overflow:hidden!important;
+      position:relative!important;
+      z-index:1!important;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.14)!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-fill{
+      height:100%!important;
+      width:0;
+      border-radius:999px!important;
+      background:linear-gradient(90deg,#ffffff 0%,#ffe1e8 45%,#ff8ea2 100%)!important;
+      background-size:220% 100%!important;
+      animation:progressGlow 2.8s ease-in-out infinite!important;
+      transition:width .8s ease!important;
+    }
+    .main > .hero-lite-countdown .micro-progress-text{
+      grid-column:4!important;
+      display:block!important;
+      justify-self:start!important;
+      align-self:center!important;
+      margin:0!important;
+      min-width:68px!important;
+      font-size:12px!important;
+      line-height:1!important;
+      font-weight:950!important;
+      white-space:nowrap!important;
+      position:relative!important;
+      z-index:1!important;
+    }
+    .main > .hero-lite-countdown .micro-time{
+      grid-column:5!important;
+      justify-self:end!important;
+      align-self:center!important;
+      margin:0!important;
+      min-width:96px!important;
+      font-size:15px!important;
+      line-height:1!important;
+      font-weight:950!important;
+      text-align:right!important;
+      white-space:nowrap!important;
+      position:relative!important;
+      z-index:1!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown{
+      min-height:48px!important;
+      padding:7px 14px!important;
+      border-radius:16px!important;
+      gap:10px!important;
+    }
+    .topbar.header-collapsed + .hero-lite-countdown .micro-flame{width:30px!important;height:30px!important;flex-basis:30px!important;font-size:16px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-label{font-size:11px!important;max-width:140px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-days{font-size:28px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-days-copy{font-size:10px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-progress-shell{height:5px!important;min-width:120px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-progress-text{font-size:10px!important;min-width:52px!important;}
+    .topbar.header-collapsed + .hero-lite-countdown .micro-time{font-size:12px!important;min-width:76px!important;}
+    @media (max-width:1000px){
+      .main > .hero-lite-countdown{
+        grid-template-columns:1fr auto auto!important;
+        grid-template-rows:auto auto!important;
+        min-height:82px!important;
+        gap:8px 12px!important;
+      }
+      .main > .hero-lite-countdown .micro-title-wrap{grid-column:1!important;grid-row:1!important;}
+      .main > .hero-lite-countdown .micro-mainline{grid-column:2!important;grid-row:1!important;}
+      .main > .hero-lite-countdown .micro-time{grid-column:3!important;grid-row:1!important;}
+      .main > .hero-lite-countdown .micro-progress-shell{grid-column:1 / 3!important;grid-row:2!important;min-width:100%!important;}
+      .main > .hero-lite-countdown .micro-progress-text{grid-column:3!important;grid-row:2!important;}
+    }
+    @media (max-width:640px){
+      .main > .hero-lite-countdown{
+        grid-template-columns:1fr auto!important;
+        min-height:96px!important;
+        padding:10px 12px!important;
+      }
+      .main > .hero-lite-countdown .micro-title-wrap{grid-column:1 / -1!important;}
+      .main > .hero-lite-countdown .micro-mainline{grid-column:1!important;grid-row:2!important;}
+      .main > .hero-lite-countdown .micro-time{grid-column:2!important;grid-row:2!important;}
+      .main > .hero-lite-countdown .micro-progress-shell{grid-column:1 / -1!important;grid-row:3!important;}
+      .main > .hero-lite-countdown .micro-progress-text{grid-column:1 / -1!important;grid-row:4!important;}
+    }
+
   </style>
 </head>
 <body>
@@ -1193,6 +2550,11 @@
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
         <div>
           <h1>Recruit Board</h1>
+          <div class="theme-toggle" id="themeToggle" aria-label="Theme toggle">
+            <button class="theme-choice" data-theme-choice="light" type="button">Light</button>
+            <button class="theme-choice" data-theme-choice="dark" type="button">Dark</button>
+            <button class="theme-choice" data-theme-choice="auto" type="button">Auto</button>
+          </div>
           <p>Organize, filter, and review athlete profiles in one place.</p>
         </div>
         <button class="small-white-btn" id="sidebarCollapseBtn" type="button">☰</button>
@@ -1242,26 +2604,7 @@
           <h2>Fresno State Recruiting Dashboard</h2>
           <p>Live board, profiles, calls, events, and roster planning.</p>
         </div>
-        <section class="micro-countdown" id="countdownSection" aria-label="June 15 countdown">
-          <div class="micro-row">
-            <div class="micro-title-wrap">
-              <span class="micro-flame">🔥</span>
-              <div>
-                <div class="micro-label" id="countdownStatus">Final Push to Contact Day</div>
-              </div>
-            </div>
-            <span class="micro-final-week" id="finalWeekBadge">Final Week</span>
-          </div>
-          <div class="micro-row">
-            <div class="micro-mainline">
-              <span class="micro-days" id="daysLeftNumber">--</span>
-              <span class="micro-days-copy">days left</span>
-            </div>
-            <div class="micro-progress-shell"><div class="micro-progress-fill" id="microProgressFill"></div></div>
-            <div class="micro-progress-text" id="microProgressText">--% there</div>
-            <div class="micro-time" id="countdownHMS">--</div>
-          </div>
-        </section>
+        
 
         <div class="recruiting-days-pill" id="recruitingDaysCounter" title="Track recruiting days used">
           <span class="recruiting-days-label">Days Used</span>
@@ -1285,6 +2628,27 @@
           </div>
         </div>
       </div>
+
+      <section class="micro-countdown hero-lite-countdown" id="countdownSection" aria-label="June 15 countdown">
+          <div class="micro-row">
+            <div class="micro-title-wrap">
+              <span class="micro-flame">🔥</span>
+              <div>
+                <div class="micro-label" id="countdownStatus">Final Push to Contact Day</div>
+              </div>
+            </div>
+            <span class="micro-final-week" id="finalWeekBadge">Final Week</span>
+          </div>
+          <div class="micro-row">
+            <div class="micro-mainline">
+              <span class="micro-days" id="daysLeftNumber">--</span>
+              <span class="micro-days-copy">days left</span>
+            </div>
+            <div class="micro-progress-shell"><div class="micro-progress-fill" id="microProgressFill"></div></div>
+            <div class="micro-progress-text" id="microProgressText">--% there</div>
+            <div class="micro-time" id="countdownHMS">--</div>
+          </div>
+        </section>
 
       <section class="content-panel weekend-mode-bar" id="weekendModeBar">
         <div>
@@ -1327,6 +2691,48 @@
       </section>
 
 <section class="recruiting-pulse" id="recruitingPulse">
+        <div class="pulse-card wide" id="compensationPlannerCard">
+          <div class="pulse-card-top">
+            <div>
+              <h3>Compensation Planner</h3>
+              <p>Track scholarship package, rev share, NIL estimate, cap usage, and offer scenarios.</p>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="saveCompBudgetBtn" type="button">Save Budget</button><button class="pulse-collapse-btn" data-collapse-target="compensationPlannerCard" type="button">−</button></div>
+          </div>
+          <div class="compensation-grid" id="compensationPlannerGrid">
+            <div class="comp-mini-card">
+              <div class="comp-kicker">Team Cap Tracker</div>
+              <div class="comp-row"><span>Total Budget</span><strong id="compTotalBudgetText">$0</strong></div>
+              <div class="comp-row"><span>Used</span><strong id="compUsedText">$0</strong></div>
+              <div class="comp-bar"><div class="comp-bar-fill" id="compBudgetFill"></div></div>
+              <div class="comp-row"><span>Remaining</span><strong id="compRemainingText">$0</strong></div>
+              <div class="comp-input-row">
+                <label>Team Budget<input id="compTeamBudgetInput" type="number" min="0" step="500" /></label>
+                <label>Position Budget<input id="compPositionBudgetInput" type="number" min="0" step="500" placeholder="Optional" /></label>
+              </div>
+            </div>
+            <div class="comp-mini-card">
+              <div class="comp-kicker">Offer Scenario Builder</div>
+              <div class="scenario-input-row">
+                <label>Select Recruit<select id="scenarioRecruitSelect"><option value="">Choose recruit</option></select></label>
+                <label>Offer $<input id="scenarioAmountInput" type="number" min="0" step="500" placeholder="12500" /></label>
+              </div>
+              <div class="scenario-result" id="scenarioResult">Choose a recruit and amount to preview remaining budget.</div>
+            </div>
+            <div class="comp-mini-card">
+              <div class="comp-kicker">By Class / Position Spend</div>
+              <div class="comp-breakdown">
+                <div><div class="comp-row"><strong>By Class</strong></div><div class="comp-breakdown-list" id="compClassSpend"></div></div>
+                <div><div class="comp-row"><strong>By Position</strong></div><div class="comp-breakdown-list" id="compPositionSpend"></div></div>
+              </div>
+            </div>
+            <div class="comp-mini-card">
+              <div class="comp-kicker">Top Allocations</div>
+              <div class="comp-breakdown-list" id="compTopAllocations"></div>
+            </div>
+          </div>
+        </div>
+      
         <div class="pulse-card" id="pressureBoardCard">
           <div class="pulse-card-top">
             <div>
@@ -1409,7 +2815,8 @@
           <div class="roster-matrix-wrap" id="rosterMatrixGrid"></div>
           <div class="tiny-note" id="rosterMatrixNote">Targets save on this browser/device. Each cell shows current tracked, committed, target, and remaining need.</div>
         </div>
-              <div class="pulse-card wide" id="eventTrackerCard">
+
+        <div class="pulse-card wide" id="eventTrackerCard">
           <div class="pulse-card-top">
             <div>
               <h3>Tournament / Event Tracker</h3>
@@ -1607,6 +3014,10 @@
         <div><label>Engagement Status</label><select id="fEngagementStatus" class="field"><option value="Auto">Auto</option><option value="Hot">Hot</option><option value="Neutral">Neutral</option><option value="Cold">Cold</option><option value="Out">Out</option></select></div>
         <div><label>Gut Feeling</label><select id="fGutFeeling" class="field"><option value="">None</option><option value="Like">👍 Like</option><option value="Unsure">🤔 Unsure</option><option value="Pass">👎 Pass</option></select></div>
         <div><label>Commit Probability</label><div class="probability-wrap"><input id="fCommitProbability" type="range" min="0" max="100" step="5" class="field" /><div class="probability-readout" id="commitProbabilityReadout">0%</div></div></div>
+        <div><label>Scholarship</label><select id="fScholarshipType" class="field"><option value="">Select</option><option value="Full">Full</option><option value="Partial">Partial</option><option value="None">None</option></select></div>
+        <div><label>Rev Share $</label><input id="fRevenueShare" type="number" min="0" step="500" class="field" /></div>
+        <div><label>NIL Estimate $</label><input id="fNilEstimate" type="number" min="0" step="500" class="field" /></div>
+        <div><label>Bonuses $</label><input id="fBonusComp" type="number" min="0" step="500" class="field" /></div>
         <div class="span-2"><label>Archetype Tags</label><div class="archetype-chip-grid" id="fArchetypeTags">
           <label><input type="checkbox" value="Program Changer" /> Program Changer</label>
           <label><input type="checkbox" value="System Fit" /> System Fit</label>
@@ -1917,17 +3328,19 @@
 
     function traitBadgeHtml(trait, compact=false){
       const icon = TRAIT_META[trait] || '🏷';
+      const safeTrait = escapeHtml(trait);
       if(compact){
-        return `<span class="trait-mini" title="${escapeHtml(trait)}" aria-label="${escapeHtml(trait)}">${icon}</span>`;
+        return `<span class="trait-mini" data-tooltip="${safeTrait}" title="${safeTrait}" aria-label="${safeTrait}" tabindex="0">${icon}</span>`;
       }
-      return `<span class="tag trait-pill" title="${escapeHtml(trait)}">${icon} ${escapeHtml(trait)}</span>`;
+      return `<span class="tag trait-pill" data-tooltip="${safeTrait}" title="${safeTrait}">${icon} ${safeTrait}</span>`;
     }
 
     function recruitTraitStrip(recruit){
       const traits = Array.isArray(recruit?.recruitTraits) ? recruit.recruitTraits : splitMulti(recruit?.recruitTraits || '');
       if(!traits.length) return '';
       const shown = traits.slice(0,4).map(trait => traitBadgeHtml(trait, true)).join('');
-      const more = traits.length > 4 ? `<span class="trait-mini trait-mini-more" title="${escapeHtml(traits.slice(4).join(', '))}" aria-label="More traits: ${escapeHtml(traits.slice(4).join(', '))}">+${traits.length-4}</span>` : '';
+      const extraTraits = traits.slice(4).join(', ');
+      const more = traits.length > 4 ? `<span class="trait-mini trait-mini-more" data-tooltip="${escapeHtml(extraTraits)}" title="${escapeHtml(extraTraits)}" aria-label="More traits: ${escapeHtml(extraTraits)}" tabindex="0">+${traits.length-4}</span>` : '';
       return `<span class="trait-strip" title="${escapeHtml(traits.join(', '))}">${shown}${more}</span>`;
     }
 
@@ -1991,7 +3404,7 @@
       localStorage.setItem(STORAGE_KEY, JSON.stringify(recruitDetails));
     }
     function loadCollapsedSections(){
-      const defaults = {commitWatchCard:true, boardHealthCard:false, clubCoachCard:false, rosterMatrixCard:true, eventTrackerCard:true, manualTournamentsCard:true};
+      const defaults = {commitWatchCard:true, boardHealthCard:false, clubCoachCard:false, rosterMatrixCard:true, compensationPlannerCard:true, eventTrackerCard:true, manualTournamentsCard:true};
       try{ return {...defaults, ...JSON.parse(localStorage.getItem(PULSE_COLLAPSE_KEY) || '{}')}; }catch(e){ return defaults; }
     }
     function saveCollapsedSections(state){
@@ -2477,6 +3890,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
         engagementStatus: row.engagementStatus || 'Auto',
         gutFeeling: row.gutFeeling || row.gut || '',
         commitProbability: row.commitProbability || '',
+        scholarshipType: row.scholarshipType || row.scholarship || '',
+        revenueShare: Number(row.revenueShare || row.revShare || row.compensation || 0),
+        nilEstimate: Number(row.nilEstimate || row.nil || 0),
+        bonusComp: Number(row.bonusComp || row.bonuses || 0),
         archetypeTags: splitMulti(row.archetypeTags || row.archetypes || ''),
         recruitTraits: splitMulti(row.recruitTraits || row.traits || row.playerTraits || ''),
         offerStatus: row.offerStatus || row.offer || row.commitmentStatus || '',
@@ -2561,7 +3978,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const preserveIfBlank = [
         'summary','followUp','academics','visitStatus','headshot','pdfFile','pdfName','profileLink','filmLink','phone','email','height','graduationYear',
         'callPlanLocal','callPlanTimezone','callPlanPST','eventName','eventDate','eventLocation','offerStatus','wroteToUs','gutFeeling',
-        'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status'
+        'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status','scholarshipType','revenueShare','nilEstimate','bonusComp'
       ];
       preserveIfBlank.forEach(field => {
         const liveValue = liveRecruit[field];
@@ -3220,6 +4637,114 @@ Let me know when you have time to connect. We're excited to stay in touch.
       }
     }
 
+
+    function formatMoney(value){
+      const n = Number(value || 0);
+      return '$' + n.toLocaleString();
+    }
+    function formatMoneyShort(value){
+      const n = Number(value || 0);
+      if(n >= 1000000) return '$' + (n/1000000).toFixed(n % 1000000 ? 1 : 0) + 'M';
+      if(n >= 1000) return '$' + (n/1000).toFixed(n % 1000 ? 1 : 0) + 'K';
+      return '$' + n.toLocaleString();
+    }
+    function totalComp(recruit){
+      return Number(recruit?.revenueShare || 0) + Number(recruit?.nilEstimate || 0) + Number(recruit?.bonusComp || 0);
+    }
+    function compensationTooltip(recruit){
+      const base = Number(recruit?.revenueShare || 0);
+      const nil = Number(recruit?.nilEstimate || 0);
+      const bonus = Number(recruit?.bonusComp || 0);
+      const total = base + nil + bonus;
+      const budget = loadCompBudget ? loadCompBudget() : {};
+      const cap = Number(budget.teamBudget || 0);
+      const impact = cap ? ((total / cap) * 100).toFixed(1) + '% of team budget' : 'Set team budget for cap impact';
+      return `Breakdown: Base ${formatMoney(base)} • NIL ${formatMoney(nil)} • Bonuses ${formatMoney(bonus)} • Total ${formatMoney(total)}\nCap impact: ${impact}`;
+    }
+    function moneyChipHtml(recruit){
+      if(!totalComp(recruit)) return '';
+      return `<span class="prob-text money-chip hover-money" tabindex="0" title="${escapeHtml(compensationTooltip(recruit))}">💰 ${formatMoneyShort(totalComp(recruit))}</span>`;
+    }
+    const COMP_BUDGET_KEY = 'recruit_board_compensation_budget_v1';
+    function loadCompBudget(){
+      try{return JSON.parse(localStorage.getItem(COMP_BUDGET_KEY) || '{}');}catch(e){return {};}
+    }
+    function saveCompBudget(){
+      const team = Number(document.getElementById('compTeamBudgetInput')?.value || 0);
+      const position = Number(document.getElementById('compPositionBudgetInput')?.value || 0);
+      localStorage.setItem(COMP_BUDGET_KEY, JSON.stringify({teamBudget:team, positionBudget:position}));
+      renderCompensationPlanner();
+    }
+    function renderSpendList(containerId, entries){
+      const box = document.getElementById(containerId);
+      if(!box) return;
+      box.innerHTML = entries.length ? entries.map(([label, amount]) => `<div class="comp-row"><span>${escapeHtml(label)}</span><strong>${formatMoneyShort(amount)}</strong></div>`).join('') : '<div class="tiny-note">No spend entered yet.</div>';
+    }
+    function renderScenarioResult(){
+      const result = document.getElementById('scenarioResult');
+      if(!result) return;
+      const recruitId = document.getElementById('scenarioRecruitSelect')?.value || '';
+      const amount = Number(document.getElementById('scenarioAmountInput')?.value || 0);
+      const recruit = recruitDetails[recruitId];
+      const budget = loadCompBudget();
+      const recruits = Object.values(recruitDetails || {});
+      const used = recruits.reduce((sum, r)=>sum + totalComp(r), 0);
+      const teamBudget = Number(budget.teamBudget || 0);
+      const remainingAfter = teamBudget ? teamBudget - used - amount : 0;
+      if(!recruitId || !amount){
+        result.innerHTML = 'Choose a recruit and amount to preview remaining budget.';
+        return;
+      }
+      const positionSpend = recruits.filter(r => (r.position || r.group || 'Other') === (recruit.position || recruit.group || 'Other')).reduce((sum, r)=>sum + totalComp(r), 0);
+      const positionBudget = Number(budget.positionBudget || 0);
+      const posAfter = positionBudget ? positionBudget - positionSpend - amount : 0;
+      result.innerHTML = `<strong>${escapeHtml(recruit.name || 'Recruit')}</strong><br>Scenario offer: <strong>${formatMoney(amount)}</strong><br>Team remaining after: <strong>${teamBudget ? formatMoney(remainingAfter) : 'Set team budget'}</strong><br>Position remaining after: <strong>${positionBudget ? formatMoney(posAfter) : 'Optional budget not set'}</strong>`;
+    }
+    function renderCompensationPlanner(){
+      const grid = document.getElementById('compensationPlannerGrid');
+      if(!grid) return;
+      const budget = loadCompBudget();
+      const teamBudget = Number(budget.teamBudget || 0);
+      const recruits = Object.entries(recruitDetails || {}).map(([id, r]) => ({id, ...r}));
+      const used = recruits.reduce((sum, r)=>sum + totalComp(r), 0);
+      const remaining = teamBudget - used;
+      const pct = teamBudget ? Math.min(100, Math.max(0, used / teamBudget * 100)) : 0;
+      const teamInput = document.getElementById('compTeamBudgetInput');
+      const posInput = document.getElementById('compPositionBudgetInput');
+      if(teamInput && document.activeElement !== teamInput) teamInput.value = teamBudget || '';
+      if(posInput && document.activeElement !== posInput) posInput.value = Number(budget.positionBudget || 0) || '';
+      const setText = (id, text)=>{ const el=document.getElementById(id); if(el) el.textContent=text; };
+      setText('compTotalBudgetText', teamBudget ? formatMoney(teamBudget) : 'Set budget');
+      setText('compUsedText', formatMoney(used));
+      setText('compRemainingText', teamBudget ? formatMoney(remaining) : 'Set budget');
+      const fill = document.getElementById('compBudgetFill');
+      if(fill) fill.style.width = pct.toFixed(1) + '%';
+      const byClass = {}, byPosition = {};
+      recruits.forEach(r=>{
+        const amount = totalComp(r);
+        if(!amount) return;
+        const cls = r.classYear || 'No Class';
+        const pos = r.group || r.position || 'Other';
+        byClass[cls] = (byClass[cls] || 0) + amount;
+        byPosition[pos] = (byPosition[pos] || 0) + amount;
+      });
+      renderSpendList('compClassSpend', Object.entries(byClass).sort());
+      renderSpendList('compPositionSpend', Object.entries(byPosition).sort((a,b)=>b[1]-a[1]));
+      const top = recruits.filter(r=>totalComp(r)>0).sort((a,b)=>totalComp(b)-totalComp(a)).slice(0,6);
+      const topBox = document.getElementById('compTopAllocations');
+      if(topBox){
+        topBox.innerHTML = top.length ? top.map(r=>`<button class="comp-pill" type="button" data-comp-open="${r.id}">${escapeHtml(r.name)} • ${formatMoneyShort(totalComp(r))}</button>`).join('') : '<div class="tiny-note">Add Rev Share or NIL Estimate in a recruit profile.</div>';
+        topBox.querySelectorAll('[data-comp-open]').forEach(btn=>btn.addEventListener('click', ()=>{ selectedRecruitId = btn.dataset.compOpen; rebuildRecruitList(selectedRecruitId); }));
+      }
+      const select = document.getElementById('scenarioRecruitSelect');
+      if(select){
+        const keep = select.value;
+        select.innerHTML = '<option value="">Choose recruit</option>' + recruits.sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(r=>`<option value="${r.id}">${escapeHtml(r.name || 'Unknown')}</option>`).join('');
+        select.value = keep && recruitDetails[keep] ? keep : '';
+      }
+      renderScenarioResult();
+    }
+
     function renderProfile(recruitId){
       const recruit = recruitDetails[recruitId];
       if(!recruit){
@@ -3237,6 +4762,11 @@ Let me know when you have time to connect. We're excited to stay in touch.
         ['June 15 Call', recruit.june15Call || '—'],
         ['Rating', recruit.rating || '—'],
         ['Commit Probability', recruit.commitProbability ? recruit.commitProbability + '%' : '—'],
+        ['Scholarship', recruit.scholarshipType || '—'],
+        ['Rev Share', formatMoney(recruit.revenueShare || 0)],
+        ['NIL Est.', formatMoney(recruit.nilEstimate || 0)],
+        ['Bonuses', formatMoney(recruit.bonusComp || 0)],
+        ['Total Package', formatMoney(totalComp(recruit))],
         ['Gut Feeling', recruit.gutFeeling || '—'],
         ['Archetypes', (recruit.archetypeTags && recruit.archetypeTags.length) ? recruit.archetypeTags.join(', ') : '—'],
         ['Recruit Traits', (recruit.recruitTraits && recruit.recruitTraits.length) ? recruit.recruitTraits.join(', ') : '—'],
@@ -3290,6 +4820,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
             <li><strong>Club:</strong> ${recruit.club || '—'}</li>
             <li><strong>Offer / Commitment:</strong> ${recruit.offerStatus || '—'}</li>
             <li><strong>Rating:</strong> ${recruit.rating || '—'}</li>
+            <li><strong>Scholarship:</strong> ${recruit.scholarshipType || '—'}</li>
+            <li><strong>Rev Share:</strong> ${formatMoney(recruit.revenueShare || 0)}</li>
+            <li><strong>NIL Estimate:</strong> ${formatMoney(recruit.nilEstimate || 0)}</li>
+            <li><strong>Total Package:</strong> ${formatMoney(totalComp(recruit))}</li>
             <li><strong>Wrote To Us:</strong> ${recruit.wroteToUs || '—'}</li>
             <li><strong>Academics:</strong> ${recruit.academics || '—'}</li>
             <li><strong>Visit Status:</strong> ${recruit.visitStatus || '—'}</li>
@@ -3424,6 +4958,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
               <div class="badge status-probability-badge">
                 <span class="status-text">${r.priority || r.status || 'Active'}</span>
                 ${r.commitProbability ? `<span class="prob-text ${Number(r.commitProbability) >= 70 ? 'prob-high' : Number(r.commitProbability) >= 40 ? 'prob-mid' : 'prob-low'}">🎯 ${r.commitProbability}%</span>` : ''}
+                ${moneyChipHtml(r)}
               </div>
             </div>
             <div class="tag-row">
@@ -3495,6 +5030,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       recruitList.querySelectorAll('[data-log]').forEach(btn=>{ btn.addEventListener('click', e=>{ e.stopPropagation(); logRecruitContact(btn.dataset.log); }); });
 
       renderBoardView(filtered);
+      renderCompensationPlanner();
       renderProfile(selectedRecruitId);
       setBoardView(currentBoardView);
       saveData();
@@ -3573,6 +5109,9 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(countdownSection){
         countdownSection.classList.toggle('final-week', diff > 0 && days < 7);
         countdownSection.classList.toggle('final-day', diff > 0 && diff <= 24*60*60*1000);
+        countdownSection.classList.toggle('countdown-warm', diff > 0 && days <= 40 && days > 20);
+        countdownSection.classList.toggle('countdown-hot', diff > 0 && days <= 20 && days >= 7);
+        countdownSection.classList.toggle('countdown-urgent', diff > 0 && days < 7);
       }
       if(statusEl){
         statusEl.textContent = diff === 0 ? 'Contact Day is Here' : days < 7 ? 'Final Week to Contact Day' : 'Final Push to Contact Day';
@@ -3638,14 +5177,14 @@ Let me know when you have time to connect. We're excited to stay in touch.
     document.head.appendChild(confettiStyle);
 
     function exportFiltered(){
-      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','gutFeeling','commitProbability','archetypeTags','recruitTraits','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
+      const headers = ['fullName','classYear','group','position','city','state','club','priority','status','june15Call','rating','engagementScoreOverride','engagementStatus','gutFeeling','commitProbability','scholarshipType','revenueShare','nilEstimate','bonusComp','archetypeTags','recruitTraits','offerStatus','wroteToUs','q1','q2','q3','q4','q1Question1','q1Answer1','q1Question2','q1Answer2','q1Question3','q1Answer3','q2Question1','q2Answer1','q2Question2','q2Answer2','q2Question3','q2Answer3','q3Question1','q3Answer1','q3Question2','q3Answer2','q3Question3','q3Answer3','q4Question1','q4Answer1','q4Question2','q4Answer2','q4Question3','q4Answer3','lastContactDate','nextActionDue','visitStatus','campAttended','pdfName','filmLink','profileLink','phone','email','callPlanLocal','callPlanTimezone','callPlanPST','tags','summary','notes','evaluation','followUp','academics','pinTier'];
       const rows = filteredIds.map(id => recruitDetails[id]);
       const csv = [
         headers.join(','),
         ...rows.map(r => headers.map(h => {
           const map = {
             fullName:r.name,classYear:r.classYear,group:r.group,position:r.position,city:r.city,state:r.state,club:r.club,
-            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',gutFeeling:r.gutFeeling || '',commitProbability:r.commitProbability || '',archetypeTags:(r.archetypeTags||[]).join(', '),recruitTraits:(r.recruitTraits||[]).join(', '),offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
+            priority:r.priority,status:r.status,june15Call:r.june15Call,rating:r.rating,engagementScoreOverride:r.engagementScoreOverride || '',engagementStatus:r.engagementStatus || 'Auto',gutFeeling:r.gutFeeling || '',commitProbability:r.commitProbability || '',scholarshipType:r.scholarshipType || '',revenueShare:r.revenueShare || 0,nilEstimate:r.nilEstimate || 0,bonusComp:r.bonusComp || 0,archetypeTags:(r.archetypeTags||[]).join(', '),recruitTraits:(r.recruitTraits||[]).join(', '),offerStatus:r.offerStatus,wroteToUs:r.wroteToUs,
             q1:r.q1,q2:r.q2,q3:r.q3,q4:r.q4,q1Question1:r.q1Question1,q1Answer1:r.q1Answer1,q1Question2:r.q1Question2,q1Answer2:r.q1Answer2,q1Question3:r.q1Question3,q1Answer3:r.q1Answer3,q2Question1:r.q2Question1,q2Answer1:r.q2Answer1,q2Question2:r.q2Question2,q2Answer2:r.q2Answer2,q2Question3:r.q2Question3,q2Answer3:r.q2Answer3,q3Question1:r.q3Question1,q3Answer1:r.q3Answer1,q3Question2:r.q3Question2,q3Answer2:r.q3Answer2,q3Question3:r.q3Question3,q3Answer3:r.q3Answer3,q4Question1:r.q4Question1,q4Answer1:r.q4Answer1,q4Question2:r.q4Question2,q4Answer2:r.q4Answer2,q4Question3:r.q4Question3,q4Answer3:r.q4Answer3,lastContactDate:r.lastContactDate,nextActionDue:r.nextActionDue,visitStatus:r.visitStatus,
             campAttended:r.campAttended,pdfName:r.pdfName || (r.pdfFile ? 'Uploaded' : ''),filmLink:r.filmLink,profileLink:r.profileLink,phone:r.phone,email:r.email,
             callPlanLocal:r.callPlanLocal,callPlanTimezone:r.callPlanTimezone,callPlanPST:r.callPlanPST,
@@ -3671,7 +5210,7 @@ Let me know when you have time to connect. We're excited to stay in touch.
       state:document.getElementById('fState'), club:document.getElementById('fClub'), priority:document.getElementById('fPriority'),
       phone:document.getElementById('fPhone'), email:document.getElementById('fEmail'), profileLink:document.getElementById('fProfileLink'),
       filmLink:document.getElementById('fFilmLink'), june15Call:document.getElementById('fJune15Call'),
-      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), gutFeeling:document.getElementById('fGutFeeling'), commitProbability:document.getElementById('fCommitProbability'), archetypeTags:document.getElementById('fArchetypeTags'), recruitTraits:document.getElementById('fRecruitTraits'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
+      rating:document.getElementById('fRating'), engagementScoreOverride:document.getElementById('fEngagementScoreOverride'), engagementStatus:document.getElementById('fEngagementStatus'), gutFeeling:document.getElementById('fGutFeeling'), commitProbability:document.getElementById('fCommitProbability'), scholarshipType:document.getElementById('fScholarshipType'), revenueShare:document.getElementById('fRevenueShare'), nilEstimate:document.getElementById('fNilEstimate'), bonusComp:document.getElementById('fBonusComp'), archetypeTags:document.getElementById('fArchetypeTags'), recruitTraits:document.getElementById('fRecruitTraits'), offerStatus:document.getElementById('fOfferStatus'), wroteToUs:document.getElementById('fWroteToUs'), eventName:document.getElementById('fEventName'), eventDate:document.getElementById('fEventDate'), eventLocation:document.getElementById('fEventLocation'),
       height:document.getElementById('fHeight'), gradYear:document.getElementById('fGradYear'),
       lastContact:document.getElementById('fLastContact'), nextActionDue:document.getElementById('fNextActionDue'),
       callPlanLocal:document.getElementById('fCallPlanLocal'), callPlanTimezone:document.getElementById('fCallPlanTimezone'), callPlanPST:document.getElementById('fCallPlanPST'),
@@ -3714,6 +5253,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
       formEls.engagementStatus.value = r?.engagementStatus || 'Auto';
       if(formEls.gutFeeling) formEls.gutFeeling.value = r?.gutFeeling || '';
       if(formEls.commitProbability){ formEls.commitProbability.value = r?.commitProbability || 0; const out=document.getElementById('commitProbabilityReadout'); if(out) out.textContent = (formEls.commitProbability.value || 0) + '%'; }
+      if(formEls.scholarshipType) formEls.scholarshipType.value = r?.scholarshipType || '';
+      if(formEls.revenueShare) formEls.revenueShare.value = r?.revenueShare || '';
+      if(formEls.nilEstimate) formEls.nilEstimate.value = r?.nilEstimate || '';
+      if(formEls.bonusComp) formEls.bonusComp.value = r?.bonusComp || '';
       if(formEls.archetypeTags){ const selected = new Set(r?.archetypeTags || []); formEls.archetypeTags.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = selected.has(cb.value)); }
       if(formEls.recruitTraits){ const selectedTraits = new Set(r?.recruitTraits || []); formEls.recruitTraits.querySelectorAll('input[type=checkbox]').forEach(cb=>cb.checked = selectedTraits.has(cb.value)); }
       formEls.offerStatus.value = r?.offerStatus || '';
@@ -3847,6 +5390,10 @@ Let me know when you have time to connect. We're excited to stay in touch.
         engagementStatus:formEls.engagementStatus.value || 'Auto',
         gutFeeling: formEls.gutFeeling ? formEls.gutFeeling.value : '',
         commitProbability:formEls.commitProbability ? formEls.commitProbability.value : '',
+        scholarshipType:formEls.scholarshipType ? formEls.scholarshipType.value : '',
+        revenueShare:formEls.revenueShare ? Number(formEls.revenueShare.value || 0) : 0,
+        nilEstimate:formEls.nilEstimate ? Number(formEls.nilEstimate.value || 0) : 0,
+        bonusComp:formEls.bonusComp ? Number(formEls.bonusComp.value || 0) : 0,
         archetypeTags:formEls.archetypeTags ? Array.from(formEls.archetypeTags.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value) : [],
         recruitTraits:formEls.recruitTraits ? Array.from(formEls.recruitTraits.querySelectorAll('input[type=checkbox]:checked')).map(cb=>cb.value) : [],
         offerStatus:formEls.offerStatus.value, wroteToUs:formEls.wroteToUs.value, eventName:formEls.eventName.value, eventDate:formEls.eventDate.value, eventLocation:formEls.eventLocation.value, height:formEls.height.value,
@@ -3884,6 +5431,13 @@ Let me know when you have time to connect. We're excited to stay in touch.
     });
 
     // Events
+    const saveCompBudgetBtn = document.getElementById('saveCompBudgetBtn');
+    if(saveCompBudgetBtn) saveCompBudgetBtn.addEventListener('click', saveCompBudget);
+    const scenarioRecruitSelect = document.getElementById('scenarioRecruitSelect');
+    if(scenarioRecruitSelect) scenarioRecruitSelect.addEventListener('change', renderScenarioResult);
+    const scenarioAmountInput = document.getElementById('scenarioAmountInput');
+    if(scenarioAmountInput) scenarioAmountInput.addEventListener('input', renderScenarioResult);
+
     document.getElementById('modalCloseBtn').addEventListener('click', closeRecruitModal);
     modal.addEventListener('click', e=>{ if(e.target === modal) closeRecruitModal(); });
     document.getElementById('addBtn').addEventListener('click', ()=>openRecruitModal());
@@ -4198,6 +5752,29 @@ Let me know when you have time to connect. We're excited to stay in touch.
     }
 
 
+    // Light / Dark / Auto Theme Toggle
+    const THEME_STORAGE_KEY = 'recruit_board_theme_v1';
+    function applyThemePreference(theme){
+      const next = ['light','dark','auto'].includes(theme) ? theme : 'auto';
+      document.body.classList.remove('theme-light','theme-dark','theme-auto');
+      document.body.classList.add('theme-' + next);
+      document.querySelectorAll('[data-theme-choice]').forEach(btn=>{
+        btn.classList.toggle('active', btn.dataset.themeChoice === next);
+      });
+    }
+    function initThemeToggle(){
+      const savedTheme = localStorage.getItem(THEME_STORAGE_KEY) || 'auto';
+      applyThemePreference(savedTheme);
+      document.querySelectorAll('[data-theme-choice]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const next = btn.dataset.themeChoice || 'auto';
+          localStorage.setItem(THEME_STORAGE_KEY, next);
+          applyThemePreference(next);
+        });
+      });
+    }
+
+
     // Recruiting Days Used Counter
     const RECRUITING_DAYS_USED_KEY = 'recruiting_days_used_v1';
     function getRecruitingDaysUsed(){
@@ -4219,7 +5796,29 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(minus) minus.addEventListener('click', (e)=>{ e.stopPropagation(); setRecruitingDaysUsed(getRecruitingDaysUsed()-1); });
     }
 
+
+
+    // Single-line header collapse on scroll, Notion-style
+    function initHeaderScrollCollapse(){
+      const topbar = document.querySelector('.topbar');
+      if(!topbar) return;
+      let ticking = false;
+      const update = ()=>{
+        topbar.classList.toggle('header-collapsed', window.scrollY > 24);
+        ticking = false;
+      };
+      update();
+      window.addEventListener('scroll', ()=>{
+        if(!ticking){
+          window.requestAnimationFrame(update);
+          ticking = true;
+        }
+      }, {passive:true});
+    }
+
     // boot
+    initThemeToggle();
+    initHeaderScrollCollapse();
     initPassword();
     initRecruitingDaysCounter();
     moveCallStreakIntoSidebar();
