@@ -3964,34 +3964,57 @@ Let me know when you have time to connect. We're excited to stay in touch.
         .join('||');
     }
 
-    function mergeRecruitRecord(localRecruit, liveRecruit){
-      const merged = { ...localRecruit, ...liveRecruit };
-      const arrayFields = ['notes','evaluation','actions','tags','communicationLog','archetypeTags','recruitTraits'];
-      arrayFields.forEach(field => {
-        if((!liveRecruit[field] || !liveRecruit[field].length) && localRecruit[field]?.length){
-          merged[field] = localRecruit[field];
-        }
+    function hasMeaningfulLiveValue(row, aliases){
+      if(!row) return false;
+      const list = Array.isArray(aliases) ? aliases : [aliases];
+      return list.some(key => {
+        if(!Object.prototype.hasOwnProperty.call(row, key)) return false;
+        const value = row[key];
+        if(value === null || typeof value === 'undefined') return false;
+        if(Array.isArray(value)) return value.length > 0;
+        return String(value).trim() !== '';
       });
-      if((!liveRecruit.notesHistory || !liveRecruit.notesHistory.length) && localRecruit.notesHistory?.length){
-        merged.notesHistory = localRecruit.notesHistory;
+    }
+
+    function preserveLocalWhenLiveBlank(merged, localRecruit, row, field, aliases){
+      if(!localRecruit || typeof localRecruit[field] === 'undefined') return;
+      if(!hasMeaningfulLiveValue(row, aliases || field)){
+        merged[field] = localRecruit[field];
       }
-      const preserveIfBlank = [
-        'summary','followUp','academics','visitStatus','headshot','pdfFile','pdfName','profileLink','filmLink','phone','email','height','graduationYear',
-        'callPlanLocal','callPlanTimezone','callPlanPST','eventName','eventDate','eventLocation','offerStatus','wroteToUs','gutFeeling',
-        'lastContactDate','nextActionDue','june15Call','rating','group','position','city','state','priority','status','scholarshipType','revenueShare','nilEstimate','bonusComp'
-      ];
-      preserveIfBlank.forEach(field => {
-        const liveValue = liveRecruit[field];
-        if((liveValue === '' || liveValue === null || typeof liveValue === 'undefined') && localRecruit[field]){
-          merged[field] = localRecruit[field];
-        }
+    }
+
+    function mergeRecruitRecord(localRecruit, liveRecruit, rawRow={}){
+      // Start with the live row, then restore any local-only work when the live
+      // sheet did not explicitly send a value for that field. This prevents
+      // Refresh Live from wiping manual dashboard additions.
+      const merged = { ...localRecruit, ...liveRecruit };
+
+      const fieldAliases = {
+        name:['fullName','name'], classYear:['classYear','graduationYear'], group:'group', position:'position', city:'city', state:'state', club:'club',
+        priority:['priority','status'], status:['status','priority'], june15Call:['june15Call','owner'], rating:'rating', offerStatus:['offerStatus','offer','commitmentStatus'], wroteToUs:'wroteToUs',
+        engagementScoreOverride:['engagementScoreOverride','engagementScore'], engagementStatus:'engagementStatus', gutFeeling:['gutFeeling','gut'], commitProbability:'commitProbability',
+        scholarshipType:['scholarshipType','scholarship'], revenueShare:['revenueShare','revShare','compensation'], nilEstimate:['nilEstimate','nil'], bonusComp:['bonusComp','bonuses'],
+        archetypeTags:['archetypeTags','archetypes'], recruitTraits:['recruitTraits','traits','playerTraits'],
+        q1:'q1', q2:'q2', q3:'q3', q4:'q4',
+        q1Question1:['q1Question1','question1','q1Question'], q1Answer1:'q1Answer1', q1Question2:'q1Question2', q1Answer2:'q1Answer2', q1Question3:'q1Question3', q1Answer3:'q1Answer3',
+        q2Question1:['q2Question1','question2','q2Question'], q2Answer1:'q2Answer1', q2Question2:'q2Question2', q2Answer2:'q2Answer2', q2Question3:'q2Question3', q2Answer3:'q2Answer3',
+        q3Question1:['q3Question1','question3','q3Question'], q3Answer1:'q3Answer1', q3Question2:'q3Question2', q3Answer2:'q3Answer2', q3Question3:'q3Question3', q3Answer3:'q3Answer3',
+        q4Question1:['q4Question1','q4Question'], q4Answer1:'q4Answer1', q4Question2:'q4Question2', q4Answer2:'q4Answer2', q4Question3:'q4Question3', q4Answer3:'q4Answer3',
+        summary:'summary', notes:'notes', notesHistory:'notesHistory', evaluation:['evaluation','eval'], actions:['followUp','actions'], academics:'academics', visitStatus:'visitStatus', followUp:'followUp',
+        nextActionDue:'nextActionDue', lastContactDate:'lastContactDate', phone:'phone', email:'email', profileLink:'profileLink', filmLink:'filmLink', headshot:['headshot','headshotUrl'],
+        pdfFile:['pdfFile','recruitPdf','recruitPDF'], pdfName:'pdfName', height:'height', graduationYear:['graduationYear','classYear'], favorite:'favorite', pinned:'pinned', pinTier:'pinTier', campAttended:'campAttended',
+        callPlanLocal:'callPlanLocal', callPlanTimezone:'callPlanTimezone', callPlanPST:'callPlanPST', eventName:['eventName','primaryEventName'], eventDate:'eventDate', eventLocation:'eventLocation', tags:'tags',
+        communicationLog:'communicationLog', selected:'selected'
+      };
+
+      Object.keys(fieldAliases).forEach(field => {
+        preserveLocalWhenLiveBlank(merged, localRecruit, rawRow, field, fieldAliases[field]);
       });
-      ['favorite','pinned','campAttended','selected','q1','q2','q3','q4'].forEach(field => {
-        if(typeof localRecruit[field] !== 'undefined') merged[field] = localRecruit[field];
-      });
-      if(typeof localRecruit.pinTier !== 'undefined') merged.pinTier = localRecruit.pinTier;
-      if(typeof localRecruit.engagementScoreOverride !== 'undefined') merged.engagementScoreOverride = localRecruit.engagementScoreOverride;
-      if(typeof localRecruit.engagementStatus !== 'undefined') merged.engagementStatus = localRecruit.engagementStatus;
+
+      // Always preserve dashboard-only state unless the sheet explicitly sends it.
+      ['selected','communicationLog','pdfFile','pdfName'].forEach(field => preserveLocalWhenLiveBlank(merged, localRecruit, rawRow, field, fieldAliases[field] || field));
+
+      // Keep newer local update time if it is newer than the live row.
       if(localRecruit.updatedAt && (!liveRecruit.updatedAt || String(localRecruit.updatedAt) > String(liveRecruit.updatedAt))){
         merged.updatedAt = localRecruit.updatedAt;
       }
@@ -4006,21 +4029,23 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const seenLocalIds = new Set();
 
       rows.forEach((row, i) => {
-        const liveRecruit = buildRecruitFromRow(row);
-        const liveId = String(row.id || row.fullName || row.name || i + 1) + '_' + i;
+        const liveRecruit = buildRecruitFromRow(row || {});
+        const stableRawId = row?.id || row?.fullName || row?.name || i + 1;
+        const liveId = String(stableRawId) + '_' + i;
         const liveMatch = recruitMatchKey(liveRecruit);
         const localPair = localById.has(liveId)
           ? [liveId, localById.get(liveId)]
           : localByMatch.get(liveMatch);
         if(localPair && Array.isArray(localPair)){
           const [localId, localRecruit] = localPair;
-          next[liveId] = mergeRecruitRecord(localRecruit, liveRecruit);
+          next[liveId] = mergeRecruitRecord(localRecruit, liveRecruit, row || {});
           seenLocalIds.add(localId);
         } else {
           next[liveId] = liveRecruit;
         }
       });
 
+      // Keep recruits created manually in the dashboard that do not exist in the sheet.
       localEntries.forEach(([id, recruit]) => {
         if(!seenLocalIds.has(id)){
           next[id] = recruit;
