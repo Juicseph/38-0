@@ -2280,6 +2280,24 @@
     .comp-mini-card{border:1px solid var(--line);border-radius:16px;background:#fff;padding:12px;display:grid;gap:8px;min-width:0;}
     .dark .comp-mini-card{background:#0f1b2d;border-color:#26364d;color:#e5edf8;}
     .comp-kicker{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+    .comp-subsection{border:1px solid rgba(148,163,184,.28);border-radius:14px;padding:10px;display:grid;gap:8px;background:rgba(248,251,255,.72);}
+    .dark .comp-subsection{background:rgba(15,27,45,.72);border-color:#26364d;}
+    .comp-subsection-top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+    .comp-subsection-title{font-size:11px;font-weight:950;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+    .comp-subcollapse-btn{border:1px solid var(--line);background:#fff;color:var(--text);width:30px;height:30px;border-radius:10px;cursor:pointer;font-weight:950;line-height:1;}
+    .dark .comp-subcollapse-btn{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
+    .comp-subsection.collapsed .comp-subsection-body{display:none!important;}
+    .comp-year-manager{display:grid;gap:8px;margin-bottom:8px;}
+    .comp-year-add-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;}
+    .comp-year-add-row input{border:1px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;color:var(--text);font-size:12px;font-weight:800;min-width:0;}
+    .dark .comp-year-add-row input{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
+    .comp-year-pills{display:flex;flex-wrap:wrap;gap:6px;}
+    .comp-year-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #c9d8f5;background:#eef4ff;color:#18407c;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;line-height:1;}
+    .dark .comp-year-pill{background:#102a4d;border-color:#2d4d78;color:#dbeafe;}
+    .comp-year-remove{border:none;background:rgba(24,64,124,.12);color:inherit;border-radius:999px;width:18px;height:18px;line-height:18px;display:inline-grid;place-items:center;cursor:pointer;font-size:11px;font-weight:950;padding:0;}
+    .comp-year-pill.locked{opacity:.78;}
+    .comp-year-pill .used-note{font-size:9px;opacity:.75;font-weight:950;text-transform:uppercase;letter-spacing:.04em;}
+
     .comp-big{font-size:24px;font-weight:950;line-height:1;color:var(--text);}
     .dark .comp-big{color:#f8fbff;}
     .comp-row{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;line-height:1.35;}
@@ -2291,6 +2309,28 @@
     .position-budget-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
     .position-budget-title{font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
     .position-budget-note{font-size:11px;color:var(--muted);line-height:1.35;}
+
+    .cap-class-list{display:grid;gap:8px;}
+    .cap-class-row{display:grid;grid-template-columns:58px minmax(140px,1fr) 108px;gap:8px;align-items:center;padding:7px 0;border-bottom:1px solid rgba(148,163,184,.22);}
+    .cap-class-year{font-size:12px;font-weight:950;letter-spacing:.05em;color:var(--text);}
+    .dark .cap-class-year{color:#e5edf8;}
+    .cap-class-meta{display:grid;gap:5px;min-width:0;}
+    .cap-class-numbers{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .cap-class-input{width:100%;border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:#fff;color:var(--text);font-size:12px;font-weight:800;}
+    .dark .cap-class-input{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
+    .class-position-budget-table{display:grid;gap:8px;max-height:260px;overflow:auto;padding-right:2px;}
+    .class-position-row{display:grid;grid-template-columns:50px repeat(4,minmax(86px,1fr));gap:7px;align-items:end;}
+    .class-position-row .year-label{font-size:11px;font-weight:950;color:var(--muted);padding-bottom:8px;}
+    .class-position-row label{display:grid;gap:3px;font-size:9px;font-weight:950;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;}
+    .class-position-row input{border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:#fff;color:var(--text);font-size:12px;font-weight:800;min-width:0;}
+    .dark .class-position-row input{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
+    .comp-risk{display:inline-flex;border-radius:999px;padding:3px 7px;font-size:11px;font-weight:900;margin-top:5px;}
+    .risk-low{background:#ecfdf3;color:#18794e;border:1px solid #b7e4c7;}
+    .risk-mid{background:#fff7e8;color:#9a6700;border:1px solid #f5d08a;}
+    .risk-high{background:#fff2f2;color:#b42318;border:1px solid #f2b8b5;}
+    .dark .risk-low{background:#0f2d1f;color:#b7f7ce;border-color:#23593c;}
+    .dark .risk-mid{background:#382b12;color:#ffd88a;border-color:#6b521e;}
+    .dark .risk-high{background:#3a1515;color:#ffb4aa;border-color:#7b2a2a;}
     .comp-input-row label,.position-budget-grid label,.scenario-input-row label{display:grid;gap:5px;font-size:11px;font-weight:900;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
     .comp-input-row input,.position-budget-grid input,.scenario-input-row input,.scenario-input-row select{border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:#fff;color:var(--text);min-width:0;}
     .dark .comp-input-row input,.dark .position-budget-grid input,.dark .scenario-input-row input,.dark .scenario-input-row select{background:#0b1424;border-color:#2b3c56;color:#e5edf8;}
@@ -2698,28 +2738,40 @@
           <div class="pulse-card-top">
             <div>
               <h3>Compensation Planner</h3>
-              <p>Track scholarship package, rev share, NIL estimate, cap usage, and offer scenarios.</p>
+              <p>Track class caps, position budgets by class, player packages, and offer scenarios.</p>
             </div>
             <div style="display:flex;gap:8px;align-items:center;"><button class="btn secondary" id="saveCompBudgetBtn" type="button">Save Budget</button><button class="pulse-collapse-btn" data-collapse-target="compensationPlannerCard" type="button">−</button></div>
           </div>
           <div class="compensation-grid" id="compensationPlannerGrid">
-            <div class="comp-mini-card">
-              <div class="comp-kicker">Team Cap Tracker</div>
-              <div class="comp-row"><span>Total Budget</span><strong id="compTotalBudgetText">$0</strong></div>
-              <div class="comp-row"><span>Used</span><strong id="compUsedText">$0</strong></div>
-              <div class="comp-bar"><div class="comp-bar-fill" id="compBudgetFill"></div></div>
-              <div class="comp-row"><span>Remaining</span><strong id="compRemainingText">$0</strong></div>
-              <div class="comp-input-row">
-                <label>Team Budget<input id="compTeamBudgetInput" type="number" min="0" step="500" /></label>
+            <div class="comp-mini-card cap-by-class-card">
+              <div class="comp-subsection" id="capByClassSection">
+                <div class="comp-subsection-top">
+                  <div class="comp-subsection-title">Cap by Class</div>
+                  <button class="comp-subcollapse-btn" data-comp-section="capByClassSection" type="button">−</button>
+                </div>
+                <div class="comp-subsection-body">
+                  <div class="comp-year-manager">
+                    <div class="comp-year-add-row">
+                      <input id="compYearInput" type="number" min="2020" max="2040" step="1" placeholder="Add class year, e.g. 2032" />
+                      <button class="btn secondary" id="addCompYearBtn" type="button">Add Year</button>
+                    </div>
+                    <div class="comp-year-pills" id="compYearPills"></div>
+                  </div>
+                  <div class="cap-class-list" id="compClassBudgetRows"></div>
+                </div>
               </div>
-              <div class="position-budget-title">Position Budgets</div>
-              <div class="position-budget-grid">
-                <label>Pins<input class="position-budget-input" data-position-budget="Pins" type="number" min="0" step="500" placeholder="Optional" /></label>
-                <label>Middles<input class="position-budget-input" data-position-budget="Middles" type="number" min="0" step="500" placeholder="Optional" /></label>
-                <label>Setters<input class="position-budget-input" data-position-budget="Setters" type="number" min="0" step="500" placeholder="Optional" /></label>
-                <label>Liberos<input class="position-budget-input" data-position-budget="Liberos" type="number" min="0" step="500" placeholder="Optional" /></label>
+              <div class="comp-subsection" id="positionBudgetByClassSection">
+                <div class="comp-subsection-top">
+                  <div>
+                    <div class="comp-subsection-title">Position Budgets by Class</div>
+                    <div class="position-budget-note">Each class has its own pool. Each position budget is scoped to that class only.</div>
+                  </div>
+                  <button class="comp-subcollapse-btn" data-comp-section="positionBudgetByClassSection" type="button">−</button>
+                </div>
+                <div class="comp-subsection-body">
+                  <div class="class-position-budget-table" id="compClassPositionBudgetRows"></div>
+                </div>
               </div>
-              <div class="position-budget-note">Optional budgets by position group. Scenario builder uses the selected recruit's group.</div>
             </div>
             <div class="comp-mini-card">
               <div class="comp-kicker">Offer Scenario Builder</div>
@@ -2730,10 +2782,17 @@
               <div class="scenario-result" id="scenarioResult">Choose a recruit and amount to preview remaining budget.</div>
             </div>
             <div class="comp-mini-card">
-              <div class="comp-kicker">By Class / Position Spend</div>
-              <div class="comp-breakdown">
-                <div><div class="comp-row"><strong>By Class</strong></div><div class="comp-breakdown-list" id="compClassSpend"></div></div>
-                <div><div class="comp-row"><strong>By Position</strong></div><div class="comp-breakdown-list" id="compPositionSpend"></div></div>
+              <div class="comp-subsection" id="classPositionSpendSection">
+                <div class="comp-subsection-top">
+                  <div class="comp-subsection-title">By Class / Position Spend</div>
+                  <button class="comp-subcollapse-btn" data-comp-section="classPositionSpendSection" type="button">−</button>
+                </div>
+                <div class="comp-subsection-body">
+                  <div class="comp-breakdown">
+                    <div><div class="comp-row"><strong>By Class</strong></div><div class="comp-breakdown-list" id="compClassSpend"></div></div>
+                    <div><div class="comp-row"><strong>By Position</strong></div><div class="comp-breakdown-list" id="compPositionSpend"></div></div>
+                  </div>
+                </div>
               </div>
             </div>
             <div class="comp-mini-card">
@@ -3419,6 +3478,33 @@
     }
     function saveCollapsedSections(state){
       localStorage.setItem(PULSE_COLLAPSE_KEY, JSON.stringify(state));
+    }
+    const COMP_SUBSECTION_COLLAPSE_KEY = 'recruit_board_comp_subsection_collapse_v1';
+    function loadCompSubsectionState(){
+      try{ return JSON.parse(localStorage.getItem(COMP_SUBSECTION_COLLAPSE_KEY) || '{}') || {}; }catch(e){ return {}; }
+    }
+    function saveCompSubsectionState(state){
+      localStorage.setItem(COMP_SUBSECTION_COLLAPSE_KEY, JSON.stringify(state));
+    }
+    function applyCompSubsectionState(){
+      const state = loadCompSubsectionState();
+      document.querySelectorAll('[data-comp-section]').forEach(btn=>{
+        const section = document.getElementById(btn.dataset.compSection);
+        const collapsed = !!state[btn.dataset.compSection];
+        if(section) section.classList.toggle('collapsed', collapsed);
+        btn.textContent = collapsed ? '+' : '−';
+      });
+    }
+    function initCompSubsectionCollapse(){
+      document.addEventListener('click', (e)=>{
+        const btn = e.target.closest('[data-comp-section]');
+        if(!btn) return;
+        const state = loadCompSubsectionState();
+        state[btn.dataset.compSection] = !state[btn.dataset.compSection];
+        saveCompSubsectionState(state);
+        applyCompSubsectionState();
+      });
+      applyCompSubsectionState();
     }
     function applyPulseCollapsedState(){
       const state = loadCollapsedSections();
@@ -4701,8 +4787,73 @@ Let me know when you have time to connect. We're excited to stay in touch.
       return `<span class="prob-text money-chip hover-money" tabindex="0" title="${escapeHtml(compensationTooltip(recruit))}">💰 ${formatMoneyShort(totalComp(recruit))}</span>`;
     }
     const COMP_BUDGET_KEY = 'recruit_board_compensation_budget_v1';
+    const COMP_YEAR_KEY = 'recruit_board_compensation_years_v1';
+    const DEFAULT_COMP_CLASS_YEARS = ['2026','2027','2028','2029','2030','2031'];
+    const COMP_POSITIONS = ['Pins','Middles','Setters','Liberos'];
     function loadCompBudget(){
       try{return JSON.parse(localStorage.getItem(COMP_BUDGET_KEY) || '{}');}catch(e){return {};}
+    }
+    function loadCompYears(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(COMP_YEAR_KEY) || 'null');
+        if(Array.isArray(saved) && saved.length) return saved.map(String).filter(Boolean);
+      }catch(e){}
+      return [...DEFAULT_COMP_CLASS_YEARS];
+    }
+    function saveCompYears(years){
+      const clean = [...new Set((years || []).map(y=>String(y).trim()).filter(Boolean))].sort();
+      localStorage.setItem(COMP_YEAR_KEY, JSON.stringify(clean));
+      return clean;
+    }
+    function compClassYears(){
+      const years = new Set(loadCompYears());
+      Object.values(recruitDetails || {}).forEach(r=>{ if(r && r.classYear) years.add(String(r.classYear)); });
+      return [...years].filter(Boolean).sort();
+    }
+    function recruitYearsInUse(){
+      const years = new Set();
+      Object.values(recruitDetails || {}).forEach(r=>{ if(r && r.classYear) years.add(String(r.classYear)); });
+      return years;
+    }
+    function renderCompYearControls(years){
+      const box = document.getElementById('compYearPills');
+      if(!box) return;
+      const saved = new Set(loadCompYears());
+      const used = recruitYearsInUse();
+      box.innerHTML = years.map(year=>{
+        const canRemove = saved.has(String(year)) && !used.has(String(year));
+        const usedText = used.has(String(year)) ? '<span class="used-note">in use</span>' : '';
+        return `<span class="comp-year-pill ${canRemove ? '' : 'locked'}">${escapeHtml(year)}${usedText}${canRemove ? `<button class="comp-year-remove" data-remove-comp-year="${escapeHtml(year)}" type="button" title="Remove ${escapeHtml(year)}">×</button>` : ''}</span>`;
+      }).join('');
+    }
+    function initCompYearManager(){
+      document.addEventListener('click', (e)=>{
+        const addBtn = e.target.closest('#addCompYearBtn');
+        const removeBtn = e.target.closest('[data-remove-comp-year]');
+        if(addBtn){
+          const input = document.getElementById('compYearInput');
+          const value = String(input?.value || '').trim();
+          if(!/^\d{4}$/.test(value)) return;
+          const years = new Set(loadCompYears());
+          years.add(value);
+          saveCompYears([...years]);
+          if(input) input.value = '';
+          renderCompensationPlanner();
+          return;
+        }
+        if(removeBtn){
+          const removeYear = String(removeBtn.dataset.removeCompYear || '');
+          const years = loadCompYears().filter(y=>String(y) !== removeYear);
+          saveCompYears(years.length ? years : [...DEFAULT_COMP_CLASS_YEARS]);
+          renderCompensationPlanner();
+        }
+      });
+      document.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' && e.target && e.target.id === 'compYearInput'){
+          e.preventDefault();
+          document.getElementById('addCompYearBtn')?.click();
+        }
+      });
     }
     function normalizeCompPosition(value){
       const raw = String(value || '').trim().toLowerCase();
@@ -4712,24 +4863,44 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(['liberos','libero','ds','defensive specialist'].includes(raw)) return 'Liberos';
       return value ? String(value) : 'Other';
     }
-    function getPositionBudgets(){
+    function emptyPositionBudgetMap(){
+      return {Pins:0, Middles:0, Setters:0, Liberos:0};
+    }
+    function getClassBudgets(){
       const budget = loadCompBudget();
-      const out = {Pins:0, Middles:0, Setters:0, Liberos:0, ...(budget.positionBudgets || {})};
-      if(!budget.positionBudgets && budget.positionBudget){
-        out.Pins = Number(budget.positionBudget || 0);
-        out.Middles = Number(budget.positionBudget || 0);
-        out.Setters = Number(budget.positionBudget || 0);
-        out.Liberos = Number(budget.positionBudget || 0);
+      const out = {};
+      compClassYears().forEach(year=>{ out[year] = Number((budget.classBudgets || {})[year] || 0); });
+      if(!budget.classBudgets && budget.teamBudget){
+        const years = compClassYears();
+        const split = years.length ? Math.round(Number(budget.teamBudget || 0) / years.length) : 0;
+        years.forEach(year=>{ out[year] = split; });
+      }
+      return out;
+    }
+    function getPositionBudgetsByClass(){
+      const budget = loadCompBudget();
+      const out = {};
+      compClassYears().forEach(year=>{
+        out[year] = {...emptyPositionBudgetMap(), ...((budget.positionBudgetsByClass || {})[year] || {})};
+      });
+      if(!budget.positionBudgetsByClass && budget.positionBudgets){
+        compClassYears().forEach(year=>{ out[year] = {...emptyPositionBudgetMap(), ...(budget.positionBudgets || {})}; });
       }
       return out;
     }
     function saveCompBudget(){
-      const team = Number(document.getElementById('compTeamBudgetInput')?.value || 0);
-      const positionBudgets = {};
-      document.querySelectorAll('[data-position-budget]').forEach(input=>{
-        positionBudgets[input.dataset.positionBudget] = Number(input.value || 0);
+      const classBudgets = {};
+      document.querySelectorAll('[data-class-budget]').forEach(input=>{
+        classBudgets[input.dataset.classBudget] = Number(input.value || 0);
       });
-      localStorage.setItem(COMP_BUDGET_KEY, JSON.stringify({teamBudget:team, positionBudgets}));
+      const positionBudgetsByClass = {};
+      document.querySelectorAll('[data-class-position-budget]').forEach(input=>{
+        const year = input.dataset.classYear;
+        const position = input.dataset.position;
+        if(!positionBudgetsByClass[year]) positionBudgetsByClass[year] = emptyPositionBudgetMap();
+        positionBudgetsByClass[year][position] = Number(input.value || 0);
+      });
+      localStorage.setItem(COMP_BUDGET_KEY, JSON.stringify({classBudgets, positionBudgetsByClass}));
       renderCompensationPlanner();
     }
     function renderSpendList(containerId, entries){
@@ -4737,66 +4908,110 @@ Let me know when you have time to connect. We're excited to stay in touch.
       if(!box) return;
       box.innerHTML = entries.length ? entries.map(([label, amount]) => `<div class="comp-row"><span>${escapeHtml(label)}</span><strong>${formatMoneyShort(amount)}</strong></div>`).join('') : '<div class="tiny-note">No spend entered yet.</div>';
     }
+    function scenarioRiskLabel(classRemaining, posRemaining, classBudget, positionBudget){
+      const classPctAfter = classBudget ? Math.max(0, classRemaining) / classBudget : 1;
+      const posPctAfter = positionBudget ? Math.max(0, posRemaining) / positionBudget : 1;
+      if(classRemaining < 0 || posRemaining < 0 || classPctAfter < .1 || posPctAfter < .1) return {text:'High cap pressure', cls:'risk-high'};
+      if(classPctAfter < .25 || posPctAfter < .25) return {text:'Medium cap pressure', cls:'risk-mid'};
+      return {text:'Low cap pressure', cls:'risk-low'};
+    }
     function renderScenarioResult(){
       const result = document.getElementById('scenarioResult');
       if(!result) return;
       const recruitId = document.getElementById('scenarioRecruitSelect')?.value || '';
       const amount = Number(document.getElementById('scenarioAmountInput')?.value || 0);
       const recruit = recruitDetails[recruitId];
-      const budget = loadCompBudget();
       const recruits = Object.values(recruitDetails || {});
-      const used = recruits.reduce((sum, r)=>sum + totalComp(r), 0);
-      const teamBudget = Number(budget.teamBudget || 0);
-      const remainingAfter = teamBudget ? teamBudget - used - amount : 0;
-      if(!recruitId || !amount){
+      if(!recruitId || !amount || !recruit){
         result.innerHTML = 'Choose a recruit and amount to preview remaining budget.';
         return;
       }
+      const recruitClass = String(recruit.classYear || 'No Class');
       const recruitPosition = normalizeCompPosition(recruit.group || recruit.position || 'Other');
-      const positionSpend = recruits.filter(r => normalizeCompPosition(r.group || r.position || 'Other') === recruitPosition).reduce((sum, r)=>sum + totalComp(r), 0);
-      const positionBudgets = getPositionBudgets();
-      const positionBudget = Number(positionBudgets[recruitPosition] || 0);
+      const classBudgets = getClassBudgets();
+      const positionBudgetsByClass = getPositionBudgetsByClass();
+      const classBudget = Number(classBudgets[recruitClass] || 0);
+      const classSpend = recruits.filter(r => String(r.classYear || 'No Class') === recruitClass).reduce((sum, r)=>sum + totalComp(r), 0);
+      const classAfter = classBudget ? classBudget - classSpend - amount : 0;
+      const positionBudget = Number((positionBudgetsByClass[recruitClass] || {})[recruitPosition] || 0);
+      const positionSpend = recruits.filter(r => String(r.classYear || 'No Class') === recruitClass && normalizeCompPosition(r.group || r.position || 'Other') === recruitPosition).reduce((sum, r)=>sum + totalComp(r), 0);
       const posAfter = positionBudget ? positionBudget - positionSpend - amount : 0;
-      result.innerHTML = `<strong>${escapeHtml(recruit.name || 'Recruit')}</strong><br>Scenario offer: <strong>${formatMoney(amount)}</strong><br>Team remaining after: <strong>${teamBudget ? formatMoney(remainingAfter) : 'Set team budget'}</strong><br>${escapeHtml(recruitPosition)} remaining after: <strong>${positionBudget ? formatMoney(posAfter) : 'Position budget not set'}</strong>`;
+      const risk = scenarioRiskLabel(classAfter, posAfter, classBudget, positionBudget);
+      result.innerHTML = `<strong>${escapeHtml(recruit.name || 'Recruit')}</strong> <span class="tiny-note">${escapeHtml(recruitClass)} • ${escapeHtml(recruitPosition)}</span><br>Scenario offer: <strong>${formatMoney(amount)}</strong><br>${escapeHtml(recruitClass)} remaining after: <strong>${classBudget ? formatMoney(classAfter) : 'Set class budget'}</strong><br>${escapeHtml(recruitClass)} ${escapeHtml(recruitPosition)} remaining after: <strong>${positionBudget ? formatMoney(posAfter) : 'Position budget not set'}</strong><br><span class="comp-risk ${risk.cls}">${risk.text}</span>`;
+    }
+    function renderClassBudgetRows(years, byClass, classBudgets){
+      const box = document.getElementById('compClassBudgetRows');
+      if(!box) return;
+      box.innerHTML = years.map(year=>{
+        const spent = Number(byClass[year] || 0);
+        const cap = Number(classBudgets[year] || 0);
+        const pct = cap ? Math.min(100, Math.max(0, spent / cap * 100)) : 0;
+        const left = cap ? cap - spent : 0;
+        return `<div class="cap-class-row">
+          <div class="cap-class-year">${escapeHtml(year)}</div>
+          <div class="cap-class-meta">
+            <div class="comp-bar"><div class="comp-bar-fill" style="width:${pct.toFixed(1)}%"></div></div>
+            <div class="cap-class-numbers">${formatMoneyShort(spent)} / ${cap ? formatMoneyShort(cap) : 'Set cap'}${cap ? ' • ' + formatMoneyShort(left) + ' left' : ''}</div>
+          </div>
+          <input class="cap-class-input" data-class-budget="${escapeHtml(year)}" type="number" min="0" step="500" placeholder="Budget" value="${cap || ''}" />
+        </div>`;
+      }).join('');
+    }
+    function renderClassPositionBudgetRows(years, byClassPosition, positionBudgetsByClass){
+      const box = document.getElementById('compClassPositionBudgetRows');
+      if(!box) return;
+      box.innerHTML = years.map(year=>{
+        const budgets = positionBudgetsByClass[year] || emptyPositionBudgetMap();
+        return `<div class="class-position-row">
+          <div class="year-label">${escapeHtml(year)}</div>
+          ${COMP_POSITIONS.map(pos=>{
+            const spent = Number((byClassPosition[year] || {})[pos] || 0);
+            const cap = Number(budgets[pos] || 0);
+            const title = cap ? `${pos}: ${formatMoneyShort(spent)} / ${formatMoneyShort(cap)} (${formatMoneyShort(cap-spent)} left)` : `${pos}: ${formatMoneyShort(spent)} spent`;
+            return `<label title="${escapeHtml(title)}">${escapeHtml(pos)}<input data-class-position-budget="true" data-class-year="${escapeHtml(year)}" data-position="${escapeHtml(pos)}" type="number" min="0" step="500" placeholder="${formatMoneyShort(spent)}" value="${cap || ''}" /></label>`;
+          }).join('')}
+        </div>`;
+      }).join('');
     }
     function renderCompensationPlanner(){
       const grid = document.getElementById('compensationPlannerGrid');
       if(!grid) return;
-      const budget = loadCompBudget();
-      const teamBudget = Number(budget.teamBudget || 0);
       const recruits = Object.entries(recruitDetails || {}).map(([id, r]) => ({id, ...r}));
-      const used = recruits.reduce((sum, r)=>sum + totalComp(r), 0);
-      const remaining = teamBudget - used;
-      const pct = teamBudget ? Math.min(100, Math.max(0, used / teamBudget * 100)) : 0;
-      const teamInput = document.getElementById('compTeamBudgetInput');
-      const positionBudgets = getPositionBudgets();
-      if(teamInput && document.activeElement !== teamInput) teamInput.value = teamBudget || '';
-      document.querySelectorAll('[data-position-budget]').forEach(input=>{
-        if(document.activeElement !== input) input.value = Number(positionBudgets[input.dataset.positionBudget] || 0) || '';
-      });
-      const setText = (id, text)=>{ const el=document.getElementById(id); if(el) el.textContent=text; };
-      setText('compTotalBudgetText', teamBudget ? formatMoney(teamBudget) : 'Set budget');
-      setText('compUsedText', formatMoney(used));
-      setText('compRemainingText', teamBudget ? formatMoney(remaining) : 'Set budget');
-      const fill = document.getElementById('compBudgetFill');
-      if(fill) fill.style.width = pct.toFixed(1) + '%';
-      const byClass = {}, byPosition = {};
+      const years = compClassYears();
+      renderCompYearControls(years);
+      const classBudgets = getClassBudgets();
+      const positionBudgetsByClass = getPositionBudgetsByClass();
+      const byClass = {}, byPosition = {}, byClassPosition = {};
       recruits.forEach(r=>{
         const amount = totalComp(r);
         if(!amount) return;
-        const cls = r.classYear || 'No Class';
+        const cls = String(r.classYear || 'No Class');
         const pos = normalizeCompPosition(r.group || r.position || 'Other');
         byClass[cls] = (byClass[cls] || 0) + amount;
         byPosition[pos] = (byPosition[pos] || 0) + amount;
+        if(!byClassPosition[cls]) byClassPosition[cls] = {};
+        byClassPosition[cls][pos] = (byClassPosition[cls][pos] || 0) + amount;
       });
-      renderSpendList('compClassSpend', Object.entries(byClass).sort());
-      const positionBudgetEntries = ['Pins','Middles','Setters','Liberos'].map(pos=>{
-        const spent = Number(byPosition[pos] || 0);
-        const cap = Number(positionBudgets[pos] || 0);
-        const label = cap ? `${pos} • ${formatMoneyShort(spent)} / ${formatMoneyShort(cap)} • ${formatMoneyShort(cap - spent)} left` : `${pos} • ${formatMoneyShort(spent)} spent`;
+      renderClassBudgetRows(years, byClass, classBudgets);
+      renderClassPositionBudgetRows(years, byClassPosition, positionBudgetsByClass);
+      renderSpendList('compClassSpend', years.map(year=>{
+        const spent = Number(byClass[year] || 0);
+        const cap = Number(classBudgets[year] || 0);
+        const label = cap ? `${year} • ${formatMoneyShort(spent)} / ${formatMoneyShort(cap)} • ${formatMoneyShort(cap - spent)} left` : `${year} • ${formatMoneyShort(spent)} spent`;
         return [label, spent];
+      }).filter(([, spent])=>spent || true));
+      const positionEntries = [];
+      years.forEach(year=>{
+        COMP_POSITIONS.forEach(pos=>{
+          const spent = Number((byClassPosition[year] || {})[pos] || 0);
+          const cap = Number((positionBudgetsByClass[year] || {})[pos] || 0);
+          if(spent || cap){
+            const label = cap ? `${year} ${pos} • ${formatMoneyShort(spent)} / ${formatMoneyShort(cap)} • ${formatMoneyShort(cap - spent)} left` : `${year} ${pos} • ${formatMoneyShort(spent)} spent`;
+            positionEntries.push([label, spent]);
+          }
+        });
       });
-      renderSpendList('compPositionSpend', positionBudgetEntries);
+      renderSpendList('compPositionSpend', positionEntries);
       const top = recruits.filter(r=>totalComp(r)>0).sort((a,b)=>totalComp(b)-totalComp(a)).slice(0,6);
       const topBox = document.getElementById('compTopAllocations');
       if(topBox){
@@ -4806,11 +5021,12 @@ Let me know when you have time to connect. We're excited to stay in touch.
       const select = document.getElementById('scenarioRecruitSelect');
       if(select){
         const keep = select.value;
-        select.innerHTML = '<option value="">Choose recruit</option>' + recruits.sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(r=>`<option value="${r.id}">${escapeHtml(r.name || 'Unknown')}</option>`).join('');
+        select.innerHTML = '<option value="">Choose recruit</option>' + recruits.sort((a,b)=>String(a.name).localeCompare(String(b.name))).map(r=>`<option value="${r.id}">${escapeHtml(r.name || 'Unknown')} ${r.classYear ? '• ' + escapeHtml(r.classYear) : ''}</option>`).join('');
         select.value = keep && recruitDetails[keep] ? keep : '';
       }
       renderScenarioResult();
     }
+
 
     function renderProfile(recruitId){
       const recruit = recruitDetails[recruitId];
@@ -5891,6 +6107,8 @@ Let me know when you have time to connect. We're excited to stay in touch.
     moveCallStreakIntoSidebar();
     moveSidebarTools();
     initPulseCollapseButtons();
+    initCompSubsectionCollapse();
+    initCompYearManager();
     setupContentCollapse();
     applyPulseCollapsedState();
     populateFilterOptions(Object.values(recruitDetails));
